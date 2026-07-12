@@ -44,10 +44,14 @@ export async function createProduct(formData: {
     throw new Error('At least one color variant must be provided.');
   }
 
+  // Generate unique product code
+  const productCode = `PRD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
   // Use transaction to write product and variants together
   return await db.transaction(async (tx) => {
     // 1. Insert product
     const [prodResult] = await tx.insert(tblProducts).values({
+      productCode,
       productName: productData.productName,
       sku: productData.sku,
       categoryId: productData.categoryId,
@@ -62,8 +66,10 @@ export async function createProduct(formData: {
     // 2. Insert variants and default inventory records (WH001)
     for (const v of formData.variants) {
       const parsedVariant = variantSchema.parse(v);
+      const variantCode = `VAR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
       const [varResult] = await tx.insert(tblProductVariants).values({
         productId,
+        variantCode,
         colorName: parsedVariant.colorName,
         sellingPrice: parsedVariant.sellingPrice.toString(),
         purchasePriceBdt: parsedVariant.purchasePriceBdt.toString(),
@@ -172,9 +178,12 @@ export async function createVariant(
   const user = await authorizeUser();
   const parsedData = variantSchema.parse(data);
 
+  const variantCode = `VAR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
   return await db.transaction(async (tx) => {
     const [result] = await tx.insert(tblProductVariants).values({
       productId,
+      variantCode,
       colorName: parsedData.colorName,
       sellingPrice: parsedData.sellingPrice.toString(),
       purchasePriceBdt: parsedData.purchasePriceBdt.toString(),

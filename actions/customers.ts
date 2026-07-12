@@ -29,9 +29,11 @@ export async function createCustomer(formData: z.infer<typeof customerSchema>) {
   const user = await authorizeUser();
   const data = customerSchema.parse(formData);
 
+  const customerCode = `CST-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
   try {
     const [result] = await db.insert(tblCustomers).values({
-      customerCode: '',
+      customerCode,
       customerName: data.customerName,
       phone: data.phone,
       facebookName: data.facebookName,

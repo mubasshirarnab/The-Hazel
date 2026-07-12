@@ -56,9 +56,11 @@ export async function createPurchaseOrder(formData: z.infer<typeof poSchema>) {
       };
     });
 
+    const purchaseOrderNumber = `PO-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
     // 2. Insert PO main row — convert purchaseDate string to Date for Drizzle date column
     const [result] = await tx.insert(tblPurchaseOrders).values({
-      purchaseOrderNumber: '',
+      purchaseOrderNumber,
       supplierId: data.supplierId,
       friendId: data.friendId,
       warehouseId: 1,

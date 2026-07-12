@@ -11,7 +11,20 @@ export const dynamic = 'force-dynamic';
 export default async function CustomersPage() {
   // Query customer analytics from view, filtering out soft-deleted customers
   const [customers]: any = await poolConnection.query(
-    `SELECT v.*, c.address, c.district, c.payment_preference
+    `SELECT 
+       v.id,
+       v.customer_code as customerCode,
+       v.customer_name as customerName,
+       v.phone,
+       v.facebook_name as facebookName,
+       v.total_orders as totalOrders,
+       v.lifetime_spend as lifetimeSpend,
+       v.average_order_value as averageOrderValue,
+       v.last_purchase as lastPurchase,
+       v.repeat_customer as repeatCustomer,
+       c.address,
+       c.district,
+       c.payment_preference as paymentPreference
      FROM vw_customer_analytics v
      INNER JOIN tbl_customers c ON c.id = v.id
      WHERE c.deleted_at IS NULL
@@ -20,10 +33,10 @@ export default async function CustomersPage() {
 
   // Compute CRM KPIs
   const totalCount = customers.length;
-  const repeatCount = customers.filter((c: any) => c.repeat_customer === 'Repeat').length;
+  const repeatCount = customers.filter((c: any) => c.repeatCustomer === 'Repeat').length;
   const repeatRate = totalCount > 0 ? (repeatCount / totalCount) * 100 : 0;
 
-  const totalSpend = customers.reduce((acc: number, c: any) => acc + parseFloat(c.lifetime_spend || 0), 0);
+  const totalSpend = customers.reduce((acc: number, c: any) => acc + parseFloat(c.lifetimeSpend || 0), 0);
   const avgLifetimeSpend = totalCount > 0 ? totalSpend / totalCount : 0;
 
   return (

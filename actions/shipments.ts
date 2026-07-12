@@ -37,10 +37,11 @@ export async function createShipment(formData: z.infer<typeof shipmentSchema>) {
   return await db.transaction(async (tx) => {
     // 1. Calculate shipping cost
     const shippingCost = data.weightKg * data.shippingRatePerKg;
+    const shipmentNumber = `SHP-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     // 2. Insert main shipment row (status_id = 2, i.e. 'in_transit')
     const [shipmentResult] = await tx.insert(tblShipments).values({
-      shipmentNumber: '',
+      shipmentNumber,
       departureDate: data.departureDate ? new Date(data.departureDate) : undefined,
       weightKg: data.weightKg.toFixed(2),
       shippingRatePerKg: data.shippingRatePerKg.toFixed(2),

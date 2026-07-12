@@ -35,8 +35,8 @@ export const tblCategories = mysqlTable('tbl_categories', {
 // 3. Products Table
 export const tblProducts = mysqlTable('tbl_products', {
   id: serial('id').primaryKey(),
-  productCode: varchar('product_code', { length: 32 }).notNull().unique().default(''),
-  sku: varchar('sku', { length: 100 }).notNull().unique().default(''),
+  productCode: varchar('product_code', { length: 32 }).notNull().unique(),
+  sku: varchar('sku', { length: 100 }).notNull().unique(),
   productName: varchar('product_name', { length: 255 }).notNull(),
   categoryId: int('category_id'),
   productStatus: varchar('product_status', { length: 30 }).notNull().default('active'),
@@ -53,7 +53,7 @@ export const tblProducts = mysqlTable('tbl_products', {
 export const tblProductVariants = mysqlTable('tbl_product_variants', {
   id: serial('id').primaryKey(),
   productId: int('product_id').notNull(),
-  variantCode: varchar('variant_code', { length: 32 }).notNull().unique().default(''),
+  variantCode: varchar('variant_code', { length: 32 }).notNull().unique(),
   colorName: varchar('color_name', { length: 100 }).notNull(),
   sellingPrice: decimal('selling_price', { precision: 12, scale: 2 }).notNull().default('0.00'),
   purchasePriceBdt: decimal('purchase_price_bdt', { precision: 12, scale: 2 }).notNull().default('0.00'),
@@ -107,7 +107,7 @@ export const tblInventory = mysqlTable('tbl_inventory', {
 // 7. Customers Table
 export const tblCustomers = mysqlTable('tbl_customers', {
   id: serial('id').primaryKey(),
-  customerCode: varchar('customer_code', { length: 32 }).notNull().unique().default(''),
+  customerCode: varchar('customer_code', { length: 32 }).notNull().unique(),
   customerName: varchar('customer_name', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 30 }),
   facebookName: varchar('facebook_name', { length: 255 }),
@@ -148,7 +148,7 @@ export const tblDeliveryStatuses = mysqlTable('tbl_delivery_statuses', {
 // 11. Orders Table
 export const tblOrders = mysqlTable('tbl_orders', {
   id: serial('id').primaryKey(),
-  orderNumber: varchar('order_number', { length: 32 }).notNull().unique(),
+  orderNumber: varchar('order_number', { length: 32 }).notNull().unique().default(''),
   customerId: int('customer_id').notNull(),
   orderDate: date('order_date').notNull(),
   orderType: varchar('order_type', { length: 20 }).notNull().default('in_stock'),
@@ -244,7 +244,7 @@ export const tblFriends = mysqlTable('tbl_friends', {
 // 17. Purchase Orders Table
 export const tblPurchaseOrders = mysqlTable('tbl_purchase_orders', {
   id: serial('id').primaryKey(),
-  purchaseOrderNumber: varchar('purchase_order_number', { length: 32 }).notNull().unique().default(''),
+  purchaseOrderNumber: varchar('purchase_order_number', { length: 32 }).notNull().unique(),
   supplierId: int('supplier_id'),
   friendId: int('friend_id'),
   warehouseId: int('warehouse_id').notNull(),
@@ -281,7 +281,7 @@ export const tblPurchaseOrderItems = mysqlTable('tbl_purchase_order_items', {
 // 19. Shipments Table
 export const tblShipments = mysqlTable('tbl_shipments', {
   id: serial('id').primaryKey(),
-  shipmentNumber: varchar('shipment_number', { length: 32 }).notNull().unique().default(''),
+  shipmentNumber: varchar('shipment_number', { length: 32 }).notNull().unique(),
   departureDate: date('departure_date'),
   warehouseArrivalDate: date('warehouse_arrival_date'),
   bangladeshArrivalDate: date('bangladesh_arrival_date'),
@@ -344,7 +344,7 @@ export const tblCostComponents = mysqlTable('tbl_cost_components', {
 // 25. Expenses Table
 export const tblExpenses = mysqlTable('tbl_expenses', {
   id: serial('id').primaryKey(),
-  expenseCode: varchar('expense_code', { length: 32 }).notNull().unique().default(''),
+  expenseCode: varchar('expense_code', { length: 32 }).notNull().unique(),
   expenseCategoryId: int('expense_category_id').notNull(),
   campaignId: int('campaign_id'),
   costComponentId: int('cost_component_id'),
@@ -420,7 +420,7 @@ export const tblMarketingPlatforms = mysqlTable('tbl_marketing_platforms', {
 // 31. Marketing Campaigns Table
 export const tblMarketingCampaigns = mysqlTable('tbl_marketing_campaigns', {
   id: serial('id').primaryKey(),
-  campaignCode: varchar('campaign_code', { length: 32 }).notNull().unique().default(''),
+  campaignCode: varchar('campaign_code', { length: 32 }).notNull().unique(),
   campaignName: varchar('campaign_name', { length: 255 }).notNull(),
   platformId: int('platform_id').notNull(),
   startDate: date('start_date'),
@@ -471,7 +471,7 @@ export const tblPayments = mysqlTable('tbl_payments', {
 // 34. Cash Flow Table
 export const tblCashFlow = mysqlTable('tbl_cash_flow', {
   id: serial('id').primaryKey(),
-  cashFlowCode: varchar('cash_flow_code', { length: 32 }).notNull().unique().default(''),
+  cashFlowCode: varchar('cash_flow_code', { length: 32 }).notNull().unique(),
   entryDate: date('entry_date').notNull(),
   entryType: varchar('entry_type', { length: 20 }).notNull(),
   amount: decimal('amount', { precision: 14, scale: 2 }).notNull().default('0.00'),
@@ -499,7 +499,7 @@ export const tblSettings = mysqlTable('tbl_settings', {
 // 36. Stock Reservations Table
 export const tblStockReservations = mysqlTable('tbl_stock_reservations', {
   id: serial('id').primaryKey(),
-  reservationCode: varchar('reservation_number', { length: 32 }).notNull().unique().default(''),
+  reservationCode: varchar('reservation_number', { length: 32 }).notNull().unique(),
   orderId: int('order_id'),
   orderItemId: bigint('order_item_id', { mode: 'number' }),
   variantId: int('variant_id').notNull(),
