@@ -551,7 +551,7 @@ export const tblProductCostLedger = mysqlTable('tbl_product_cost_ledger', {
 // 39. Shipment Items Table
 export const tblShipmentItems = mysqlTable('tbl_shipment_items', {
   id: serial('id').primaryKey(),
-  shipmentId: bigint('shipment_id', { mode: 'number' }).notNull(),
+  shipmentId: int('shipment_id').notNull(),
   purchaseOrderItemId: bigint('purchase_order_item_id', { mode: 'number' }).notNull(),
   variantId: int('variant_id').notNull(),
   quantityShipped: int('quantity_shipped').notNull().default(0),

@@ -2,6 +2,7 @@
 
 import { db, poolConnection } from '@/lib/db/db';
 import { tblPurchaseOrders, tblPurchaseOrderItems } from '@/lib/db/schema';
+import { sql } from 'drizzle-orm';
 import { eq, and, isNull, desc } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth';
@@ -40,7 +41,7 @@ export async function createPurchaseOrder(formData: z.infer<typeof poSchema>) {
   return await db.transaction(async (tx) => {
     // 1. Calculate items cost details
     let totalBdt = 0;
-    const itemsToInsert = data.items.map((item) => {
+    const itemsToInsertFormatted = data.items.map((item) => {
       const unitBdt = item.unitPurchasePriceRmb * data.historicalRmbRate;
       const lineBdt = item.quantity * unitBdt;
       totalBdt += lineBdt;
@@ -75,23 +76,15 @@ export async function createPurchaseOrder(formData: z.infer<typeof poSchema>) {
 
     const poId = result.insertId;
 
-    // 3. Insert PO items using raw SQL (bigint auto-increment PK)
-    for (const item of itemsToInsert) {
-      await poolConnection.query(
-        `INSERT INTO tbl_purchase_order_items
+    // 3. Insert PO items using raw SQL within the same transaction
+    for (const item of itemsToInsertFormatted) {
+      await tx.execute(sql`
+        INSERT INTO tbl_purchase_order_items
           (purchase_order_id, variant_id, quantity, unit_purchase_price_rmb,
            unit_purchase_price_bdt, received_quantity, line_total_bdt, notes)
-         VALUES (?, ?, ?, ?, ?, 0, ?, ?)`,
-        [
-          poId,
-          item.variantId,
-          item.quantity,
-          item.unitPurchasePriceRmb,
-          item.unitPurchasePriceBdt,
-          item.lineTotalBdt,
-          item.notes,
-        ]
-      );
+         VALUES (${poId}, ${item.variantId}, ${item.quantity}, ${item.unitPurchasePriceRmb},
+                 ${item.unitPurchasePriceBdt}, 0, ${item.lineTotalBdt}, ${item.notes})
+      `);
     }
 
     revalidatePath('/purchase-orders');

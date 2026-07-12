@@ -54,6 +54,11 @@ export default function AdjustmentDialog({ variants, warehouses }: AdjustmentDia
       return;
     }
 
+    if (reason.trim().length < 3) {
+      toast.error('Reason must be at least 3 characters.');
+      return;
+    }
+
     const qty = parseInt(quantity);
     if (isNaN(qty) || qty <= 0) {
       toast.error('Quantity must be a positive integer.');
