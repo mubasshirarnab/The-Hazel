@@ -163,15 +163,15 @@ export default async function DashboardPage() {
 
       {/* ─── Charts Row ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-5">
+        <div className="hz-card">
+          <h3 className="text-eyebrow mb-4">
             Monthly Revenue Trend
           </h3>
           <RevenueAreaChart data={monthlyRevenue} />
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-5">
+        <div className="hz-card">
+          <h3 className="text-eyebrow mb-4">
             Revenue vs Expenses vs Profit
           </h3>
           <MonthlyPLChart data={monthlyPL} />
@@ -181,25 +181,25 @@ export default async function DashboardPage() {
       {/* ─── Bottom Row: Best sellers + Low Stock ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Best Selling Products */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3">
+        <div className="hz-card space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3">
             Best Selling Products
           </h3>
           {bestSellers.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">No sales data yet.</p>
+            <p className="text-xs text-[var(--hz-ink-muted)] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestSellers.map((p: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-600 w-4">{i + 1}.</span>
-                    <span className="text-zinc-200 font-medium truncate max-w-[140px]">
+                    <span className="text-[10px] font-bold text-[var(--hz-ink-muted)] w-4">{i + 1}.</span>
+                    <span className="text-[var(--hz-ink)] font-medium truncate max-w-[140px]">
                       {p.product_name}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-rose-400 font-bold">{p.total_quantity_sold} sold</span>
-                    <span className="text-zinc-500 ml-2">{formatBDT(p.revenue)}</span>
+                    <span className="text-[var(--hz-forest)] font-bold">{p.total_quantity_sold} sold</span>
+                    <span className="text-[var(--hz-ink-muted)] ml-2">{formatBDT(p.revenue)}</span>
                   </div>
                 </div>
               ))}
@@ -208,26 +208,26 @@ export default async function DashboardPage() {
         </div>
 
         {/* Best Selling Colors */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3">
+        <div className="hz-card space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3">
             Top Color Variants
           </h3>
           {bestColors.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">No sales data yet.</p>
+            <p className="text-xs text-[var(--hz-ink-muted)] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestColors.map((c: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-600 w-4">{i + 1}.</span>
+                    <span className="text-[10px] font-bold text-[var(--hz-ink-muted)] w-4">{i + 1}.</span>
                     <div>
-                      <span className="text-zinc-200 font-medium block truncate max-w-[130px]">
+                      <span className="text-[var(--hz-ink)] font-medium block truncate max-w-[130px]">
                         {c.product_name}
                       </span>
-                      <span className="text-zinc-500 text-[10px]">{c.color_name}</span>
+                      <span className="text-[var(--hz-ink-muted)] text-[10px]">{c.color_name}</span>
                     </div>
                   </div>
-                  <span className="text-rose-400 font-bold">{c.total_quantity_sold} sold</span>
+                  <span className="text-[var(--hz-forest)] font-bold">{c.total_quantity_sold} sold</span>
                 </div>
               ))}
             </div>
@@ -235,28 +235,28 @@ export default async function DashboardPage() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3 flex items-center gap-2">
-            <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
+        <div className="hz-card space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3 flex items-center gap-2">
+            <AlertCircle className="h-3.5 w-3.5 text-[var(--hz-warning-fg)]" />
             <span>Low Stock Alerts</span>
           </h3>
           {lowStock.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">All stock levels healthy ✓</p>
+            <p className="text-xs text-[var(--hz-ink-muted)] italic">All stock levels healthy ✓</p>
           ) : (
             <div className="space-y-3">
               {lowStock.map((s: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <div>
-                    <span className="text-zinc-200 font-medium block truncate max-w-[140px]">
+                    <span className="text-[var(--hz-ink)] font-medium block truncate max-w-[140px]">
                       {s.product_name}
                     </span>
-                    <span className="text-zinc-500 text-[10px]">{s.color_name}</span>
+                    <span className="text-[var(--hz-ink-muted)] text-[10px]">{s.color_name}</span>
                   </div>
                   <span
-                    className={`font-bold font-mono px-2 py-0.5 rounded text-[10px] ${
+                    className={`font-mono font-semibold px-2 py-0.5 rounded-sm text-[10px] ${
                       s.available_stock === 0
-                        ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        ? 'bg-[var(--hz-danger-bg)] text-[var(--hz-danger-fg)] border border-[var(--hz-danger-fg)]/20'
+                        : 'bg-[var(--hz-warning-bg)] text-[var(--hz-warning-fg)] border border-[var(--hz-warning-fg)]/20'
                     }`}
                   >
                     {s.available_stock ?? 0} left

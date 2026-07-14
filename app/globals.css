@@ -1,8 +1,6 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 
 :root {
-  /* Hazel Design System Tokens */
   --hz-forest: #1F3A2E;
   --hz-forest-600: #274a3a;
   --hz-forest-700: #172c22;
@@ -26,7 +24,6 @@
   --hz-info-fg: #3B5A6B;
   --hz-info-bg: #E1E9EE;
 
-  /* Tailwind Theme Integration */
   --background: var(--hz-cream);
   --foreground: var(--hz-ink);
   --card: var(--hz-ivory);
@@ -49,20 +46,6 @@
 }
 
 [data-theme="dark"] {
-  --hz-bg: #14181A;
-  --hz-surface: #1A1F20;
-  --hz-surface-raised: #222829;
-  --hz-text: #F5F3EE;
-  --hz-text-soft: #E5E1D8;
-  --hz-text-muted: #7A776F;
-  --hz-primary: #7FA890;
-  --hz-primary-hover: #8FB8A0;
-  --hz-primary-pressed: #6F9880;
-  --hz-on-primary: #14181A;
-  --hz-border: #2A3032;
-  --hz-border-soft: #242A2C;
-  --hz-ring: rgba(127, 168, 144, 0.2);
-
   --background: #14181A;
   --foreground: #F5F3EE;
   --card: #222829;
@@ -123,7 +106,6 @@ body {
               color 0.2s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
-/* Display Typography */
 .font-display {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 500;
@@ -131,13 +113,11 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Monospace for codes/IDs */
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 500;
 }
 
-/* Eyebrow/Label text */
 .text-eyebrow {
   font-size: 11px;
   font-weight: 600;
@@ -146,12 +126,10 @@ body {
   color: var(--hz-ink-muted);
 }
 
-/* Gold accent */
 .text-gold {
   color: var(--hz-gold);
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -170,7 +148,6 @@ body {
   background: var(--hz-ink-muted);
 }
 
-/* Hazel Layout Classes */
 .hz-shell {
   display: flex;
   min-height: 100vh;
@@ -181,6 +158,8 @@ body {
   flex-shrink: 0;
   background: var(--hz-alabaster);
   border-right: 1px solid var(--hz-line);
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .hz-shell__main {
@@ -196,11 +175,6 @@ body {
   border-bottom: 1px solid var(--hz-line);
 }
 
-.hz-shell__sidebar {
-  height: 100vh;
-  overflow-y: auto;
-}
-
 .hz-content {
   flex: 1;
   padding: 24px;
@@ -210,7 +184,6 @@ body {
   overflow-y: auto;
 }
 
-/* Hazel Card */
 .hz-card {
   background: var(--hz-ivory);
   border: 1px solid var(--hz-line);
@@ -238,7 +211,6 @@ body {
   margin-bottom: 8px;
 }
 
-/* Hazel Button */
 .hz-btn {
   display: inline-flex;
   align-items: center;
@@ -325,7 +297,6 @@ body {
   font-size: 14px;
 }
 
-/* Hazel Badge */
 .hz-badge {
   display: inline-flex;
   align-items: center;
@@ -363,7 +334,6 @@ body {
   border: 1px solid var(--hz-line);
 }
 
-/* Hazel Input */
 .hz-input {
   width: 100%;
   font-family: 'Inter', sans-serif;
@@ -393,7 +363,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Hazel Table */
 .hz-table-container {
   overflow-x: auto;
   border: 1px solid var(--hz-line);
