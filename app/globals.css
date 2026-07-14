@@ -1,77 +1,171 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 
 :root {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-  
-  --card: 240 10% 6%;
-  --card-foreground: 0 0% 98%;
-  
-  --popover: 240 10% 4%;
-  --popover-foreground: 0 0% 98%;
-  
-  --primary: 346.8 77.2% 49.8%; /* Fashion rose accent color */
-  --primary-foreground: 355.7 100% 97.3%;
-  
-  --secondary: 240 4% 12%;
-  --secondary-foreground: 0 0% 98%;
-  
-  --muted: 240 4% 12%;
-  --muted-foreground: 240 5% 65%;
-  
-  --accent: 240 4% 15%;
-  --accent-foreground: 0 0% 98%;
-  
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  
-  --border: 240 4% 16%;
-  --input: 240 4% 16%;
-  --ring: 346.8 77.2% 49.8%;
+  /* Hazel Design System Tokens */
+  --hz-forest: #1F3A2E;
+  --hz-forest-600: #274a3a;
+  --hz-forest-700: #172c22;
+  --hz-walnut: #6A4E3B;
+  --hz-gold: #B08D57;
+  --hz-cream: #F8F6F2;
+  --hz-alabaster: #F5F3EE;
+  --hz-ivory: #FBFAF7;
+  --hz-ink: #2B2B2B;
+  --hz-ink-soft: #4A4A48;
+  --hz-ink-muted: #7A776F;
+  --hz-line: #E5E1D8;
+  --hz-line-soft: #EDEAE2;
+
+  --hz-success-fg: #3F6B4E;
+  --hz-success-bg: #E7EFE8;
+  --hz-warning-fg: #A67A2E;
+  --hz-warning-bg: #F5ECD8;
+  --hz-danger-fg: #8C3A2E;
+  --hz-danger-bg: #F1DED9;
+  --hz-info-fg: #3B5A6B;
+  --hz-info-bg: #E1E9EE;
+
+  /* Tailwind Theme Integration */
+  --background: var(--hz-cream);
+  --foreground: var(--hz-ink);
+  --card: var(--hz-ivory);
+  --card-foreground: var(--hz-ink);
+  --popover: var(--hz-ivory);
+  --popover-foreground: var(--hz-ink);
+  --primary: var(--hz-forest);
+  --primary-foreground: #FFFFFF;
+  --secondary: var(--hz-alabaster);
+  --secondary-foreground: var(--hz-ink);
+  --muted: var(--hz-alabaster);
+  --muted-foreground: var(--hz-ink-muted);
+  --accent: var(--hz-walnut);
+  --accent-foreground: #FFFFFF;
+  --destructive: var(--hz-danger-fg);
+  --destructive-foreground: #FFFFFF;
+  --border: var(--hz-line);
+  --input: var(--hz-line);
+  --ring: var(--hz-forest);
+}
+
+[data-theme="dark"] {
+  --hz-bg: #14181A;
+  --hz-surface: #1A1F20;
+  --hz-surface-raised: #222829;
+  --hz-text: #F5F3EE;
+  --hz-text-soft: #E5E1D8;
+  --hz-text-muted: #7A776F;
+  --hz-primary: #7FA890;
+  --hz-primary-hover: #8FB8A0;
+  --hz-primary-pressed: #6F9880;
+  --hz-on-primary: #14181A;
+  --hz-border: #2A3032;
+  --hz-border-soft: #242A2C;
+  --hz-ring: rgba(127, 168, 144, 0.2);
+
+  --background: #14181A;
+  --foreground: #F5F3EE;
+  --card: #222829;
+  --card-foreground: #F5F3EE;
+  --popover: #222829;
+  --popover-foreground: #F5F3EE;
+  --primary: #7FA890;
+  --primary-foreground: #14181A;
+  --secondary: #1A1F20;
+  --secondary-foreground: #F5F3EE;
+  --muted: #1A1F20;
+  --muted-foreground: #7A776F;
+  --accent: #8FB8A0;
+  --accent-foreground: #14181A;
+  --destructive: #C45A4E;
+  --destructive-foreground: #F5F3EE;
+  --border: #2A3032;
+  --input: #2A3032;
+  --ring: #7FA890;
 }
 
 @theme inline {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.2s cubic-bezier(0.2, 0.6, 0.2, 1),
+              color 0.2s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
-/* Glassmorphism styling helper for dashboards and widgets */
-.glass-card {
-  background: rgba(18, 18, 22, 0.4);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(63, 63, 70, 0.35);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+/* Display Typography */
+.font-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
-.glass-card-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* Monospace for codes/IDs */
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
 }
 
-.glass-card-hover:hover {
-  background: rgba(24, 24, 30, 0.55);
-  border-color: rgba(225, 29, 72, 0.35); /* glows with primary color border */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
+/* Eyebrow/Label text */
+.text-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--hz-ink-muted);
+}
+
+/* Gold accent */
+.text-gold {
+  color: var(--hz-gold);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hz-alabaster);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hz-line);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hz-ink-muted);
 }
