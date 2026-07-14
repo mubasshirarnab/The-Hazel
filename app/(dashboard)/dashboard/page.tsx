@@ -81,9 +81,9 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Title */}
-      <div>
-        <h1 className="text-2xl font-display font-semibold tracking-tight text-[var(--hz-ink)]">Dashboard</h1>
-        <p className="text-xs text-[var(--hz-ink-soft)] mt-1">
+      <div className="hz-elevated hz-card">
+        <h1 className="text-3xl font-display font-semibold hz-gradient-text">Dashboard</h1>
+        <p className="text-xs text-[var(--hz-ink-soft)] mt-2">
           Real-time overview of orders, inventory, finances and marketing performance.
         </p>
       </div>
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
         ].map(({ label, value, icon: Icon, color, bgColor }) => (
           <div
             key={label}
-            className={`hz-card flex flex-col gap-3 ${bgColor}`}
+            className={`hz-card hz-elevated flex flex-col gap-3 ${bgColor}`}
           >
             <div className="flex items-center justify-between">
               <span className="text-eyebrow">{label}</span>
@@ -163,15 +163,15 @@ export default async function DashboardPage() {
 
       {/* ─── Charts Row ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="hz-card">
-          <h3 className="text-eyebrow mb-4">
+        <div className="hz-card hz-elevated">
+          <h3 className="text-eyebrow mb-4 hz-gradient-text">
             Monthly Revenue Trend
           </h3>
           <RevenueAreaChart data={monthlyRevenue} />
         </div>
 
-        <div className="hz-card">
-          <h3 className="text-eyebrow mb-4">
+        <div className="hz-card hz-elevated">
+          <h3 className="text-eyebrow mb-4 hz-gradient-text">
             Revenue vs Expenses vs Profit
           </h3>
           <MonthlyPLChart data={monthlyPL} />
@@ -181,8 +181,8 @@ export default async function DashboardPage() {
       {/* ─── Bottom Row: Best sellers + Low Stock ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Best Selling Products */}
-        <div className="hz-card space-y-4">
-          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3">
+        <div className="hz-card hz-elevated space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3 hz-gradient-text">
             Best Selling Products
           </h3>
           {bestSellers.length === 0 ? (
@@ -190,7 +190,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {bestSellers.map((p: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
+                <div key={i} className="flex items-center justify-between text-xs p-2 rounded hover:bg-[var(--hz-alabaster)] transition-colors">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-[var(--hz-ink-muted)] w-4">{i + 1}.</span>
                     <span className="text-[var(--hz-ink)] font-medium truncate max-w-[140px]">
@@ -208,8 +208,8 @@ export default async function DashboardPage() {
         </div>
 
         {/* Best Selling Colors */}
-        <div className="hz-card space-y-4">
-          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3">
+        <div className="hz-card hz-elevated space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3 hz-gradient-text">
             Top Color Variants
           </h3>
           {bestColors.length === 0 ? (
@@ -217,7 +217,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {bestColors.map((c: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
+                <div key={i} className="flex items-center justify-between text-xs p-2 rounded hover:bg-[var(--hz-alabaster)] transition-colors">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-[var(--hz-ink-muted)] w-4">{i + 1}.</span>
                     <div>
@@ -235,8 +235,8 @@ export default async function DashboardPage() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="hz-card space-y-4">
-          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3 flex items-center gap-2">
+        <div className="hz-card hz-elevated space-y-4">
+          <h3 className="text-eyebrow border-b border-[var(--hz-line-soft)] pb-3 flex items-center gap-2 hz-gradient-text">
             <AlertCircle className="h-3.5 w-3.5 text-[var(--hz-warning-fg)]" />
             <span>Low Stock Alerts</span>
           </h3>
@@ -245,7 +245,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {lowStock.map((s: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
+                <div key={i} className="flex items-center justify-between text-xs p-2 rounded hover:bg-[var(--hz-alabaster)] transition-colors">
                   <div>
                     <span className="text-[var(--hz-ink)] font-medium block truncate max-w-[140px]">
                       {s.product_name}

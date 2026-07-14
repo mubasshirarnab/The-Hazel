@@ -41,7 +41,7 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans bg-[var(--hz-cream)] text-[var(--hz-ink)]">
         <AuthProvider>
           <QueryProvider>
             {children}

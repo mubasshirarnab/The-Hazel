@@ -187,9 +187,14 @@ body {
 .hz-card {
   background: var(--hz-ivory);
   border: 1px solid var(--hz-line);
-  border-radius: 4px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 200ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.hz-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .hz-card__header {
@@ -240,30 +245,36 @@ body {
 }
 
 .hz-btn--primary {
-  background: var(--hz-forest);
+  background: linear-gradient(135deg, var(--hz-forest) 0%, #2a4f3f 100%);
   color: white;
   border-color: var(--hz-forest);
+  box-shadow: 0 2px 4px rgba(31, 58, 46, 0.15);
 }
 
 .hz-btn--primary:hover:not(:disabled) {
-  background: var(--hz-forest-600);
-  border-color: var(--hz-forest-600);
+  background: linear-gradient(135deg, #274a3a 0%, #1F3A2E 100%);
+  box-shadow: 0 4px 8px rgba(31, 58, 46, 0.2);
+  transform: translateY(-1px);
 }
 
 .hz-btn--primary:active:not(:disabled) {
   background: var(--hz-forest-700);
   border-color: var(--hz-forest-700);
+  transform: translateY(0);
 }
 
 .hz-btn--secondary {
-  background: var(--hz-alabaster);
+  background: linear-gradient(135deg, var(--hz-alabaster) 0%, var(--hz-ivory) 100%);
   color: var(--hz-ink);
   border-color: var(--hz-line);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .hz-btn--secondary:hover:not(:disabled) {
-  background: var(--hz-ivory);
-  border-color: var(--hz-line-soft);
+  background: linear-gradient(135deg, var(--hz-ivory) 0%, white 100%);
+  border-color: var(--hz-forest);
+  box-shadow: 0 2px 4px rgba(31, 58, 46, 0.1);
+  transform: translateY(-1px);
 }
 
 .hz-btn--ghost {
@@ -339,23 +350,25 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   line-height: 1.35;
-  padding: 12px;
-  background: var(--hz-cream);
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--hz-cream) 0%, var(--hz-alabaster) 100%);
   border: 1px solid var(--hz-line);
-  border-radius: 3px;
+  border-radius: 6px;
   color: var(--hz-ink);
-  transition: border-color 120ms cubic-bezier(0.2, 0.6, 0.2, 1),
-              box-shadow 120ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition: all 200ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .hz-input::placeholder {
   color: var(--hz-ink-muted);
+  font-style: italic;
 }
 
 .hz-input:focus {
   outline: none;
   border-color: var(--hz-forest);
-  box-shadow: 0 0 0 3px rgba(31, 58, 46, 0.15);
+  box-shadow: 0 0 0 4px rgba(31, 58, 46, 0.08), 0 2px 6px rgba(31, 58, 46, 0.12);
+  background: white;
 }
 
 .hz-input:disabled {
@@ -366,8 +379,9 @@ body {
 .hz-table-container {
   overflow-x: auto;
   border: 1px solid var(--hz-line);
-  border-radius: 4px;
+  border-radius: 8px;
   background: var(--hz-ivory);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .hz-table {
@@ -378,20 +392,23 @@ body {
 
 .hz-table th {
   text-align: left;
-  padding: 12px 16px;
+  padding: 16px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--hz-ink-muted);
-  border-bottom: 1px solid var(--hz-line);
-  background: var(--hz-alabaster);
+  border-bottom: 2px solid var(--hz-line);
+  background: linear-gradient(135deg, var(--hz-alabaster) 0%, var(--hz-ivory) 100%);
+  position: sticky;
+  top: 0;
 }
 
 .hz-table td {
-  padding: 12px 16px;
+  padding: 14px 16px;
   color: var(--hz-ink);
   border-bottom: 1px solid var(--hz-line-soft);
+  transition: background-color 150ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
 .hz-table tr:last-child td {
@@ -399,5 +416,80 @@ body {
 }
 
 .hz-table tr:hover td {
-  background: var(--hz-alabaster);
+  background: linear-gradient(135deg, var(--hz-alabaster) 0%, var(--hz-cream) 100%);
+}
+
+/* Extraordinary UI Enhancements */
+.hz-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 225, 216, 0.5);
+}
+
+.hz-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hz-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.hz-gradient-text {
+  background: linear-gradient(135deg, var(--hz-forest) 0%, var(--hz-walnut) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hz-elevated {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 200ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.hz-elevated:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.hz-soft-glow {
+  box-shadow: 0 0 20px rgba(31, 58, 46, 0.08), 0 0 40px rgba(31, 58, 46, 0.04);
+}
+
+.hz-border-gradient {
+  position: relative;
+  background: var(--hz-ivory);
+  border-radius: 8px;
+}
+
+.hz-border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--hz-forest), var(--hz-walnut), var(--hz-gold));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hz-pattern {
+  background-image: radial-gradient(circle at 1px 1px, var(--hz-line) 1px, transparent 0);
+  background-size: 24px 24px;
+  opacity: 0.5;
 }
