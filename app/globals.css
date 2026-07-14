@@ -196,6 +196,11 @@ body {
   border-bottom: 1px solid var(--hz-line);
 }
 
+.hz-shell__sidebar {
+  height: 100vh;
+  overflow-y: auto;
+}
+
 .hz-content {
   flex: 1;
   padding: 24px;
