@@ -79,11 +79,11 @@ export default async function DashboardPage() {
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Hazel ERP Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-2xl font-display font-semibold tracking-tight text-[var(--hz-ink)]">Dashboard</h1>
+        <p className="text-xs text-[var(--hz-ink-soft)] mt-1">
           Real-time overview of orders, inventory, finances and marketing performance.
         </p>
       </div>
@@ -95,68 +95,68 @@ export default async function DashboardPage() {
             label: 'Total Revenue',
             value: formatBDT(totalRevenue),
             icon: DollarSign,
-            color: 'text-emerald-400',
-            bgColor: 'bg-emerald-500/5 border-emerald-500/20',
+            color: 'text-[var(--hz-success-fg)]',
+            bgColor: 'bg-[var(--hz-success-bg)] border-[var(--hz-success-fg)]/20',
           },
           {
             label: 'Net Profit',
             value: formatBDT(netProfit),
             icon: TrendingUp,
-            color: netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: netProfit >= 0 ? 'text-[var(--hz-success-fg)]' : 'text-[var(--hz-danger-fg)]',
+            bgColor: netProfit >= 0 ? 'bg-[var(--hz-success-bg)] border-[var(--hz-success-fg)]/20' : 'bg-[var(--hz-danger-bg)] border-[var(--hz-danger-fg)]/20',
           },
           {
             label: 'Total Orders',
             value: String(orderStats?.total_orders || 0),
             icon: ShoppingBag,
-            color: 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--hz-forest)]',
+            bgColor: 'bg-[var(--hz-alabaster)] border-[var(--hz-line)]',
           },
           {
             label: 'Total Customers',
             value: String(customerStats?.total_customers || 0),
             icon: Users,
-            color: 'text-sky-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--hz-walnut)]',
+            bgColor: 'bg-[var(--hz-alabaster)] border-[var(--hz-line)]',
           },
           {
             label: 'Inventory Value',
             value: formatBDT(inventoryStats?.total_inventory_value || 0),
             icon: Package,
-            color: 'text-amber-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--hz-gold)]',
+            bgColor: 'bg-[var(--hz-alabaster)] border-[var(--hz-line)]',
           },
           {
             label: 'Stock Units',
             value: String(inventoryStats?.total_units || 0),
             icon: Layers,
-            color: 'text-zinc-300',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--hz-ink)]',
+            bgColor: 'bg-[var(--hz-alabaster)] border-[var(--hz-line)]',
           },
           {
             label: 'Pending Orders',
             value: String(orderStats?.pending_orders || 0),
             icon: AlertCircle,
-            color: 'text-amber-400',
-            bgColor: 'bg-amber-500/5 border-amber-500/20',
+            color: 'text-[var(--hz-warning-fg)]',
+            bgColor: 'bg-[var(--hz-warning-bg)] border-[var(--hz-warning-fg)]/20',
           },
           {
             label: 'Profit Margin',
             value: `${profitMargin.toFixed(1)}%`,
             icon: BarChart2,
-            color: profitMargin >= 20 ? 'text-emerald-400' : 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: profitMargin >= 20 ? 'text-[var(--hz-success-fg)]' : 'text-[var(--hz-danger-fg)]',
+            bgColor: profitMargin >= 20 ? 'bg-[var(--hz-success-bg)] border-[var(--hz-success-fg)]/20' : 'bg-[var(--hz-danger-bg)] border-[var(--hz-danger-fg)]/20',
           },
         ].map(({ label, value, icon: Icon, color, bgColor }) => (
           <div
             key={label}
-            className={`p-5 rounded-xl border backdrop-blur-md flex flex-col gap-3 ${bgColor}`}
+            className={`hz-card flex flex-col gap-3 ${bgColor}`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">{label}</span>
+              <span className="text-eyebrow">{label}</span>
               <Icon className={`h-4 w-4 ${color} opacity-70`} />
             </div>
-            <span className={`text-xl font-bold font-mono tracking-tight ${color}`}>{value}</span>
+            <span className={`text-lg font-mono font-semibold tracking-tight ${color}`}>{value}</span>
           </div>
         ))}
       </div>
