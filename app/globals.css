@@ -169,3 +169,261 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--hz-ink-muted);
 }
+
+/* Hazel Layout Classes */
+.hz-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.hz-shell__sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  background: var(--hz-alabaster);
+  border-right: 1px solid var(--hz-line);
+}
+
+.hz-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hz-topbar {
+  height: 56px;
+  background: var(--hz-ivory);
+  border-bottom: 1px solid var(--hz-line);
+}
+
+.hz-content {
+  flex: 1;
+  padding: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* Hazel Card */
+.hz-card {
+  background: var(--hz-ivory);
+  border: 1px solid var(--hz-line);
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.hz-card__header {
+  margin-bottom: 16px;
+}
+
+.hz-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hz-ink);
+}
+
+.hz-card__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--hz-ink-muted);
+  margin-bottom: 8px;
+}
+
+/* Hazel Button */
+.hz-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 120ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hz-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hz-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 58, 46, 0.15);
+}
+
+.hz-btn--primary {
+  background: var(--hz-forest);
+  color: white;
+  border-color: var(--hz-forest);
+}
+
+.hz-btn--primary:hover:not(:disabled) {
+  background: var(--hz-forest-600);
+  border-color: var(--hz-forest-600);
+}
+
+.hz-btn--primary:active:not(:disabled) {
+  background: var(--hz-forest-700);
+  border-color: var(--hz-forest-700);
+}
+
+.hz-btn--secondary {
+  background: var(--hz-alabaster);
+  color: var(--hz-ink);
+  border-color: var(--hz-line);
+}
+
+.hz-btn--secondary:hover:not(:disabled) {
+  background: var(--hz-ivory);
+  border-color: var(--hz-line-soft);
+}
+
+.hz-btn--ghost {
+  background: transparent;
+  color: var(--hz-ink);
+  border-color: transparent;
+}
+
+.hz-btn--ghost:hover:not(:disabled) {
+  background: var(--hz-alabaster);
+}
+
+.hz-btn--danger {
+  background: var(--hz-danger-fg);
+  color: white;
+  border-color: var(--hz-danger-fg);
+}
+
+.hz-btn--danger:hover:not(:disabled) {
+  background: #7a3328;
+  border-color: #7a3328;
+}
+
+.hz-btn--sm {
+  padding: 8px 12px;
+  font-size: 11px;
+}
+
+.hz-btn--lg {
+  padding: 16px 24px;
+  font-size: 14px;
+}
+
+/* Hazel Badge */
+.hz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hz-badge--success {
+  background: var(--hz-success-bg);
+  color: var(--hz-success-fg);
+}
+
+.hz-badge--warning {
+  background: var(--hz-warning-bg);
+  color: var(--hz-warning-fg);
+}
+
+.hz-badge--danger {
+  background: var(--hz-danger-bg);
+  color: var(--hz-danger-fg);
+}
+
+.hz-badge--info {
+  background: var(--hz-info-bg);
+  color: var(--hz-info-fg);
+}
+
+.hz-badge--neutral {
+  background: var(--hz-alabaster);
+  color: var(--hz-ink-muted);
+  border: 1px solid var(--hz-line);
+}
+
+/* Hazel Input */
+.hz-input {
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 12px;
+  background: var(--hz-cream);
+  border: 1px solid var(--hz-line);
+  border-radius: 3px;
+  color: var(--hz-ink);
+  transition: border-color 120ms cubic-bezier(0.2, 0.6, 0.2, 1),
+              box-shadow 120ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.hz-input::placeholder {
+  color: var(--hz-ink-muted);
+}
+
+.hz-input:focus {
+  outline: none;
+  border-color: var(--hz-forest);
+  box-shadow: 0 0 0 3px rgba(31, 58, 46, 0.15);
+}
+
+.hz-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Hazel Table */
+.hz-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--hz-line);
+  border-radius: 4px;
+  background: var(--hz-ivory);
+}
+
+.hz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.hz-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--hz-ink-muted);
+  border-bottom: 1px solid var(--hz-line);
+  background: var(--hz-alabaster);
+}
+
+.hz-table td {
+  padding: 12px 16px;
+  color: var(--hz-ink);
+  border-bottom: 1px solid var(--hz-line-soft);
+}
+
+.hz-table tr:last-child td {
+  border-bottom: none;
+}
+
+.hz-table tr:hover td {
+  background: var(--hz-alabaster);
+}
