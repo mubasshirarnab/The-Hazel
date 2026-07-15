@@ -8,22 +8,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="hz-shell">
+    <div className="flex h-screen w-screen overflow-hidden bg-zinc-950">
       {/* Sidebar Navigation */}
-      <aside className="hz-shell__sidebar">
-        <Sidebar />
-      </aside>
+      <Sidebar />
 
       {/* Main Content Area */}
-      <div className="hz-shell__main">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar Header */}
-        <header className="hz-topbar">
-          <Header />
-        </header>
+        <Header />
 
         {/* Dynamic Page Container */}
-        <main className="hz-content">
-          {children}
+        <main className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-zinc-800/80 bg-zinc-950 text-zinc-100">
+          <div className="mx-auto max-w-7xl w-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>

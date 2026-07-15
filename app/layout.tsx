@@ -1,29 +1,18 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Inter, JetBrains_Mono } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/components/shared/auth-provider';
 import QueryProvider from '@/components/shared/query-provider';
 import { Toaster } from 'sonner';
 
-const cormorant = Cormorant_Garamond({
-  variable: '--font-cormorant',
+const geistSans = Geist({
+  variable: '--font-geist-sans',
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
 });
 
-const inter = Inter({
-  variable: '--font-inter',
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-jetbrains',
-  subsets: ['latin'],
-  weight: ['500'],
-  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -39,9 +28,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-[var(--hz-cream)] text-[var(--hz-ink)]">
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-50 font-sans">
         <AuthProvider>
           <QueryProvider>
             {children}
