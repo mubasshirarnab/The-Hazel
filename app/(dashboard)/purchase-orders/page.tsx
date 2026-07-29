@@ -12,11 +12,12 @@ import { Plus } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
 import DataTable from '@/components/shared/data-table';
 import { columns } from './columns';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PurchaseOrdersPage() {
-  // Query all active POs joined with lookup details
   const purchaseOrders = await db
     .select({
       id: tblPurchaseOrders.id,
@@ -36,28 +37,26 @@ export default async function PurchaseOrdersPage() {
     .orderBy(desc(tblPurchaseOrders.purchaseDate), desc(tblPurchaseOrders.id));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Purchase Orders (POs)"
         description="Establish RMB supplier orders, track China warehouse handovers, and coordinate imports."
       >
-        <Link
-          href="/purchase-orders/new"
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-colors cursor-pointer shadow-lg shadow-rose-600/10"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>New PO</span>
+        <Link href="/purchase-orders/new">
+          <Button variant="primary" icon={<Plus className="h-4 w-4 shrink-0" />}>
+            New PO
+          </Button>
         </Link>
       </PageHeader>
 
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/10">
+      <Card hoverEffect={false} className="p-6">
         <DataTable
           columns={columns}
           data={purchaseOrders}
           searchKey="purchaseOrderNumber"
           searchPlaceholder="Search POs by PO Code..."
         />
-      </div>
+      </Card>
     </div>
   );
 }

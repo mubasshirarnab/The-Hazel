@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { ColumnDef } from '@tanstack/react-table';
 import { deleteProduct } from '@/actions/products';
 import { toast } from 'sonner';
-import { Edit2, Eye, Trash2, Loader2 } from 'lucide-react';
+import { Eye, Trash2, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export interface ProductRow {
   id: number;
@@ -22,7 +23,7 @@ export const columns: ColumnDef<ProductRow>[] = [
     accessorKey: 'productCode',
     header: 'Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.productCode}
       </span>
     ),
@@ -31,7 +32,7 @@ export const columns: ColumnDef<ProductRow>[] = [
     accessorKey: 'productName',
     header: 'Product Name',
     cell: ({ row }) => (
-      <div className="font-medium text-zinc-100 max-w-[240px] truncate">
+      <div className="font-semibold text-[#1A1A1A] max-w-[240px] truncate">
         {row.original.productName}
       </div>
     ),
@@ -40,7 +41,7 @@ export const columns: ColumnDef<ProductRow>[] = [
     accessorKey: 'sku',
     header: 'SKU',
     cell: ({ row }) => (
-      <span className="font-mono text-xs text-zinc-300">
+      <span className="font-mono text-xs text-[#6B6B6B]">
         {row.original.sku}
       </span>
     ),
@@ -49,7 +50,7 @@ export const columns: ColumnDef<ProductRow>[] = [
     accessorKey: 'categoryName',
     header: 'Category',
     cell: ({ row }) => (
-      <span className="text-zinc-400">
+      <span className="text-[#6B6B6B] font-medium">
         {row.original.categoryName || 'Uncategorized'}
       </span>
     ),
@@ -61,15 +62,9 @@ export const columns: ColumnDef<ProductRow>[] = [
       const status = row.original.productStatus;
       const isArchived = status === 'archived';
       return (
-        <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border leading-none ${
-            isArchived
-              ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
-              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-          }`}
-        >
+        <Badge variant={isArchived ? 'outline' : 'forest'}>
           {isArchived ? 'Archived' : 'Active'}
-        </span>
+        </Badge>
       );
     },
   },
@@ -83,7 +78,6 @@ export const columns: ColumnDef<ProductRow>[] = [
   },
 ];
 
-// Split action cell into a component to use useTransition hook
 function ActionCell({ id, productName }: { id: number; productName: string }) {
   const [isPending, startTransition] = useTransition();
 
@@ -106,7 +100,7 @@ function ActionCell({ id, productName }: { id: number; productName: string }) {
     <div className="flex items-center gap-2">
       <Link
         href={`/products/${id}`}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"
+        className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#1F3A2E] transition-colors border border-transparent hover:border-[#E9E7E2]"
         title="View Details"
       >
         <Eye className="h-4 w-4" />
@@ -114,11 +108,11 @@ function ActionCell({ id, productName }: { id: number; productName: string }) {
       <button
         onClick={handleDelete}
         disabled={isPending}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-50"
+        className="p-1.5 rounded-[8px] hover:bg-[#DC2626]/10 text-[#6B6B6B] hover:text-[#DC2626] transition-colors cursor-pointer disabled:opacity-50 border border-transparent hover:border-[#DC2626]/20"
         title="Delete Product"
       >
         {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+          <Loader2 className="h-4 w-4 animate-spin text-[#6B6B6B]" />
         ) : (
           <Trash2 className="h-4 w-4" />
         )}

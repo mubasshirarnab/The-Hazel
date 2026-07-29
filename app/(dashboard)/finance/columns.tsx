@@ -19,7 +19,7 @@ export const columns: ColumnDef<CashFlowRow>[] = [
     accessorKey: 'cash_flow_code',
     header: 'Entry Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.cash_flow_code}
       </span>
     ),
@@ -34,21 +34,21 @@ export const columns: ColumnDef<CashFlowRow>[] = [
         day: 'numeric',
         year: 'numeric',
       });
-      return <span className="text-zinc-400 text-xs">{formatted}</span>;
+      return <span className="text-[#6B6B6B] text-xs font-medium">{formatted}</span>;
     },
   },
   {
     accessorKey: 'entry_type',
     header: 'Type',
     cell: ({ row }) => {
-      const type = row.original.entry_type; // 'inflow' or 'outflow'
+      const type = row.original.entry_type;
       const isIn = type.toLowerCase() === 'inflow';
       return (
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider ${
             isIn
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+              ? 'bg-[#22C55E]/10 text-[#15803D] border border-[#22C55E]/20'
+              : 'bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/20'
           }`}
         >
           {isIn ? 'Inflow' : 'Outflow'}
@@ -65,7 +65,7 @@ export const columns: ColumnDef<CashFlowRow>[] = [
       return (
         <Currency
           amount={row.original.amount}
-          className={isIn ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}
+          className={isIn ? 'text-[#15803D] font-bold' : 'text-[#DC2626] font-bold'}
         />
       );
     },
@@ -74,7 +74,7 @@ export const columns: ColumnDef<CashFlowRow>[] = [
     accessorKey: 'description',
     header: 'Description',
     cell: ({ row }) => (
-      <span className="text-zinc-300 font-medium max-w-[320px] truncate block">
+      <span className="text-[#1A1A1A] font-medium max-w-[320px] truncate block">
         {row.original.description}
       </span>
     ),

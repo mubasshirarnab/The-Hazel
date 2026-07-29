@@ -2,11 +2,13 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
-import Currency, { formatBDT } from '@/components/shared/currency';
+import { formatBDT } from '@/components/shared/currency';
 import StatusBadge from '@/components/shared/status-badge';
 import Link from 'next/link';
 import { ArrowLeft, Clock, User, ClipboardList, MapPin } from 'lucide-react';
 import OrderActions from './order-actions';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,16 +95,14 @@ export default async function OrderDetailPage({ params }: PageProps) {
   `, [orderId]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Page Header */}
       <PageHeader title={`Order: ${order.orderNumber}`} description={`Created on ${new Date(order.createdAt).toLocaleDateString()}`}>
         <div className="flex items-center gap-3">
-          <Link
-            href="/orders"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-amber-500/20 bg-[#0F1117] hover:bg-amber-500/5 text-zinc-400 hover:text-amber-200 transition-all text-sm font-semibold cursor-pointer"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>All Orders</span>
+          <Link href="/orders">
+            <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
+              All Orders
+            </Button>
           </Link>
           
           <OrderActions
@@ -116,17 +116,17 @@ export default async function OrderDetailPage({ params }: PageProps) {
       {/* Status Row */}
       <div className="flex flex-wrap items-center gap-3 px-1">
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Order</span>
+          <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Order</span>
           <StatusBadge status={order.orderStatus} />
         </div>
-        <div className="w-px h-4 bg-amber-500/20" />
+        <div className="w-px h-4 bg-[#E9E7E2]" />
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Payment</span>
+          <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Payment</span>
           <StatusBadge status={order.paymentStatus} />
         </div>
-        <div className="w-px h-4 bg-amber-500/20" />
+        <div className="w-px h-4 bg-[#E9E7E2]" />
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Delivery</span>
+          <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Delivery</span>
           <StatusBadge status={order.deliveryStatus} />
         </div>
       </div>
@@ -136,187 +136,199 @@ export default async function OrderDetailPage({ params }: PageProps) {
         {/* Left Column: Customer Profile & Statuses summary */}
         <div className="lg:col-span-1 space-y-5">
           {/* Customer Summary Card */}
-          <div className="p-6 rounded-2xl luxury-card space-y-5">
-            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
-              <User className="h-4 w-4 text-amber-400" />
-              <span>Customer Profile</span>
-            </h3>
-
-            <div className="space-y-3.5 text-sm">
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
+                <User className="h-4 w-4 text-[#B08D57]" />
+                <span>Customer Profile</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3.5 text-xs pt-4">
               <div>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Customer Name</span>
-                <span className="text-zinc-100 font-semibold">{order.customerName}</span>
-                <span className="text-zinc-500 font-mono text-xs ml-1.5">({order.customerCode})</span>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Customer Name</span>
+                <span className="text-[#1A1A1A] font-semibold">{order.customerName}</span>
+                <span className="text-[#6B6B6B] font-mono text-xs ml-1.5">({order.customerCode})</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Phone</span>
-                <span className="font-mono text-amber-300">{order.phone || '—'}</span>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Phone</span>
+                <span className="font-mono text-[#1F3A2E] font-semibold">{order.phone || '—'}</span>
               </div>
               {order.facebookName && (
                 <div>
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Facebook Username</span>
-                  <span className="text-rose-400 font-semibold">{order.facebookName}</span>
+                  <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Facebook Username</span>
+                  <span className="text-[#B08D57] font-semibold">{order.facebookName}</span>
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Delivery Address Card */}
-          <div className="p-6 rounded-2xl luxury-card space-y-5">
-            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
-              <MapPin className="h-4 w-4 text-amber-400" />
-              <span>Shipping Details</span>
-            </h3>
-
-            <div className="space-y-3.5 text-sm">
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
+                <MapPin className="h-4 w-4 text-[#B08D57]" />
+                <span>Shipping Details</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3.5 text-xs pt-4">
               <div>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">District</span>
-                <span className="text-zinc-100 font-semibold">{order.district || 'Not Specified'}</span>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">District</span>
+                <span className="text-[#1A1A1A] font-semibold">{order.district || 'Not Specified'}</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Full Address</span>
-                <p className="text-zinc-300 mt-1 leading-relaxed text-xs">{order.address || 'No Address Listed'}</p>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Full Address</span>
+                <p className="text-[#1A1A1A] mt-1 leading-relaxed text-xs">{order.address || 'No Address Listed'}</p>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Payment Preference</span>
-                <span className="text-amber-300 font-semibold text-xs bg-amber-500/10 border border-amber-500/25 px-2.5 py-0.5 rounded-full inline-block mt-0.5">
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Payment Preference</span>
+                <span className="text-[#1F3A2E] font-semibold text-xs bg-[#1F3A2E]/10 border border-[#1F3A2E]/20 px-2.5 py-0.5 rounded-full inline-block mt-0.5 shadow-soft-1">
                   {order.paymentPreference || 'Cash on Delivery'}
                 </span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Order notes block */}
           {order.notes && (
-            <div className="p-6 rounded-2xl luxury-card space-y-3">
-              <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest block">Order Notes</h3>
-              <p className="text-zinc-300 leading-relaxed text-xs bg-[#0A0C10] p-3 rounded-xl border border-amber-500/10">
-                {order.notes}
-              </p>
-            </div>
+            <Card hoverEffect={false}>
+              <CardHeader>
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-[#1F3A2E]">Order Notes</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <p className="text-[#1A1A1A] leading-relaxed text-xs bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
+                  {order.notes}
+                </p>
+              </CardContent>
+            </Card>
           )}
         </div>
 
         {/* Right Column: Order Items, Financials, and Status History logs */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items card */}
-          <div className="p-6 rounded-2xl luxury-card space-y-5">
-            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
-              <ClipboardList className="h-4.5 w-4.5 text-amber-400" />
-              <span>Order Items</span>
-            </h3>
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
+                <ClipboardList className="h-4.5 w-4.5 text-[#B08D57]" />
+                <span>Order Items</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5 pt-4">
+              {/* Items Table */}
+              <div className="overflow-x-auto rounded-[12px] border border-[#E9E7E2] bg-white shadow-soft-1">
+                <table className="min-w-full divide-y divide-[#E9E7E2] text-xs">
+                  <thead className="bg-[#F7F6F3] text-[11px] font-bold text-[#1F3A2E] uppercase tracking-wider">
+                    <tr>
+                      <th className="px-5 py-3.5 text-left">Variant Code</th>
+                      <th className="px-5 py-3.5 text-left">Product / Color</th>
+                      <th className="px-5 py-3.5 text-right">Price</th>
+                      <th className="px-5 py-3.5 text-right">Qty</th>
+                      <th className="px-5 py-3.5 text-right">Discount</th>
+                      <th className="px-5 py-3.5 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E9E7E2]/60 text-[#1A1A1A]">
+                    {orderItems.map((item: any) => {
+                      const price = Number(item.sellingPrice);
+                      const qty = item.quantity;
+                      const discount = Number(item.discountAmount);
+                      const total = (price - discount) * qty;
 
-            {/* Items Table */}
-            <div className="overflow-x-auto rounded-xl border border-amber-500/15 bg-[#0A0C10]/80">
-              <table className="min-w-full divide-y divide-amber-500/10 text-sm">
-                <thead className="bg-[#141720] text-[11px] font-bold text-amber-300/80 uppercase tracking-wider">
-                  <tr>
-                    <th className="px-5 py-3.5 text-left">Variant Code</th>
-                    <th className="px-5 py-3.5 text-left">Product / Color</th>
-                    <th className="px-5 py-3.5 text-right">Price</th>
-                    <th className="px-5 py-3.5 text-right">Qty</th>
-                    <th className="px-5 py-3.5 text-right">Discount</th>
-                    <th className="px-5 py-3.5 text-right">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                  {orderItems.map((item: any) => {
-                    const price = Number(item.sellingPrice);
-                    const qty = item.quantity;
-                    const discount = Number(item.discountAmount);
-                    const total = (price - discount) * qty;
+                      return (
+                        <tr key={item.id} className="hover:bg-[#F7F6F3]/70 transition-colors">
+                          <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-[#1F3A2E] font-bold">
+                            {item.variantCode}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="font-semibold text-[#1A1A1A]">{item.productName}</div>
+                            <div className="text-xs text-[#6B6B6B] mt-0.5">{item.colorName}</div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-[#6B6B6B]">
+                            {formatBDT(price)}
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-right font-bold font-mono text-[#1A1A1A]">
+                            {qty}
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-[#DC2626]">
+                            {discount > 0 ? `-${formatBDT(discount)}` : '—'}
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-right font-bold text-[#1F3A2E] font-mono">
+                            {formatBDT(total)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
 
-                    return (
-                      <tr key={item.id} className="hover:bg-amber-500/5 transition-colors">
-                        <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-amber-400 font-bold">
-                          {item.variantCode}
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="font-semibold text-zinc-100">{item.productName}</div>
-                          <div className="text-xs text-zinc-500 mt-0.5">{item.colorName}</div>
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-zinc-300">
-                          {formatBDT(price)}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-right font-bold text-zinc-100">
-                          {qty}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-rose-400">
-                          {discount > 0 ? `-${formatBDT(discount)}` : '—'}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-right font-bold text-amber-300 font-mono">
-                          {formatBDT(total)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Financial Summary */}
-            <div className="flex flex-col items-end gap-2 text-sm text-zinc-400 pr-2">
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
-                <span>Subtotal:</span>
-                <span className="font-semibold text-zinc-300 font-mono">{formatBDT(order.subtotal)}</span>
-              </div>
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
-                <span>Total Discount:</span>
-                <span className="font-semibold text-rose-400 font-mono">-{formatBDT(order.discountTotal)}</span>
-              </div>
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
-                <span>Shipping:</span>
-                <span className="font-semibold text-zinc-300 font-mono">+{formatBDT(order.shippingAmount)}</span>
-              </div>
-              <div className="flex gap-12 justify-between w-64 text-base font-extrabold bg-gradient-to-r from-amber-500/10 to-rose-500/10 px-4 py-3 rounded-xl border border-amber-500/25">
-                <span className="text-amber-300">Grand Total:</span>
-                <span className="font-mono text-amber-200">{formatBDT(order.grandTotal)}</span>
-              </div>
-              {Number(order.outstandingAmount) > 0 && (
-                <div className="flex gap-12 justify-between w-64 text-xs bg-rose-500/10 px-4 py-2 rounded-xl border border-rose-500/25">
-                  <span className="text-rose-400 font-semibold">Outstanding:</span>
-                  <span className="font-mono text-rose-400 font-bold">{formatBDT(order.outstandingAmount)}</span>
+              {/* Financial Summary */}
+              <div className="flex flex-col items-end gap-2 text-xs text-[#6B6B6B] pr-2">
+                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                  <span>Subtotal:</span>
+                  <span className="font-semibold text-[#1A1A1A] font-mono">{formatBDT(order.subtotal)}</span>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                  <span>Total Discount:</span>
+                  <span className="font-semibold text-[#DC2626] font-mono">-{formatBDT(order.discountTotal)}</span>
+                </div>
+                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                  <span>Shipping:</span>
+                  <span className="font-semibold text-[#1A1A1A] font-mono">+{formatBDT(order.shippingAmount)}</span>
+                </div>
+                <div className="flex gap-12 justify-between w-64 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
+                  <span>Grand Total:</span>
+                  <span className="font-mono">{formatBDT(order.grandTotal)}</span>
+                </div>
+                {Number(order.outstandingAmount) > 0 && (
+                  <div className="flex gap-12 justify-between w-64 text-xs bg-[#DC2626]/10 border border-[#DC2626]/20 px-4 py-2 rounded-[12px]">
+                    <span className="text-[#DC2626] font-semibold">Outstanding:</span>
+                    <span className="font-mono text-[#DC2626] font-bold">{formatBDT(order.outstandingAmount)}</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Status logs audit history */}
-          <div className="p-6 rounded-2xl luxury-card space-y-5">
-            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
-              <Clock className="h-4.5 w-4.5 text-amber-400" />
-              <span>Status History Log</span>
-            </h3>
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
+                <Clock className="h-4.5 w-4.5 text-[#B08D57]" />
+                <span>Status History Log</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              {statusHistory.length === 0 ? (
+                <p className="text-xs text-[#9E9E9E] italic">No status updates logged.</p>
+              ) : (
+                <div className="space-y-3">
+                  {statusHistory.map((log: any) => (
+                    <div
+                      key={log.id}
+                      className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] flex items-start justify-between gap-4 text-xs hover:border-[#B08D57]/40 transition-colors"
+                    >
+                      <div className="space-y-1">
+                        <span className="font-bold text-[#1F3A2E] capitalize">
+                          {log.statusName}
+                        </span>
+                        <p className="text-[#6B6B6B] leading-relaxed">{log.notes || 'No description provided.'}</p>
+                      </div>
 
-            {statusHistory.length === 0 ? (
-              <p className="text-xs text-zinc-500 italic">No status updates logged.</p>
-            ) : (
-              <div className="space-y-3">
-                {statusHistory.map((log: any) => (
-                  <div
-                    key={log.id}
-                    className="p-4 rounded-xl bg-[#0A0C10] border border-amber-500/10 flex items-start justify-between gap-4 text-xs hover:border-amber-500/20 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <span className="font-bold text-amber-300 capitalize">
-                        {log.statusName}
-                      </span>
-                      <p className="text-zinc-500 leading-relaxed">{log.notes || 'No description provided.'}</p>
+                      <div className="text-right shrink-0">
+                        <span className="text-[10px] font-mono text-[#B08D57] block font-semibold">
+                          by {log.changedBy}
+                        </span>
+                        <span className="text-[9px] text-[#9E9E9E] font-mono block mt-1">
+                          {new Date(log.changedAt).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-[10px] font-mono text-amber-400/80 block font-semibold">
-                        by {log.changedBy}
-                      </span>
-                      <span className="text-[9px] text-zinc-600 font-mono block mt-1">
-                        {new Date(log.changedAt).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

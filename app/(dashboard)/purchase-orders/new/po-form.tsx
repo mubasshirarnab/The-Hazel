@@ -4,9 +4,12 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPurchaseOrder } from '@/actions/purchase-orders';
 import { toast } from 'sonner';
-import { Trash2, Plus, ArrowLeft, Loader2, Save } from 'lucide-react';
+import { Trash2, Plus, ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { formatBDT } from '@/components/shared/currency';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input, Select, Textarea } from '@/components/ui/input';
 
 interface SupplierOption {
   id: number;
@@ -44,7 +47,6 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Form states
   const [supplierId, setSupplierId] = useState('');
   const [friendId, setFriendId] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(() => {
@@ -55,7 +57,6 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
   const [chinaLocalDeliveryCost, setChinaLocalDeliveryCost] = useState('0');
   const [notes, setNotes] = useState('');
 
-  // Selected items state
   const [items, setItems] = useState<SelectedItem[]>([
     { variantId: '', quantity: '10', unitPurchasePriceRmb: '0', notes: '' },
   ]);
@@ -78,7 +79,6 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
     setItems(updated);
   };
 
-  // Computations
   const rmbRate = parseFloat(historicalRmbRate) || 0;
   const deliveryCostBdt = (parseFloat(chinaLocalDeliveryCost) || 0) * rmbRate;
 
@@ -108,7 +108,6 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
       return;
     }
 
-    // Validate items
     for (const [i, item] of items.entries()) {
       if (!item.variantId) {
         toast.error(`Please select a variant for item ${i + 1}.`);
@@ -160,115 +159,107 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-fade-in">
       {/* 1. Supplier & Exchange Rate Settings */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-6">
-        <h3 className="text-base font-bold text-zinc-100 border-b border-zinc-800 pb-3">
-          1. Supply Chain & Rate Configuration
-        </h3>
+      <Card hoverEffect={false}>
+        <CardHeader>
+          <CardTitle>1. Supply Chain & Rate Configuration</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">Supplier</label>
+              <Select
+                value={supplierId}
+                onChange={(e) => setSupplierId(e.target.value)}
+                disabled={loading}
+                required
+              >
+                <option value="">Select Supplier...</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.supplierCode} — {s.supplierName}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Supplier select */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Supplier</label>
-            <select
-              value={supplierId}
-              onChange={(e) => setSupplierId(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-              required
-            >
-              <option value="">Select Supplier...</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.supplierCode} — {s.supplierName}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">China Agent (Friend)</label>
+              <Select
+                value={friendId}
+                onChange={(e) => setFriendId(e.target.value)}
+                disabled={loading}
+                required
+              >
+                <option value="">Select China Agent...</option>
+                {friends.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.friendCode} — {f.friendName}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-          {/* China Agent friend select */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">China Agent (Friend)</label>
-            <select
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-              required
-            >
-              <option value="">Select China Agent...</option>
-              {friends.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.friendCode} — {f.friendName}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">PO Date</label>
+              <Input
+                type="date"
+                value={purchaseDate}
+                onChange={(e) => setPurchaseDate(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
 
-          {/* PO Date */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">PO Date</label>
-            <input
-              type="date"
-              value={purchaseDate}
-              onChange={(e) => setPurchaseDate(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-              required
-            />
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">
+                Exchange Rate (RMB to BDT)
+              </label>
+              <Input
+                type="number"
+                step="0.0001"
+                value={historicalRmbRate}
+                onChange={(e) => setHistoricalRmbRate(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
 
-          {/* Historical exchange rate */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
-              Exchange Rate (RMB to BDT)
-            </label>
-            <input
-              type="number"
-              step="0.0001"
-              value={historicalRmbRate}
-              onChange={(e) => setHistoricalRmbRate(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-              required
-            />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">
+                China Local Delivery Cost (RMB)
+              </label>
+              <Input
+                type="number"
+                value={chinaLocalDeliveryCost}
+                onChange={(e) => setChinaLocalDeliveryCost(e.target.value)}
+                disabled={loading}
+              />
+            </div>
           </div>
-
-          {/* China local delivery cost */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
-              China Local Delivery Cost (RMB)
-            </label>
-            <input
-              type="number"
-              value={chinaLocalDeliveryCost}
-              onChange={(e) => setChinaLocalDeliveryCost(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-            />
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* 2. Items purchasing list */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-6">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h3 className="text-base font-bold text-zinc-100">
+      <Card hoverEffect={false}>
+        <div className="flex items-center justify-between border-b border-[#E9E7E2] pb-4 mb-4">
+          <h3 className="text-xl font-bold font-serif text-[#1F3A2E]">
             2. Purchase Order Items
           </h3>
-          <button
+          <Button
             type="button"
+            variant="gold"
+            size="sm"
             onClick={handleAddItem}
             disabled={loading}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-zinc-100 transition-colors disabled:opacity-50 cursor-pointer"
+            icon={<Plus className="h-4 w-4 shrink-0" />}
           >
-            <Plus className="h-3.5 w-3.5" />
-            <span>Add Item</span>
-          </button>
+            Add Item
+          </Button>
         </div>
 
-        <div className="space-y-4">
+        <CardContent className="space-y-4 pt-0">
           {items.map((item, index) => {
             const priceRmb = parseFloat(item.unitPurchasePriceRmb) || 0;
             const priceBdt = priceRmb * rmbRate;
@@ -276,16 +267,14 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
             return (
               <div
                 key={index}
-                className="p-4 rounded-lg bg-zinc-900/60 border border-zinc-800/80 grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group"
+                className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group hover:border-[#B08D57]/40 transition-colors"
               >
-                {/* Select Variant */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select variant</label>
-                  <select
+                  <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest">Select variant</label>
+                  <Select
                     value={item.variantId}
                     onChange={(e) => handleItemChange(index, 'variantId', e.target.value)}
                     disabled={loading}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
                     required
                   >
                     <option value="">Select Variant...</option>
@@ -294,43 +283,38 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
                         {v.variantCode} — {v.productName} ({v.colorName})
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
 
-                {/* Unit Price (RMB) */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Price (¥ RMB)</label>
-                  <input
+                  <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest">Price (¥ RMB)</label>
+                  <Input
                     type="number"
                     placeholder="0.00"
                     value={item.unitPurchasePriceRmb}
                     onChange={(e) => handleItemChange(index, 'unitPurchasePriceRmb', e.target.value)}
                     disabled={loading}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
                     required
                   />
                 </div>
 
-                {/* Qty */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Quantity Ordered</label>
-                  <input
+                  <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest">Quantity Ordered</label>
+                  <Input
                     type="number"
                     min="1"
                     placeholder="10"
                     value={item.quantity}
                     onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                     disabled={loading}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
                     required
                   />
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {/* calculated BDT equivalent */}
                   <div className="flex-1 space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Est. Cost (BDT)</label>
-                    <span className="block text-xs font-semibold text-zinc-400 font-mono py-2">
+                    <label className="text-[10px] font-bold text-[#6B6B6B] uppercase tracking-widest block">Est. Cost (BDT)</label>
+                    <span className="block text-xs font-bold text-[#1A1A1A] font-mono py-2">
                       {formatBDT(priceBdt)}
                     </span>
                   </div>
@@ -339,7 +323,7 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
                     type="button"
                     onClick={() => handleRemoveItem(index)}
                     disabled={loading}
-                    className="p-2 rounded bg-zinc-950 border border-zinc-800 text-zinc-500 hover:text-rose-400 hover:border-rose-500/20 disabled:opacity-50 transition-colors cursor-pointer self-end mb-0.5"
+                    className="p-2.5 rounded-[10px] bg-white border border-[#E9E7E2] text-[#9E9E9E] hover:text-[#DC2626] hover:border-[#DC2626]/30 disabled:opacity-50 transition-colors cursor-pointer self-end mb-0.5 shadow-soft-1"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -347,65 +331,54 @@ export default function POForm({ suppliers, friends, variants }: POFormProps) {
               </div>
             );
           })}
-        </div>
 
-        {/* Totals Summary */}
-        <div className="p-4 rounded-lg bg-zinc-950 border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">Items Value (BDT)</span>
-            <span className="text-sm font-semibold text-zinc-300">{formatBDT(subtotalBdt)}</span>
+          <div className="p-4 rounded-[12px] bg-[#F7F6F3] border border-[#E9E7E2] flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
+            <div className="space-y-1">
+              <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Items Value (BDT)</span>
+              <span className="text-sm font-semibold text-[#1A1A1A] font-mono">{formatBDT(subtotalBdt)}</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">China Delivery (BDT)</span>
+              <span className="text-sm font-semibold text-[#1A1A1A] font-mono">{formatBDT(deliveryCostBdt)}</span>
+            </div>
+            <div className="space-y-1 bg-[#1F3A2E] text-white px-5 py-3 rounded-[12px] shadow-soft-1">
+              <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Estimated PO Total</span>
+              <span className="text-base font-bold font-mono">{formatBDT(grandTotalBdt)}</span>
+            </div>
           </div>
-          <div className="space-y-1">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">China Delivery (BDT)</span>
-            <span className="text-sm font-semibold text-zinc-300">{formatBDT(deliveryCostBdt)}</span>
-          </div>
-          <div className="space-y-1 bg-zinc-900 px-4 py-2 rounded border border-zinc-800">
-            <span className="text-[10px] text-rose-400 uppercase tracking-widest block font-bold">Estimated PO Total</span>
-            <span className="text-base font-bold text-zinc-50">{formatBDT(grandTotalBdt)}</span>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Notes text area */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-2">
-        <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">PO Notes</label>
-        <textarea
-          rows={3}
-          placeholder="Enter payment reference, supply conditions, or custom instructions..."
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          disabled={loading}
-          className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-600 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors disabled:opacity-50 resize-none"
-        />
-      </div>
+      <Card hoverEffect={false}>
+        <CardHeader>
+          <CardTitle className="text-xs uppercase tracking-wider">PO Notes</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <Textarea
+            rows={3}
+            placeholder="Enter payment reference, supply conditions, or custom instructions..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={loading}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Action Buttons */}
       <div className="flex items-center justify-end gap-3 pt-4">
-        <Link
-          href="/purchase-orders"
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Cancel</span>
+        <Link href="/purchase-orders">
+          <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
+            Cancel
+          </Button>
         </Link>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-all font-semibold text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          loading={loading}
+          variant="primary"
+          icon={<Save className="h-4 w-4 shrink-0" />}
         >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Saving PO...</span>
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" />
-              <span>Save Purchase Order</span>
-            </>
-          )}
-        </button>
+          Save Purchase Order
+        </Button>
       </div>
     </form>
   );

@@ -5,11 +5,11 @@ import DataTable from '@/components/shared/data-table';
 import CustomerDialog from './customer-dialog';
 import { columns } from './columns';
 import Currency from '@/components/shared/currency';
+import { Card } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CustomersPage() {
-  // Query customer analytics from view, filtering out soft-deleted customers
   const [customers]: any = await poolConnection.query(
     `SELECT 
        v.id,
@@ -31,7 +31,6 @@ export default async function CustomersPage() {
      ORDER BY v.lifetime_spend DESC`
   );
 
-  // Compute CRM KPIs
   const totalCount = customers.length;
   const repeatCount = customers.filter((c: any) => c.repeatCustomer === 'Repeat').length;
   const repeatRate = totalCount > 0 ? (repeatCount / totalCount) * 100 : 0;
@@ -40,7 +39,7 @@ export default async function CustomersPage() {
   const avgLifetimeSpend = totalCount > 0 ? totalSpend / totalCount : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Customer Profiles & Analytics"
         description="Monitor repeat rates, lifetime purchases, and default delivery preferences."
@@ -50,40 +49,40 @@ export default async function CustomersPage() {
 
       {/* Analytics Summary Widget */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Registered Profiles</span>
-          <span className="text-2xl font-bold tracking-tight text-zinc-100 mt-2 block">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Registered Profiles</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1A1A1A] mt-2 block font-mono">
             {totalCount} customers
           </span>
-        </div>
+        </Card>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Repeat Buyer Rate</span>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Repeat Buyer Rate</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold tracking-tight text-rose-400">
+            <span className="text-2xl font-bold tracking-tight text-[#B08D57] font-mono">
               {repeatRate.toFixed(1)}%
             </span>
-            <span className="text-xs text-zinc-500 font-semibold">({repeatCount} repeat buyers)</span>
+            <span className="text-xs text-[#6B6B6B] font-semibold">({repeatCount} repeat buyers)</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Avg. Lifetime Value</span>
-          <div className="text-2xl font-bold tracking-tight text-emerald-400 mt-2">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Avg. Lifetime Value</span>
+          <div className="text-2xl font-bold tracking-tight text-[#15803D] mt-2 font-mono">
             <Currency amount={avgLifetimeSpend} />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Customer Data Table */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/10">
+      <Card hoverEffect={false} className="p-6">
         <DataTable
           columns={columns}
           data={customers}
           searchKey="customerName"
           searchPlaceholder="Search customers by name..."
         />
-      </div>
+      </Card>
     </div>
   );
 }

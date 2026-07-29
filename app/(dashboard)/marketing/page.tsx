@@ -6,11 +6,11 @@ import PageHeader from '@/components/shared/page-header';
 import CampaignDialog from './campaign-dialog';
 import MarketingTable from './marketing-table';
 import Currency from '@/components/shared/currency';
+import { Card } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MarketingPage() {
-  // Fetch campaigns via vw_marketing_roas joined with raw campaign table for mutable fields
   const [campaigns]: any = await poolConnection.query(`
     SELECT
       c.id,
@@ -31,21 +31,18 @@ export default async function MarketingPage() {
     ORDER BY c.created_at DESC
   `);
 
-  // Fetch platforms for dropdowns
   const platforms = await db
     .select({ id: tblMarketingPlatforms.id, platformName: tblMarketingPlatforms.platformName })
     .from(tblMarketingPlatforms)
     .where(eq(tblMarketingPlatforms.isActive, 1));
 
-  // Aggregate metrics
-  const totalBudget = campaigns.reduce((s: number, c: any) => s + parseFloat(c.budget_amount || 0), 0);
   const totalSpend  = campaigns.reduce((s: number, c: any) => s + parseFloat(c.spend_amount  || 0), 0);
   const totalRevenue = campaigns.reduce((s: number, c: any) => s + parseFloat(c.revenue_amount || 0), 0);
   const blendedRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
   const totalOrders = campaigns.reduce((s: number, c: any) => s + (c.orders_generated || 0), 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Ad Campaigns & ROAS"
         description="Track Facebook/Instagram ad budgets, attribute sales revenues, and optimize Return on Ad Spend."
@@ -55,36 +52,36 @@ export default async function MarketingPage() {
 
       {/* KPI widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Total Ad Spend</span>
-          <div className="text-2xl font-bold tracking-tight text-rose-400 mt-2">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Ad Spend</span>
+          <div className="text-2xl font-bold tracking-tight text-[#DC2626] mt-2 font-mono">
             <Currency amount={totalSpend} />
           </div>
-        </div>
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Tracked Revenue</span>
-          <div className="text-2xl font-bold tracking-tight text-emerald-400 mt-2">
+        </Card>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Tracked Revenue</span>
+          <div className="text-2xl font-bold tracking-tight text-[#15803D] mt-2 font-mono">
             <Currency amount={totalRevenue} />
           </div>
-        </div>
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Blended ROAS</span>
-          <span className="text-2xl font-bold tracking-tight text-zinc-100 mt-2 block font-mono">
+        </Card>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Blended ROAS</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">
             {blendedRoas.toFixed(2)}x
           </span>
-        </div>
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Attributed Orders</span>
-          <span className="text-2xl font-bold tracking-tight text-zinc-300 mt-2 block">
+        </Card>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Attributed Orders</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1A1A1A] mt-2 block font-mono">
             {totalOrders} conversions
           </span>
-        </div>
+        </Card>
       </div>
 
       {/* Campaigns table */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/10">
+      <Card hoverEffect={false} className="p-6">
         <MarketingTable campaigns={campaigns} platforms={platforms} />
-      </div>
+      </Card>
     </div>
   );
 }

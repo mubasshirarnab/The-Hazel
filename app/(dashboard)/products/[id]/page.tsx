@@ -4,9 +4,12 @@ import { db, poolConnection } from '@/lib/db/db';
 import { tblProducts, tblCategories, tblProductVariants } from '@/lib/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Box, Tag, DollarSign, Percent, TrendingUp } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Box, Tag, DollarSign } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
-import Currency, { formatBDT } from '@/components/shared/currency';
+import { formatBDT } from '@/components/shared/currency';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +66,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   // Map variant statistics
   const variantData = variants.map((v) => {
-    // Find cost breakdown
     const cost = costBreakdowns.find((cb: any) => cb.variant_id === v.id) || {
       purchase_cost: Number(v.purchasePriceBdt),
       import_cost: 0,
@@ -77,7 +79,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
       true_product_cost: Number(v.purchasePriceBdt),
     };
 
-    // Find stock levels
     const stocks = stockLevels.filter((s: any) => s.variant_id === v.id);
     const totalCurrentStock = stocks.reduce((acc: number, s: any) => acc + (s.current_stock || 0), 0);
     const totalReservedStock = stocks.reduce((acc: number, s: any) => acc + (s.reserved_stock || 0), 0);
@@ -107,45 +108,44 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Page Header */}
       <PageHeader title={product.productName} description={`Business Code: ${product.productCode}`}>
-        <Link
-          href="/products"
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to List</span>
+        <Link href="/products">
+          <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
+            Back to List
+          </Button>
         </Link>
       </PageHeader>
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Product Meta Details */}
-        <div className="lg:col-span-1 p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-5 h-fit">
-          <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Product Profile
-          </h3>
-
-          <div className="space-y-4 text-sm">
+        <Card hoverEffect={false} className="lg:col-span-1 h-fit">
+          <CardHeader>
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#1F3A2E]">
+              Product Profile
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4 text-xs">
             <div>
-              <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">SKU Reference</span>
-              <span className="font-mono text-zinc-200 mt-1 block">{product.sku}</span>
+              <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">SKU Reference</span>
+              <span className="font-mono text-[#1A1A1A] font-semibold mt-1 block">{product.sku}</span>
             </div>
 
             <div>
-              <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Category</span>
-              <span className="text-zinc-200 mt-1 block">{product.categoryName || 'Uncategorized'}</span>
+              <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Category</span>
+              <span className="text-[#1A1A1A] font-medium mt-1 block">{product.categoryName || 'Uncategorized'}</span>
             </div>
 
             {product.purchaseLink && (
               <div>
-                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Purchase Source</span>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Purchase Source</span>
                 <a
                   href={product.purchaseLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-rose-400 hover:text-rose-300 font-medium mt-1 transition-colors"
+                  className="inline-flex items-center gap-1 text-[#B08D57] hover:underline font-semibold mt-1 transition-colors"
                 >
                   <span>1688 / Supplier Link</span>
                   <ExternalLink className="h-3 w-3" />
@@ -155,54 +155,52 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {product.notes && (
               <div>
-                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Internal Notes</span>
-                <p className="text-zinc-300 mt-1 leading-relaxed text-xs bg-zinc-900/50 p-3 rounded border border-zinc-850">
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Internal Notes</span>
+                <p className="text-[#1A1A1A] mt-1 leading-relaxed text-xs bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
                   {product.notes}
                 </p>
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Variants Cost Breakdowns & Stocks */}
         <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
-            <Tag className="h-5 w-5 text-rose-500" />
+          <h3 className="text-xl font-bold font-serif text-[#1F3A2E] flex items-center gap-2">
+            <Tag className="h-5 w-5 text-[#B08D57]" />
             <span>Variants ({variantData.length})</span>
           </h3>
 
           {variantData.length === 0 ? (
-            <div className="p-8 text-center rounded-xl border border-zinc-850 bg-zinc-900/10 text-zinc-500">
+            <Card hoverEffect={false} className="p-8 text-center text-[#6B6B6B]">
               No variants defined for this product.
-            </div>
+            </Card>
           ) : (
             <div className="space-y-6">
               {variantData.map((v) => (
                 <div
                   key={v.id}
-                  className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 overflow-hidden"
+                  className="rounded-[18px] border border-[#E9E7E2] bg-white overflow-hidden shadow-soft-1"
                 >
                   {/* Variant Header Summary */}
-                  <div className="px-6 py-4 bg-zinc-900/60 border-b border-zinc-800/80 flex flex-wrap items-center justify-between gap-4">
+                  <div className="px-6 py-4 bg-[#F7F6F3] border-b border-[#E9E7E2] flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <span className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/15">
-                        {v.variantCode}
-                      </span>
-                      <h4 className="text-base font-bold text-zinc-100 mt-1.5">{v.colorName}</h4>
+                      <Badge variant="forest">{v.variantCode}</Badge>
+                      <h4 className="text-base font-bold text-[#1F3A2E] mt-1">{v.colorName}</h4>
                     </div>
 
                     <div className="flex items-center gap-4 text-right">
                       <div>
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">Selling Price</span>
-                        <span className="text-sm font-bold text-zinc-200">{formatBDT(v.sellPrice)}</span>
+                        <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Selling Price</span>
+                        <span className="text-sm font-bold font-mono text-[#1A1A1A]">{formatBDT(v.sellPrice)}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">True Cost</span>
-                        <span className="text-sm font-bold text-zinc-300">{formatBDT(v.trueCost)}</span>
+                        <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">True Cost</span>
+                        <span className="text-sm font-bold font-mono text-[#6A4E3B]">{formatBDT(v.trueCost)}</span>
                       </div>
-                      <div className="bg-zinc-850 px-3 py-1.5 rounded-lg border border-zinc-800">
-                        <span className="text-[10px] text-rose-400 uppercase tracking-widest block font-bold">Est. Margin</span>
-                        <span className={v.profit >= 0 ? 'text-sm font-bold text-emerald-400' : 'text-sm font-bold text-rose-400'}>
+                      <div className="bg-white px-3 py-1.5 rounded-[10px] border border-[#E9E7E2] shadow-soft-1">
+                        <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Est. Margin</span>
+                        <span className={v.profit >= 0 ? 'text-sm font-bold font-mono text-[#15803D]' : 'text-sm font-bold font-mono text-[#DC2626]'}>
                           {v.margin.toFixed(1)}%
                         </span>
                       </div>
@@ -212,81 +210,81 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Cost Ledger Breakdown */}
                     <div className="space-y-4">
-                      <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 border-b border-zinc-800 pb-2">
-                        <DollarSign className="h-4 w-4 text-emerald-500" />
+                      <h5 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-1.5 border-b border-[#E9E7E2] pb-2">
+                        <DollarSign className="h-4 w-4 text-[#15803D]" />
                         <span>True Cost Breakdown</span>
                       </h5>
 
-                      <div className="space-y-2 text-sm">
+                      <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">Purchase Cost:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.purchase_cost || v.purchasePriceBdt)}</span>
+                          <span className="text-[#6B6B6B]">Purchase Cost:</span>
+                          <span className="font-mono text-[#1A1A1A] font-semibold">{formatBDT(v.cost.purchase_cost || v.purchasePriceBdt)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">China Local Delivery:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.import_cost)}</span>
+                          <span className="text-[#6B6B6B]">China Local Delivery:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.import_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">International Shipping:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.shipping_cost)}</span>
+                          <span className="text-[#6B6B6B]">International Shipping:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.shipping_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">Packaging:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.packaging_cost)}</span>
+                          <span className="text-[#6B6B6B]">Packaging:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.packaging_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">Photoshoot:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.photoshoot_cost)}</span>
+                          <span className="text-[#6B6B6B]">Photoshoot:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.photoshoot_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">Advertising:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.advertising_cost)}</span>
+                          <span className="text-[#6B6B6B]">Advertising:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.advertising_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">PR / Influencers:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.pr_cost || v.cost.influencer_cost)}</span>
+                          <span className="text-[#6B6B6B]">PR / Influencers:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.pr_cost || v.cost.influencer_cost)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-zinc-500">Miscellaneous:</span>
-                          <span className="text-zinc-300">{formatBDT(v.cost.miscellaneous_cost)}</span>
+                          <span className="text-[#6B6B6B]">Miscellaneous:</span>
+                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.miscellaneous_cost)}</span>
                         </div>
-                        <div className="flex justify-between border-t border-zinc-800/80 pt-2 font-semibold">
-                          <span className="text-zinc-300">True Product Cost:</span>
-                          <span className="text-zinc-50">{formatBDT(v.trueCost)}</span>
+                        <div className="flex justify-between border-t border-[#E9E7E2] pt-2 font-bold text-[#1F3A2E]">
+                          <span>True Product Cost:</span>
+                          <span className="font-mono">{formatBDT(v.trueCost)}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Stock Inventory summary */}
                     <div className="space-y-4">
-                      <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 border-b border-zinc-800 pb-2">
-                        <Box className="h-4 w-4 text-rose-500" />
+                      <h5 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-1.5 border-b border-[#E9E7E2] pb-2">
+                        <Box className="h-4 w-4 text-[#B08D57]" />
                         <span>Inventory & Stock</span>
                       </h5>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-zinc-950/40 p-3 rounded-lg border border-zinc-850">
-                          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Current Stock</span>
-                          <span className="text-lg font-bold text-zinc-100 mt-1 block">{v.totalCurrentStock} units</span>
+                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
+                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Current Stock</span>
+                          <span className="text-lg font-bold font-mono text-[#1A1A1A] mt-0.5 block">{v.totalCurrentStock} units</span>
                         </div>
-                        <div className="bg-zinc-950/40 p-3 rounded-lg border border-zinc-850">
-                          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Reserved Stock</span>
-                          <span className="text-lg font-bold text-amber-500 mt-1 block">{v.totalReservedStock} units</span>
+                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
+                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Reserved Stock</span>
+                          <span className="text-lg font-bold font-mono text-[#D97706] mt-0.5 block">{v.totalReservedStock} units</span>
                         </div>
-                        <div className="bg-zinc-950/40 p-3 rounded-lg border border-zinc-850">
-                          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Available Stock</span>
-                          <span className="text-lg font-bold text-emerald-400 mt-1 block">{v.totalAvailableStock} units</span>
+                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
+                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Available Stock</span>
+                          <span className="text-lg font-bold font-mono text-[#15803D] mt-0.5 block">{v.totalAvailableStock} units</span>
                         </div>
-                        <div className="bg-zinc-950/40 p-3 rounded-lg border border-zinc-850">
-                          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Returned / Damaged</span>
-                          <span className="text-xs font-semibold text-zinc-300 mt-1 block">
+                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
+                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Returned / Damaged</span>
+                          <span className="text-xs font-semibold text-[#6B6B6B] mt-1 block">
                             Returned: {v.totalReturnedStock} / Damaged: {v.totalDamagedStock}
                           </span>
                         </div>
                       </div>
 
                       {v.notes && (
-                        <div className="mt-2 text-xs text-zinc-400 italic bg-zinc-900/20 p-2.5 rounded border border-zinc-800/40">
+                        <div className="mt-2 text-xs text-[#6B6B6B] italic bg-[#FAFAF8] p-2.5 rounded-[10px] border border-[#E9E7E2]">
                           Note: {v.notes}
                         </div>
                       )}

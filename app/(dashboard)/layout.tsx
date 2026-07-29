@@ -8,7 +8,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-app)] text-[var(--text-main)] transition-colors duration-300">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#FAFAF8]">
       {/* Sidebar Navigation */}
       <Sidebar />
 
@@ -18,8 +18,8 @@ export default function DashboardLayout({
         <Header />
 
         {/* Dynamic Page Container */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-thin bg-[var(--bg-app)] text-[var(--text-main)] transition-colors duration-300">
-          <div className="mx-auto max-w-7xl w-full animate-fade-in">
+        <main className="flex-1 overflow-y-auto p-8 scrollbar-thin bg-[#FAFAF8] text-[#1A1A1A]">
+          <div className="mx-auto max-w-7xl w-full">
             {children}
           </div>
         </main>

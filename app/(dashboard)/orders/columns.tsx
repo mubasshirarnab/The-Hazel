@@ -6,6 +6,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import Currency from '@/components/shared/currency';
 import StatusBadge from '@/components/shared/status-badge';
 import { Eye } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export interface OrderRow {
   id: number;
@@ -24,7 +25,7 @@ export const columns: ColumnDef<OrderRow>[] = [
     accessorKey: 'orderNumber',
     header: 'Order Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.orderNumber}
       </span>
     ),
@@ -33,7 +34,7 @@ export const columns: ColumnDef<OrderRow>[] = [
     accessorKey: 'customerName',
     header: 'Customer',
     cell: ({ row }) => (
-      <div className="font-medium text-zinc-100 max-w-[150px] truncate">
+      <div className="font-semibold text-[#1A1A1A] max-w-[150px] truncate">
         {row.original.customerName}
       </div>
     ),
@@ -48,7 +49,7 @@ export const columns: ColumnDef<OrderRow>[] = [
         day: 'numeric',
         year: 'numeric',
       });
-      return <span className="text-zinc-400 text-xs">{formatted}</span>;
+      return <span className="text-[#6B6B6B] text-xs font-medium">{formatted}</span>;
     },
   },
   {
@@ -57,22 +58,16 @@ export const columns: ColumnDef<OrderRow>[] = [
     cell: ({ row }) => {
       const isPre = row.original.orderType === 'preorder';
       return (
-        <span
-          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
-            isPre
-              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-              : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-          }`}
-        >
+        <Badge variant={isPre ? 'gold' : 'forest'}>
           {isPre ? 'Pre-Order' : 'In-Stock'}
-        </span>
+        </Badge>
       );
     },
   },
   {
     accessorKey: 'grandTotal',
     header: 'Grand Total',
-    cell: ({ row }) => <Currency amount={row.original.grandTotal} className="text-zinc-100 font-bold" />,
+    cell: ({ row }) => <Currency amount={row.original.grandTotal} className="text-[#1A1A1A] font-bold" />,
   },
   {
     accessorKey: 'orderStatus',
@@ -95,7 +90,7 @@ export const columns: ColumnDef<OrderRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/orders/${row.original.id}`}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors inline-block"
+        className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#1F3A2E] transition-colors inline-block border border-transparent hover:border-[#E9E7E2]"
         title="View Order Details"
       >
         <Eye className="h-4 w-4" />

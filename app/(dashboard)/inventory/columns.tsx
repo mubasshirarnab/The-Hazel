@@ -25,7 +25,7 @@ export const columns: ColumnDef<InventoryRow>[] = [
     accessorKey: 'product_name',
     header: 'Product Name',
     cell: ({ row }) => (
-      <div className="font-medium text-zinc-100 max-w-[200px] truncate">
+      <div className="font-semibold text-[#1A1A1A] max-w-[200px] truncate">
         {row.original.product_name}
       </div>
     ),
@@ -34,7 +34,7 @@ export const columns: ColumnDef<InventoryRow>[] = [
     accessorKey: 'color_name',
     header: 'Color Variant',
     cell: ({ row }) => (
-      <span className="text-zinc-300">
+      <span className="text-[#6B6B6B] font-medium">
         {row.original.color_name}
       </span>
     ),
@@ -43,7 +43,7 @@ export const columns: ColumnDef<InventoryRow>[] = [
     accessorKey: 'warehouse_name',
     header: 'Warehouse',
     cell: ({ row }) => (
-      <span className="text-zinc-400 font-medium text-xs">
+      <span className="text-[#6B6B6B] font-medium text-xs">
         {row.original.warehouse_name}
       </span>
     ),
@@ -52,7 +52,7 @@ export const columns: ColumnDef<InventoryRow>[] = [
     accessorKey: 'current_stock',
     header: 'Current Stock',
     cell: ({ row }) => (
-      <span className="font-bold text-zinc-200">
+      <span className="font-bold font-mono text-[#1A1A1A]">
         {row.original.current_stock}
       </span>
     ),
@@ -64,8 +64,8 @@ export const columns: ColumnDef<InventoryRow>[] = [
       const reserved = row.original.reserved_stock;
       return (
         <span
-          className={`font-semibold ${
-            reserved > 0 ? 'text-amber-500' : 'text-zinc-500'
+          className={`font-bold font-mono ${
+            reserved > 0 ? 'text-[#D97706]' : 'text-[#9E9E9E]'
           }`}
         >
           {reserved}
@@ -80,8 +80,8 @@ export const columns: ColumnDef<InventoryRow>[] = [
       const available = row.original.available_stock;
       return (
         <span
-          className={`font-bold ${
-            available > 0 ? 'text-emerald-400' : 'text-rose-400'
+          className={`font-bold font-mono ${
+            available > 0 ? 'text-[#15803D]' : 'text-[#DC2626]'
           }`}
         >
           {available}
@@ -93,7 +93,7 @@ export const columns: ColumnDef<InventoryRow>[] = [
     accessorKey: 'returned_stock',
     header: 'Returned / Damaged',
     cell: ({ row }) => (
-      <span className="text-xs text-zinc-400">
+      <span className="text-xs text-[#6B6B6B]">
         R: {row.original.returned_stock} / D: {row.original.damaged_stock}
       </span>
     ),
@@ -106,6 +106,6 @@ export const columns: ColumnDef<InventoryRow>[] = [
   {
     accessorKey: 'inventory_value',
     header: 'Total Value',
-    cell: ({ row }) => <Currency amount={row.original.inventory_value} className="text-emerald-400 font-bold" />,
+    cell: ({ row }) => <Currency amount={row.original.inventory_value} className="text-[#15803D] font-bold" />,
   },
 ];

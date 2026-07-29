@@ -7,6 +7,7 @@ import DataTable from '@/components/shared/data-table';
 import Currency from '@/components/shared/currency';
 import AdjustmentDialog from './adjustment-dialog';
 import { columns } from './columns';
+import { Card } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export default async function InventoryPage() {
   const totalAvailable = totalUnits - totalReserved;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Warehouse Inventory"
         description="Monitor physical stock levels, pending preorder reservations, stock conditions, and valuation."
@@ -55,44 +56,44 @@ export default async function InventoryPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Total Valuation</span>
-          <div className="text-2xl font-bold tracking-tight text-emerald-400 mt-2">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Valuation</span>
+          <div className="text-2xl font-bold tracking-tight text-[#15803D] mt-2 font-mono">
             <Currency amount={totalValue} />
           </div>
-        </div>
+        </Card>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Total Physical Units</span>
-          <span className="text-2xl font-bold tracking-tight text-zinc-100 mt-2 block">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Physical Units</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1A1A1A] mt-2 block font-mono">
             {totalUnits} units
           </span>
-        </div>
+        </Card>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Preorder Reserved</span>
-          <span className="text-2xl font-bold tracking-tight text-amber-500 mt-2 block">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Preorder Reserved</span>
+          <span className="text-2xl font-bold tracking-tight text-[#D97706] mt-2 block font-mono">
             {totalReserved} units
           </span>
-        </div>
+        </Card>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Available to Sell</span>
-          <span className="text-2xl font-bold tracking-tight text-rose-400 mt-2 block">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Available to Sell</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">
             {totalAvailable} units
           </span>
-        </div>
+        </Card>
       </div>
 
       {/* Data Table */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/10">
+      <Card hoverEffect={false} className="p-6">
         <DataTable
           columns={columns}
           data={stocks}
           searchKey="product_name"
           searchPlaceholder="Search inventory by product name..."
         />
-      </div>
+      </Card>
     </div>
   );
 }

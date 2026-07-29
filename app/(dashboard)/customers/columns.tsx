@@ -7,6 +7,7 @@ import { deleteCustomer } from '@/actions/customers';
 import { toast } from 'sonner';
 import { Edit2, Trash2, Loader2 } from 'lucide-react';
 import CustomerDialog from './customer-dialog';
+import { Badge } from '@/components/ui/badge';
 
 export interface CustomerRow {
   id: number;
@@ -29,7 +30,7 @@ export const columns: ColumnDef<CustomerRow>[] = [
     accessorKey: 'customerCode',
     header: 'Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.customerCode}
       </span>
     ),
@@ -38,7 +39,7 @@ export const columns: ColumnDef<CustomerRow>[] = [
     accessorKey: 'customerName',
     header: 'Name',
     cell: ({ row }) => (
-      <div className="font-medium text-zinc-100 truncate max-w-[150px]">
+      <div className="font-semibold text-[#1A1A1A] truncate max-w-[150px]">
         {row.original.customerName}
       </div>
     ),
@@ -47,7 +48,7 @@ export const columns: ColumnDef<CustomerRow>[] = [
     accessorKey: 'phone',
     header: 'Phone',
     cell: ({ row }) => (
-      <span className="text-zinc-300 font-mono text-xs">
+      <span className="text-[#6B6B6B] font-mono text-xs">
         {row.original.phone || '—'}
       </span>
     ),
@@ -56,7 +57,7 @@ export const columns: ColumnDef<CustomerRow>[] = [
     accessorKey: 'facebookName',
     header: 'Facebook Name',
     cell: ({ row }) => (
-      <span className="text-zinc-400 max-w-[120px] truncate block">
+      <span className="text-[#6B6B6B] max-w-[120px] truncate block font-medium">
         {row.original.facebookName || '—'}
       </span>
     ),
@@ -65,7 +66,7 @@ export const columns: ColumnDef<CustomerRow>[] = [
     accessorKey: 'totalOrders',
     header: 'Orders',
     cell: ({ row }) => (
-      <span className="font-bold text-zinc-200">
+      <span className="font-bold font-mono text-[#1A1A1A]">
         {row.original.totalOrders}
       </span>
     ),
@@ -73,29 +74,23 @@ export const columns: ColumnDef<CustomerRow>[] = [
   {
     accessorKey: 'lifetimeSpend',
     header: 'Lifetime Spend',
-    cell: ({ row }) => <Currency amount={row.original.lifetimeSpend} className="text-zinc-100" />,
+    cell: ({ row }) => <Currency amount={row.original.lifetimeSpend} className="text-[#1A1A1A] font-bold" />,
   },
   {
     accessorKey: 'averageOrderValue',
     header: 'AOV',
-    cell: ({ row }) => <Currency amount={row.original.averageOrderValue} className="text-zinc-400 font-medium" />,
+    cell: ({ row }) => <Currency amount={row.original.averageOrderValue} className="text-[#6B6B6B] font-medium" />,
   },
   {
     accessorKey: 'repeatCustomer',
     header: 'Type',
     cell: ({ row }) => {
-      const type = row.original.repeatCustomer; // 'Repeat' or 'New'
+      const type = row.original.repeatCustomer;
       const isRepeat = type === 'Repeat';
       return (
-        <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border leading-none ${
-            isRepeat
-              ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-              : 'bg-zinc-800 text-zinc-400 border-zinc-700'
-          }`}
-        >
+        <Badge variant={isRepeat ? 'gold' : 'outline'}>
           {type}
-        </span>
+        </Badge>
       );
     },
   },
@@ -104,13 +99,13 @@ export const columns: ColumnDef<CustomerRow>[] = [
     header: 'Last Purchase',
     cell: ({ row }) => {
       const d = row.original.lastPurchase;
-      if (!d) return <span className="text-zinc-500">—</span>;
+      if (!d) return <span className="text-[#9E9E9E]">—</span>;
       const formatted = new Date(d).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
       });
-      return <span className="text-zinc-400 text-xs">{formatted}</span>;
+      return <span className="text-[#6B6B6B] text-xs">{formatted}</span>;
     },
   },
   {
@@ -146,7 +141,7 @@ function ActionCell({ customer }: { customer: CustomerRow }) {
       <CustomerDialog
         customer={customer}
         trigger={
-          <button className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer">
+          <button className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#1F3A2E] transition-colors cursor-pointer border border-transparent hover:border-[#E9E7E2]">
             <Edit2 className="h-4 w-4" />
           </button>
         }
@@ -154,11 +149,11 @@ function ActionCell({ customer }: { customer: CustomerRow }) {
       <button
         onClick={handleDelete}
         disabled={isPending}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-50"
+        className="p-1.5 rounded-[8px] hover:bg-[#DC2626]/10 text-[#6B6B6B] hover:text-[#DC2626] transition-colors cursor-pointer disabled:opacity-50 border border-transparent hover:border-[#DC2626]/20"
         title="Delete Customer"
       >
         {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+          <Loader2 className="h-4 w-4 animate-spin text-[#6B6B6B]" />
         ) : (
           <Trash2 className="h-4 w-4" />
         )}

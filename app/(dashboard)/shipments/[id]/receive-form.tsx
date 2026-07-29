@@ -4,7 +4,10 @@ import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { receiveShipmentAction } from '@/actions/shipments';
 import { toast } from 'sonner';
-import { Truck, Loader2, Play } from 'lucide-react';
+import { Truck, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input, Select } from '@/components/ui/input';
 
 interface AssociatedPO {
   id: number;
@@ -21,10 +24,8 @@ export default function ReceiveForm({ shipmentId, pos }: ReceiveFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Selected PO
   const [selectedPoId, setSelectedPoId] = useState('');
 
-  // Arrival Date
   const [receiveDate, setReceiveDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -65,71 +66,61 @@ export default function ReceiveForm({ shipmentId, pos }: ReceiveFormProps) {
   if (pos.length === 0) return null;
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-6">
-      <div>
-        <h4 className="text-base font-bold text-zinc-100 flex items-center gap-2">
-          <Truck className="h-5 w-5 text-rose-500" />
+    <Card hoverEffect={false}>
+      <CardHeader>
+        <CardTitle className="text-base font-bold flex items-center gap-2 text-[#1F3A2E]">
+          <Truck className="h-5 w-5 text-[#B08D57]" />
           <span>Receive Shipment Cargo & Stock</span>
-        </h4>
-        <p className="text-xs text-zinc-400 mt-1">
+        </CardTitle>
+        <p className="text-xs text-[#6B6B6B] mt-1 font-medium">
           Select a Purchase Order inside this shipment cargo to receive into Dhaka Central Warehouse stock.
         </p>
-      </div>
+      </CardHeader>
+      <CardContent className="pt-2">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Select PO to receive</label>
+              <Select
+                value={selectedPoId}
+                onChange={(e) => setSelectedPoId(e.target.value)}
+                disabled={isPending}
+                required
+              >
+                <option value="">Select PO...</option>
+                {pos.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.purchaseOrderNumber} (Value: ৳{Number(p.totalAmountBdt).toLocaleString()})
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Select PO */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Select PO to receive</label>
-          <select
-            value={selectedPoId}
-            onChange={(e) => setSelectedPoId(e.target.value)}
-            disabled={isPending}
-            className="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 text-xs focus:outline-none focus:border-rose-500 transition-colors"
-            required
-          >
-            <option value="">Select PO...</option>
-            {pos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.purchaseOrderNumber} (Value: ৳{Number(p.totalAmountBdt).toLocaleString()})
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Arrival Date</label>
+              <Input
+                type="date"
+                value={receiveDate}
+                onChange={(e) => setReceiveDate(e.target.value)}
+                disabled={isPending}
+                required
+              />
+            </div>
+          </div>
 
-        {/* Arrival Date */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Arrival Date</label>
-          <input
-            type="date"
-            value={receiveDate}
-            onChange={(e) => setReceiveDate(e.target.value)}
-            disabled={isPending}
-            className="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 text-xs focus:outline-none focus:border-rose-500 transition-colors"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Action Submit */}
-      <div className="flex justify-end pt-4 border-t border-zinc-800/80">
-        <button
-          type="submit"
-          disabled={isPending || !selectedPoId}
-          className="flex items-center gap-1.5 px-4.5 py-2.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-colors cursor-pointer disabled:opacity-50"
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Receiving stocks...</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-3.5 w-3.5 fill-current" />
-              <span>Receive PO Cargo & Add Stocks</span>
-            </>
-          )}
-        </button>
-      </div>
-    </form>
+          <div className="flex justify-end pt-4 border-t border-[#E9E7E2]">
+            <Button
+              type="submit"
+              loading={isPending}
+              disabled={!selectedPoId}
+              variant="primary"
+              icon={<Play className="h-4 w-4 shrink-0" />}
+            >
+              Receive PO Cargo & Add Stocks
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

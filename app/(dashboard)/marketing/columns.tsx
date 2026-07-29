@@ -28,7 +28,7 @@ export const columns = (platforms: any[]): ColumnDef<CampaignRow>[] => [
     accessorKey: 'campaign_code',
     header: 'Campaign Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.campaign_code}
       </span>
     ),
@@ -37,7 +37,7 @@ export const columns = (platforms: any[]): ColumnDef<CampaignRow>[] => [
     accessorKey: 'campaign_name',
     header: 'Campaign Name',
     cell: ({ row }) => (
-      <span className="font-medium text-zinc-100 truncate max-w-[150px] block">
+      <span className="font-semibold text-[#1A1A1A] truncate max-w-[150px] block">
         {row.original.campaign_name}
       </span>
     ),
@@ -46,7 +46,7 @@ export const columns = (platforms: any[]): ColumnDef<CampaignRow>[] => [
     accessorKey: 'platform_name',
     header: 'Platform',
     cell: ({ row }) => (
-      <span className="text-zinc-300 font-semibold text-xs">
+      <span className="text-[#6B6B6B] font-semibold text-xs">
         {row.original.platform_name}
       </span>
     ),
@@ -59,18 +59,18 @@ export const columns = (platforms: any[]): ColumnDef<CampaignRow>[] => [
   {
     accessorKey: 'spend_amount',
     header: 'Actual Spend',
-    cell: ({ row }) => <Currency amount={row.original.spend_amount} className="text-rose-400" />,
+    cell: ({ row }) => <Currency amount={row.original.spend_amount} className="text-[#DC2626]" />,
   },
   {
     accessorKey: 'revenue_amount',
     header: 'Tracked Revenue',
-    cell: ({ row }) => <Currency amount={row.original.revenue_amount} className="text-emerald-400 font-bold" />,
+    cell: ({ row }) => <Currency amount={row.original.revenue_amount} className="text-[#15803D] font-bold" />,
   },
   {
     accessorKey: 'orders_generated',
     header: 'Orders',
     cell: ({ row }) => (
-      <span className="font-bold text-zinc-200">
+      <span className="font-bold text-[#1A1A1A] font-mono">
         {row.original.orders_generated}
       </span>
     ),
@@ -82,12 +82,12 @@ export const columns = (platforms: any[]): ColumnDef<CampaignRow>[] => [
       const roasVal = parseFloat(row.original.roas as string) || 0;
       return (
         <span
-          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+          className={`font-mono font-bold text-xs px-2 py-0.5 rounded-full ${
             roasVal >= 4
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              ? 'bg-[#22C55E]/10 text-[#15803D] border border-[#22C55E]/20'
               : roasVal >= 2
-              ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
-              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+              ? 'bg-[#1F3A2E]/10 text-[#1F3A2E] border border-[#1F3A2E]/20'
+              : 'bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/20'
           }`}
         >
           {roasVal.toFixed(2)}x
@@ -123,7 +123,6 @@ function ActionCell({ campaign, platforms }: { campaign: CampaignRow; platforms:
     }
   };
 
-  // Reshape parameters for dialog validation
   const mappedCampaign = {
     id: campaign.id,
     campaignName: campaign.campaign_name,
@@ -142,7 +141,7 @@ function ActionCell({ campaign, platforms }: { campaign: CampaignRow; platforms:
         campaign={mappedCampaign}
         platforms={platforms}
         trigger={
-          <button className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer">
+          <button className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#1F3A2E] transition-colors cursor-pointer border border-transparent hover:border-[#E9E7E2]">
             <Edit2 className="h-4 w-4" />
           </button>
         }
@@ -150,11 +149,11 @@ function ActionCell({ campaign, platforms }: { campaign: CampaignRow; platforms:
       <button
         onClick={handleDelete}
         disabled={isPending}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-50"
+        className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#DC2626] transition-colors cursor-pointer disabled:opacity-50 border border-transparent hover:border-[#E9E7E2]"
         title="Delete Campaign"
       >
         {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+          <Loader2 className="h-4 w-4 animate-spin text-[#9E9E9E]" />
         ) : (
           <Trash2 className="h-4 w-4" />
         )}

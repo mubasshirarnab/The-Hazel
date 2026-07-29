@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { updateSettings } from '@/actions/settings';
 import { toast } from 'sonner';
-import { Save, Loader2 } from 'lucide-react';
+import { Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface SettingRow {
   setting_key: string;
@@ -83,7 +84,7 @@ export default function SettingsForm({ settings }: SettingsFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
       {settings.map((setting) => {
         const meta = SETTING_META[setting.setting_key];
         if (!meta) return null;
@@ -91,12 +92,12 @@ export default function SettingsForm({ settings }: SettingsFormProps) {
         return (
           <div
             key={setting.setting_key}
-            className="p-5 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-3"
+            className="p-5 rounded-[14px] border border-[#E9E7E2] bg-[#FAFAF8] space-y-3 hover:border-[#B08D57]/40 transition-colors"
           >
             <div>
-              <label className="text-sm font-semibold text-zinc-200 block">{meta.label}</label>
+              <label className="text-sm font-semibold text-[#1A1A1A] block">{meta.label}</label>
               {meta.description && (
-                <p className="text-[11px] text-zinc-500 mt-0.5">{meta.description}</p>
+                <p className="text-[11px] text-[#9E9E9E] mt-0.5">{meta.description}</p>
               )}
             </div>
 
@@ -111,12 +112,12 @@ export default function SettingsForm({ settings }: SettingsFormProps) {
                     setValues((prev) => ({ ...prev, [setting.setting_key]: e.target.value }))
                   }
                   disabled={loading}
-                  className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 font-mono text-sm focus:outline-none focus:border-rose-500 transition-colors"
+                  className="w-full px-4 py-2.5 bg-white border border-[#E9E7E2] rounded-[12px] text-[#1A1A1A] font-mono text-sm focus:outline-none focus:border-[#1F3A2E] focus:ring-2 focus:ring-[#1F3A2E]/10 transition-all shadow-soft-1"
                   required
                 />
               </div>
               {meta.unit && (
-                <span className="text-xs text-zinc-500 font-semibold whitespace-nowrap">
+                <span className="text-xs text-[#6B6B6B] font-semibold whitespace-nowrap">
                   {meta.unit}
                 </span>
               )}
@@ -126,18 +127,14 @@ export default function SettingsForm({ settings }: SettingsFormProps) {
       })}
 
       <div className="pt-4 flex justify-end">
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-zinc-50 font-semibold text-sm transition-colors cursor-pointer disabled:opacity-50"
+          loading={loading}
+          variant="gold"
+          icon={<Save className="h-4 w-4 shrink-0" />}
         >
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          <span>Save Business Settings</span>
-        </button>
+          Save Business Settings
+        </Button>
       </div>
     </form>
   );

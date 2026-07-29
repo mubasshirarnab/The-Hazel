@@ -1,116 +1,144 @@
 @import "tailwindcss";
 
-/* Design Tokens for Light & Dark Themes */
-:root,
-html.light {
-  --bg-app: #f8fafc; /* Crisp Slate 50 */
-  --bg-surface: #ffffff; /* Pure White Card */
-  --bg-elevated: #f1f5f9; /* Slate 100 */
-  --bg-sidebar: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.85);
+@theme inline {
+  --font-serif: var(--font-serif), Cormorant Garamond, Playfair Display, Georgia, serif;
+  --font-sans: var(--font-sans), Plus Jakarta Sans, Inter, system-ui, sans-serif;
 
-  --text-main: #0f172a; /* Slate 900 - High contrast, zero eye strain */
-  --text-muted: #64748b; /* Slate 500 */
-  --text-subtle: #94a3b8; /* Slate 400 */
+  --color-background: #FAFAF8;
+  --color-foreground: #1A1A1A;
 
-  --border-subtle: rgba(226, 232, 240, 0.9); /* Slate 200 */
-  --border-accent: rgba(217, 119, 6, 0.25); /* Gold accent border */
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1A1A1A;
 
-  --accent-gold: #d97706; /* Warm Amber / Gold */
-  --accent-gold-light: #fef3c7;
-  --accent-rose: #e11d48;
-  --accent-emerald: #059669;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1A1A1A;
 
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(226, 232, 240, 0.8);
-  --card-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
-  --card-hover-shadow: 0 20px 40px -10px rgba(217, 119, 6, 0.12), 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+  --color-primary: #1F3A2E;
+  --color-primary-foreground: #FFFFFF;
+  --color-primary-hover: #162A21;
 
-  --input-bg: #f8fafc;
-  --input-border: #cbd5e1;
+  --color-accent: #B08D57;
+  --color-accent-foreground: #FFFFFF;
+
+  --color-secondary: #6A4E3B;
+  --color-secondary-foreground: #FFFFFF;
+
+  --color-muted: #F7F6F3;
+  --color-muted-foreground: #6B6B6B;
+
+  --color-border: #E9E7E2;
+  --color-input: #E9E7E2;
+  --color-ring: #1F3A2E;
+
+  --color-success: #22C55E;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
 }
 
-html.dark {
-  --bg-app: #08090d; /* Deep Obsidian */
-  --bg-surface: #0f1117; /* Obsidian Card */
-  --bg-elevated: #141720;
-  --bg-sidebar: #0b0d12;
-  --bg-header: rgba(8, 9, 13, 0.85);
-
-  --text-main: #f8fafc; /* Crisp Slate White */
-  --text-muted: #94a3b8; /* Slate 400 */
-  --text-subtle: #64748b;
-
-  --border-subtle: rgba(245, 158, 11, 0.15);
-  --border-accent: rgba(245, 158, 11, 0.35);
-
-  --accent-gold: #f59e0b;
-  --accent-gold-light: rgba(245, 158, 11, 0.15);
-  --accent-rose: #f43f5e;
-  --accent-emerald: #10b981;
-
-  --card-bg: rgba(15, 17, 23, 0.85);
-  --card-border: rgba(245, 158, 11, 0.18);
-  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-  --card-hover-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.15), 0 0 20px 0 rgba(225, 29, 72, 0.1);
-
-  --input-bg: #0d0e14;
-  --input-border: rgba(245, 158, 11, 0.25);
+:root {
+  --background: #FAFAF8;
+  --foreground: #1A1A1A;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --primary: #1F3A2E;
+  --primary-foreground: #FFFFFF;
+  --accent: #B08D57;
+  --secondary: #6A4E3B;
+  --muted: #F7F6F3;
+  --muted-foreground: #6B6B6B;
+  --border: #E9E7E2;
+  --input: #E9E7E2;
+  --ring: #1F3A2E;
 }
 
 body {
-  background-color: var(--bg-app);
-  color: var(--text-main);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  background-color: #FAFAF8;
+  color: #1A1A1A;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Metallic Gold Gradients */
-.text-gold-gradient {
-  background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 50%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Editorial Serif Heading Helper */
+.font-serif-heading {
+  font-family: var(--font-serif);
 }
 
-html.light .text-gold-gradient {
-  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Luxury Soft Shadows */
+.shadow-soft-1 {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-.text-gold-rose-gradient {
-  background: linear-gradient(135deg, #fde68a 0%, #f43f5e 50%, #fbbf24 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.shadow-soft-2 {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-html.light .text-gold-rose-gradient {
-  background: linear-gradient(135deg, #d97706 0%, #e11d48 50%, #b45309 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.shadow-soft-3 {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
 }
 
-/* Dynamic Luxury Card Styling */
+/* Luxury Card Styling */
 .luxury-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--card-border);
-  box-shadow: var(--card-shadow);
-  border-radius: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #FFFFFF;
+  border: 1px solid #E9E7E2;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .luxury-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .luxury-card-hover:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--card-hover-shadow);
+  border-color: rgba(176, 141, 87, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
 }
 
-/* Micro-animations */
+/* Glassmorphism Header */
+.glass-header {
+  background: rgba(250, 250, 248, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #E9E7E2;
+}
+
+/* Editorial Typography Helpers */
+.text-gold-accent {
+  color: #B08D57;
+}
+
+.text-forest {
+  color: #1F3A2E;
+}
+
+.bg-forest {
+  background-color: #1F3A2E;
+}
+
+.bg-gold {
+  background-color: #B08D57;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAFAF8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E9E7E2;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B08D57;
+}
+
+/* Smooth Fade & Slide Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -123,25 +151,5 @@ html.light .text-gold-rose-gradient {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Custom Ergonomic Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--text-subtle);
-  border-radius: 9999px;
-  opacity: 0.5;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-gold);
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

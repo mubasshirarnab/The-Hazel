@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createExpenseAllocation } from '@/actions/allocations';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2, Save, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { formatBDT } from '@/components/shared/currency';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input, Select, Textarea } from '@/components/ui/input';
 
 interface CategoryOption {
   id: number;
@@ -37,7 +40,6 @@ export default function AllocationForm({ categories, components, variants }: All
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Form states
   const [expenseName, setExpenseName] = useState('');
   const [expenseCategoryId, setExpenseCategoryId] = useState('');
   const [costComponentId, setCostComponentId] = useState('');
@@ -51,7 +53,6 @@ export default function AllocationForm({ categories, components, variants }: All
   >('equal_distribution');
   const [notes, setNotes] = useState('');
 
-  // Selected variants
   const [selectedVariantIds, setSelectedVariantIds] = useState<number[]>([]);
   const [manualAmounts, setManualAmounts] = useState<Record<number, string>>({});
 
@@ -69,7 +70,6 @@ export default function AllocationForm({ categories, components, variants }: All
 
   const totalAmountVal = parseFloat(amount) || 0;
 
-  // Perform dynamic allocations based on method
   const calculatedAllocations = selectedVariantIds.map((vId) => {
     const variant = variants.find((v) => v.id === vId)!;
     const qty = variant.currentStock || 0;
@@ -98,7 +98,6 @@ export default function AllocationForm({ categories, components, variants }: All
       allocatedAmount = totalValueSum > 0 ? (totalAmountVal * price) / totalValueSum : 0;
       qtyBasis = 0;
     } else {
-      // Manual Allocation
       allocatedAmount = parseFloat(manualAmounts[vId]) || 0;
       qtyBasis = 0;
       valBasis = 0;
@@ -173,205 +172,198 @@ export default function AllocationForm({ categories, components, variants }: All
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl animate-fade-in">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Expense Settings */}
-        <div className="lg:col-span-1 p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-5 h-fit">
-          <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Expense Config
-          </h3>
+        <Card hoverEffect={false} className="lg:col-span-1 h-fit">
+          <CardHeader>
+            <CardTitle className="text-xs uppercase tracking-widest text-[#1F3A2E]">
+              Expense Config
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Expense Name</label>
+              <Input
+                placeholder="e.g. Summer Photoshoot"
+                value={expenseName}
+                onChange={(e) => setExpenseName(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
 
-          {/* Name */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Expense Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Summer Photoshoot"
-              value={expenseName}
-              onChange={(e) => setExpenseName(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            />
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Category</label>
+              <Select
+                value={expenseCategoryId}
+                onChange={(e) => setExpenseCategoryId(e.target.value)}
+                disabled={loading}
+                required
+              >
+                <option value="">Select Category...</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.categoryName}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Category */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Category</label>
-            <select
-              value={expenseCategoryId}
-              onChange={(e) => setExpenseCategoryId(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            >
-              <option value="">Select Category...</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.categoryName}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Cost Component</label>
+              <Select
+                value={costComponentId}
+                onChange={(e) => setCostComponentId(e.target.value)}
+                disabled={loading}
+                required
+              >
+                <option value="">Select Component...</option>
+                {components.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.componentName}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Cost Component */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Cost Component</label>
-            <select
-              value={costComponentId}
-              onChange={(e) => setCostComponentId(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            >
-              <option value="">Select Component...</option>
-              {components.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.componentName}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Expense Date</label>
+              <Input
+                type="date"
+                value={expenseDate}
+                onChange={(e) => setExpenseDate(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
 
-          {/* Date */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Expense Date</label>
-            <input
-              type="date"
-              value={expenseDate}
-              onChange={(e) => setExpenseDate(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            />
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Total Expense Amount (BDT)</label>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
 
-          {/* Amount */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Total Expense Amount (BDT)</label>
-            <input
-              type="number"
-              placeholder="0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            />
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Allocation Method</label>
+              <Select
+                value={methodCode}
+                onChange={(e) => setMethodCode(e.target.value as any)}
+                disabled={loading}
+                required
+              >
+                <option value="equal_distribution">Equal Distribution</option>
+                <option value="quantity_based">Quantity (Stock Ratio)</option>
+                <option value="purchase_value_based">Value (Purchase Ratio)</option>
+                <option value="manual_allocation">Manual Allocation</option>
+              </Select>
+            </div>
 
-          {/* Method */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Allocation Method</label>
-            <select
-              value={methodCode}
-              onChange={(e) => setMethodCode(e.target.value as any)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-              required
-            >
-              <option value="equal_distribution">Equal Distribution</option>
-              <option value="quantity_based">Quantity (Stock Ratio)</option>
-              <option value="purchase_value_based">Value (Purchase Ratio)</option>
-              <option value="manual_allocation">Manual Allocation</option>
-            </select>
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Notes</label>
-            <textarea
-              rows={2}
-              placeholder="Allocation details..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500 resize-none"
-            />
-          </div>
-        </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Notes</label>
+              <Textarea
+                rows={2}
+                placeholder="Allocation details..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Right Column: Variant Selector & Realtime Ratio Allocation displays */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Target Variant Selection Grid */}
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-            <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest border-b border-zinc-800 pb-3">
-              2. Target Handbag Color Variants
-            </h3>
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs uppercase tracking-widest text-[#1F3A2E]">
+                2. Target Handbag Color Variants
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-2 scrollbar-thin">
+                {variants.map((v) => {
+                  const isSelected = selectedVariantIds.includes(v.id);
+                  return (
+                    <div
+                      key={v.id}
+                      onClick={() => handleToggleVariant(v.id)}
+                      className={`p-3 rounded-[12px] border transition-all duration-150 cursor-pointer flex items-center justify-between ${
+                        isSelected
+                          ? 'bg-[#1F3A2E]/10 border-[#1F3A2E]/30 text-[#1F3A2E]'
+                          : 'bg-[#FAFAF8] border-[#E9E7E2] hover:border-[#B08D57]/40 text-[#1A1A1A]'
+                      }`}
+                    >
+                      <div>
+                        <span className="font-mono text-[10px] font-bold text-[#1F3A2E] block">
+                          {v.variantCode}
+                        </span>
+                        <span className="text-xs font-semibold text-[#1A1A1A] block mt-0.5">
+                          {v.productName} ({v.colorName})
+                        </span>
+                        <span className="text-[9px] text-[#6B6B6B] block mt-0.5 font-medium">
+                          Stock: {v.currentStock} units | Purchase: {formatBDT(v.purchasePriceBdt)}
+                        </span>
+                      </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
-              {variants.map((v) => {
-                const isSelected = selectedVariantIds.includes(v.id);
-                return (
-                  <div
-                    key={v.id}
-                    onClick={() => handleToggleVariant(v.id)}
-                    className={`p-3 rounded-lg border transition-all duration-150 cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-rose-500/5 border-rose-500/30 text-zinc-100'
-                        : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-750 text-zinc-400'
-                    }`}
-                  >
-                    <div>
-                      <span className="font-mono text-[10px] font-semibold text-rose-400 block">
-                        {v.variantCode}
-                      </span>
-                      <span className="text-xs font-semibold text-zinc-200 block mt-0.5">
-                        {v.productName} ({v.colorName})
-                      </span>
-                      <span className="text-[9px] text-zinc-500 block mt-0.5">
-                        Stock: {v.currentStock} units | Purchase: {formatBDT(v.purchasePriceBdt)}
-                      </span>
+                      <div className={`h-4.5 w-4.5 rounded-[6px] border flex items-center justify-center shrink-0 ${
+                        isSelected ? 'border-[#1F3A2E] bg-[#1F3A2E] text-white' : 'border-[#E9E7E2]'
+                      }`}>
+                        {isSelected && <span className="text-[9px] font-bold">✓</span>}
+                      </div>
                     </div>
-
-                    <div className={`h-4.5 w-4.5 rounded border flex items-center justify-center shrink-0 ${
-                      isSelected ? 'border-rose-500 bg-rose-600' : 'border-zinc-700'
-                    }`}>
-                      {isSelected && <span className="text-[9px] font-bold text-zinc-50">✓</span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Allocation Math Results ledger */}
           {selectedVariantIds.length > 0 && (
-            <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-              <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest border-b border-zinc-800 pb-3 flex items-center justify-between">
-                <span>3. Allocation Breakdown Ledger</span>
-                <span className="text-xs font-semibold text-rose-400 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  <span>Sum: {formatBDT(sumAllocations)}</span>
-                </span>
-              </h3>
-
-              <div className="space-y-3">
+            <Card hoverEffect={false}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xs uppercase tracking-widest text-[#1F3A2E]">
+                    3. Allocation Breakdown Ledger
+                  </CardTitle>
+                  <span className="text-xs font-bold text-[#B08D57] flex items-center gap-1 font-mono">
+                    <Sparkles className="h-3.5 w-3.5 text-[#B08D57]" />
+                    <span>Sum: {formatBDT(sumAllocations)}</span>
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2 space-y-3">
                 {calculatedAllocations.map((item) => (
                   <div
                     key={item.variantId}
-                    className="p-3.5 rounded-lg bg-zinc-950/60 border border-zinc-850 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
+                    className="p-3.5 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
                   >
                     <div>
-                      <span className="font-mono text-[10px] font-semibold text-rose-400">
+                      <span className="font-mono text-[10px] font-bold text-[#1F3A2E]">
                         {item.variantCode}
                       </span>
-                      <span className="text-zinc-200 font-semibold block mt-0.5">
+                      <span className="text-[#1A1A1A] font-semibold block mt-0.5">
                         {item.productName} ({item.colorName})
                       </span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-6 self-end md:self-auto">
                       <div className="text-right">
-                        <span className="text-[9px] text-zinc-500 uppercase tracking-widest block font-medium">Stock Cost Impact</span>
-                        <span className="text-xs font-semibold text-zinc-400">
+                        <span className="text-[9px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Stock Cost Impact</span>
+                        <span className="text-xs font-bold text-[#15803D] font-mono">
                           +{formatBDT(item.unitImpact)} / unit
                         </span>
                       </div>
 
                       {methodCode === 'manual_allocation' ? (
                         <div className="flex items-center gap-2">
-                          <label className="text-[10px] text-rose-400 font-bold uppercase tracking-widest">BDT Amount:</label>
+                          <label className="text-[10px] text-[#1F3A2E] font-bold uppercase tracking-widest">BDT Amount:</label>
                           <input
                             type="number"
                             value={manualAmounts[item.variantId] || ''}
@@ -382,14 +374,14 @@ export default function AllocationForm({ categories, components, variants }: All
                               })
                             }
                             disabled={loading}
-                            className="w-24 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded text-center text-xs font-semibold text-zinc-100 focus:outline-none focus:border-rose-500"
+                            className="w-24 px-2.5 py-1 bg-white border border-[#E9E7E2] rounded-[8px] text-center text-xs font-bold text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E]"
                             required
                           />
                         </div>
                       ) : (
                         <div className="text-right">
-                          <span className="text-[9px] text-rose-400 uppercase tracking-widest block font-bold">Allocated Amount</span>
-                          <span className="text-xs font-bold text-zinc-100 font-mono">
+                          <span className="text-[9px] text-[#B08D57] uppercase tracking-widest block font-bold">Allocated Amount</span>
+                          <span className="text-xs font-bold text-[#1A1A1A] font-mono">
                             {formatBDT(item.allocatedAmount)}
                           </span>
                         </div>
@@ -397,39 +389,28 @@ export default function AllocationForm({ categories, components, variants }: All
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
 
-      {/* Save Button bar */}
       <div className="flex items-center justify-end gap-3 pt-4">
-        <Link
-          href="/cost-allocation"
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Cancel</span>
+        <Link href="/cost-allocation">
+          <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
+            Cancel
+          </Button>
         </Link>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading || selectedVariantIds.length === 0}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-all font-semibold text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          loading={loading}
+          disabled={selectedVariantIds.length === 0}
+          variant="primary"
+          icon={<Save className="h-4 w-4 shrink-0" />}
         >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Allocating Costs...</span>
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" />
-              <span>Apply Allocation</span>
-            </>
-          )}
-        </button>
+          Apply Allocation
+        </Button>
       </div>
     </form>
   );

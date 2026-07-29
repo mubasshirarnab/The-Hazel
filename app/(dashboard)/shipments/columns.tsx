@@ -24,7 +24,7 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     accessorKey: 'shipmentNumber',
     header: 'Shipment Code',
     cell: ({ row }) => (
-      <span className="font-mono text-xs font-semibold text-rose-400">
+      <span className="font-mono text-xs font-bold text-[#1F3A2E]">
         {row.original.shipmentNumber}
       </span>
     ),
@@ -34,9 +34,9 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     header: 'Departure',
     cell: ({ row }) => {
       const d = row.original.departureDate;
-      if (!d) return <span className="text-zinc-500">—</span>;
+      if (!d) return <span className="text-[#9E9E9E]">—</span>;
       return (
-        <span className="text-zinc-300 text-xs">
+        <span className="text-[#6B6B6B] text-xs font-medium">
           {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </span>
       );
@@ -47,9 +47,9 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     header: 'Warehouse Arrival',
     cell: ({ row }) => {
       const d = row.original.warehouseArrivalDate;
-      if (!d) return <span className="text-zinc-500">—</span>;
+      if (!d) return <span className="text-[#9E9E9E]">—</span>;
       return (
-        <span className="text-zinc-350 text-xs font-semibold">
+        <span className="text-[#1A1A1A] text-xs font-bold">
           {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </span>
       );
@@ -59,7 +59,7 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     accessorKey: 'weightKg',
     header: 'Weight (KG)',
     cell: ({ row }) => (
-      <span className="font-bold text-zinc-200">
+      <span className="font-bold font-mono text-[#1A1A1A]">
         {parseFloat(row.original.weightKg).toFixed(1)} kg
       </span>
     ),
@@ -68,7 +68,7 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     accessorKey: 'shippingRatePerKg',
     header: 'Rate/KG',
     cell: ({ row }) => (
-      <span className="font-mono text-xs text-zinc-400">
+      <span className="font-mono text-xs text-[#6B6B6B]">
         {parseFloat(row.original.shippingRatePerKg).toFixed(0)} BDT
       </span>
     ),
@@ -77,7 +77,7 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     accessorKey: 'shippingCost',
     header: 'Total Shipping Cost',
     cell: ({ row }) => (
-      <CurrencyFormatter amount={row.original.shippingCost} className="text-zinc-100 font-bold" />
+      <CurrencyFormatter amount={row.original.shippingCost} className="text-[#1A1A1A] font-bold" />
     ),
   },
   {
@@ -91,7 +91,7 @@ export const columns: ColumnDef<ShipmentRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/shipments/${row.original.id}`}
-        className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors inline-block"
+        className="p-1.5 rounded-[8px] hover:bg-[#F7F6F3] text-[#6B6B6B] hover:text-[#1F3A2E] transition-colors inline-block border border-transparent hover:border-[#E9E7E2]"
         title="View Shipment Details"
       >
         <Eye className="h-4 w-4" />

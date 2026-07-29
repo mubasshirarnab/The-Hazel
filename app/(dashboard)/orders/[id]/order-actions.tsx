@@ -4,7 +4,10 @@ import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { completeOrder, cancelOrder, processOrderReturn } from '@/actions/orders';
 import { toast } from 'sonner';
-import { Check, X, Undo2, Loader2, AlertTriangle } from 'lucide-react';
+import { Check, X, Undo2, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/input';
 
 interface OrderActionsProps {
   orderId: number;
@@ -88,109 +91,92 @@ export default function OrderActions({ orderId, orderStatus, returnStatus }: Ord
     <>
       <div className="flex flex-wrap items-center gap-3">
         {showComplete && (
-          <button
+          <Button
             onClick={handleComplete}
-            disabled={isPending}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
+            loading={isPending}
+            variant="primary"
+            size="sm"
+            icon={<Check className="h-4 w-4 shrink-0" />}
           >
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-            <span>Mark as Delivered</span>
-          </button>
+            Mark as Delivered
+          </Button>
         )}
 
         {showCancel && (
-          <button
+          <Button
             onClick={handleCancel}
-            disabled={isPending}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
+            loading={isPending}
+            variant="danger"
+            size="sm"
+            icon={<X className="h-4 w-4 shrink-0" />}
           >
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
-            <span>Cancel Order</span>
-          </button>
+            Cancel Order
+          </Button>
         )}
 
         {showReturn && (
-          <button
+          <Button
             onClick={() => setIsReturnOpen(true)}
-            disabled={isPending}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-[var(--accent-gold)] hover:bg-amber-500/20 transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
+            loading={isPending}
+            variant="gold"
+            size="sm"
+            icon={<Undo2 className="h-4 w-4 shrink-0" />}
           >
-            <Undo2 className="h-4 w-4" />
-            <span>Accept Customer Return</span>
-          </button>
+            Accept Customer Return
+          </Button>
         )}
       </div>
 
-      {/* Customer Return Modal */}
-      {isReturnOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md p-7 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-main)] shadow-2xl relative transition-colors duration-300">
-            <button
-              onClick={() => setIsReturnOpen(false)}
-              className="absolute right-5 top-5 p-1.5 rounded-lg hover:bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            <div className="mb-6 flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-500 flex-shrink-0">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-extrabold text-[var(--text-main)]">Accept Customer Return</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">
-                  This will restock all items from this order back into inventory and mark the order as{' '}
-                  <strong className="text-[var(--accent-gold)]">Returned</strong>. A refund record will be generated automatically.
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleReturnSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-[var(--accent-gold)] uppercase tracking-widest block">
-                  Customer Return Reason <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="e.g. Item received damaged in transit. Customer requested full refund and return of goods..."
-                  value={returnReason}
-                  onChange={(e) => setReturnReason(e.target.value)}
-                  disabled={isPending}
-                  className="w-full px-3.5 py-2.5 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-[var(--text-main)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:border-[var(--accent-gold)] focus:ring-2 focus:ring-amber-500/20 transition-all resize-none font-medium shadow-2xs"
-                  required
-                />
-              </div>
-
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-[var(--accent-gold)] leading-relaxed">
-                <strong>What happens:</strong> All ordered items will be restocked into inventory, sales count decreases, and a{' '}
-                <span className="font-mono">RTN-XXXXXXXX</span> refund record will be created.
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-subtle)]">
-                <button
-                  type="button"
-                  onClick={() => { setIsReturnOpen(false); setReturnReason(''); }}
-                  disabled={isPending}
-                  className="px-4 py-2 text-xs font-semibold border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)] rounded-xl transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-amber-500/20"
-                >
-                  {isPending ? (
-                    <><Loader2 className="h-3.5 w-3.5 animate-spin" /><span>Processing...</span></>
-                  ) : (
-                    <><Undo2 className="h-3.5 w-3.5" /><span>Confirm Return & Restock</span></>
-                  )}
-                </button>
-              </div>
-            </form>
+      <Dialog
+        isOpen={isReturnOpen}
+        onClose={() => setIsReturnOpen(false)}
+        title="Accept Customer Return"
+        description="Restock all items back into inventory and mark order as returned with an automated refund log."
+      >
+        <form onSubmit={handleReturnSubmit} className="space-y-4">
+          <div className="flex items-start gap-3 p-3 rounded-[12px] bg-[#B08D57]/10 border border-[#B08D57]/20 text-[#6A4E3B] text-xs">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-[#B08D57] mt-0.5" />
+            <p className="leading-relaxed">
+              Restocks items into inventory, decreases sales totals, and generates a refund record (<strong className="font-mono">RTN-XXXXXXXX</strong>).
+            </p>
           </div>
-        </div>
-      )}
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">
+              Customer Return Reason <span className="text-[#DC2626]">*</span>
+            </label>
+            <Textarea
+              rows={4}
+              placeholder="e.g. Item received damaged in transit. Customer requested full refund..."
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+              disabled={isPending}
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E9E7E2]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => { setIsReturnOpen(false); setReturnReason(''); }}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              loading={isPending}
+              variant="gold"
+              size="sm"
+              icon={<Undo2 className="h-4 w-4 shrink-0" />}
+            >
+              Confirm Return & Restock
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </>
   );
 }

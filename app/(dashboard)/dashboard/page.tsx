@@ -1,10 +1,9 @@
 import React from 'react';
 import { poolConnection } from '@/lib/db/db';
-import Currency, { formatBDT } from '@/components/shared/currency';
+import { formatBDT } from '@/components/shared/currency';
 import { RevenueAreaChart, MonthlyPLChart } from './charts';
 import {
   ShoppingBag,
-  Users,
   Package,
   TrendingUp,
   DollarSign,
@@ -86,16 +85,16 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Page Title Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#E9E7E2]">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-extrabold tracking-tight text-gold-gradient font-serif">Executive Command Center</h1>
-            <span className="px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[var(--accent-gold)] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-2xs">
-              <Crown className="h-3 w-3 text-amber-500" />
+            <h1 className="text-3xl font-bold tracking-tight text-[#1F3A2E] font-serif">Executive Command Center</h1>
+            <span className="px-3 py-0.5 rounded-full bg-[#1F3A2E]/10 border border-[#1F3A2E]/20 text-[#1F3A2E] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-soft-1">
+              <Crown className="h-3 w-3 text-[#B08D57]" />
               <span>Haute Couture Analytics</span>
             </span>
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1 font-medium">
+          <p className="text-xs text-[#6B6B6B] mt-1 font-medium leading-relaxed">
             Real-time financial performance, inventory valuation, cogs breakdown, and sales analytics.
           </p>
         </div>
@@ -108,101 +107,101 @@ export default async function DashboardPage() {
             label: 'Total Sales',
             value: formatBDT(totalRevenue),
             icon: DollarSign,
-            color: 'text-[var(--accent-gold)]',
-            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
+            color: 'text-[#1F3A2E]',
+            iconBg: 'bg-[#1F3A2E]/10 border-[#1F3A2E]/20 text-[#1F3A2E]',
           },
           {
             label: 'COGS (Product Cost)',
             value: formatBDT(cogs),
             icon: Package,
-            color: 'text-[var(--text-main)]',
-            iconBg: 'bg-slate-500/10 border-slate-500/20 text-slate-500',
+            color: 'text-[#1A1A1A]',
+            iconBg: 'bg-[#F7F6F3] border-[#E9E7E2] text-[#6A4E3B]',
           },
           {
             label: 'Gross Profit',
             value: formatBDT(grossProfit),
             icon: TrendingUp,
-            color: grossProfit >= 0 ? 'text-sky-600 dark:text-sky-300' : 'text-rose-500',
-            iconBg: 'bg-sky-500/10 border-sky-500/30 text-sky-500',
+            color: grossProfit >= 0 ? 'text-[#15803D]' : 'text-[#DC2626]',
+            iconBg: 'bg-[#22C55E]/10 border-[#22C55E]/20 text-[#15803D]',
           },
           {
             label: 'Operating Expenses',
             value: formatBDT(totalExpenses),
             icon: DollarSign,
-            color: 'text-rose-600 dark:text-rose-400',
-            iconBg: 'bg-rose-500/10 border-rose-500/30 text-rose-500',
+            color: 'text-[#6A4E3B]',
+            iconBg: 'bg-[#6A4E3B]/10 border-[#6A4E3B]/20 text-[#6A4E3B]',
           },
           {
             label: 'Net Profit',
             value: formatBDT(netProfit),
             icon: TrendingUp,
-            color: netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500',
-            iconBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500',
+            color: netProfit >= 0 ? 'text-[#15803D]' : 'text-[#DC2626]',
+            iconBg: 'bg-[#22C55E]/10 border-[#22C55E]/20 text-[#15803D]',
           },
           {
             label: 'Profit Margin',
             value: `${profitMargin.toFixed(1)}%`,
             icon: BarChart2,
-            color: profitMargin >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500',
-            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
+            color: profitMargin >= 20 ? 'text-[#15803D]' : 'text-[#DC2626]',
+            iconBg: 'bg-[#B08D57]/10 border-[#B08D57]/20 text-[#B08D57]',
           },
           {
             label: 'Total Orders',
             value: String(orderStats?.total_orders || 0),
             icon: ShoppingBag,
-            color: 'text-[var(--accent-gold)]',
-            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
+            color: 'text-[#1F3A2E]',
+            iconBg: 'bg-[#1F3A2E]/10 border-[#1F3A2E]/20 text-[#1F3A2E]',
           },
           {
             label: 'Pending Orders',
             value: String(orderStats?.pending_orders || 0),
             icon: AlertCircle,
-            color: 'text-rose-600 dark:text-rose-400',
-            iconBg: 'bg-rose-500/10 border-rose-500/30 text-rose-500',
+            color: 'text-[#D97706]',
+            iconBg: 'bg-[#D97706]/10 border-[#D97706]/20 text-[#D97706]',
           },
           {
             label: 'Inventory Value',
             value: formatBDT(inventoryStats?.total_inventory_value || 0),
             icon: Package,
-            color: 'text-[var(--accent-gold)]',
-            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
+            color: 'text-[#1F3A2E]',
+            iconBg: 'bg-[#1F3A2E]/10 border-[#1F3A2E]/20 text-[#1F3A2E]',
           },
           {
             label: 'Stock Units',
             value: String(inventoryStats?.total_units || 0),
             icon: Layers,
-            color: 'text-[var(--text-main)]',
-            iconBg: 'bg-slate-500/10 border-slate-500/20 text-slate-500',
+            color: 'text-[#1A1A1A]',
+            iconBg: 'bg-[#F7F6F3] border-[#E9E7E2] text-[#6B6B6B]',
           },
         ].map(({ label, value, icon: Icon, color, iconBg }) => (
           <div
             key={label}
-            className="p-5 luxury-card luxury-card-hover flex flex-col justify-between gap-3 group relative overflow-hidden"
+            className="p-5 rounded-[18px] luxury-card luxury-card-hover flex flex-col justify-between gap-3 group relative overflow-hidden"
           >
             <div className="flex items-center justify-between relative z-10">
-              <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{label}</span>
-              <div className={`p-2 rounded-xl border ${iconBg} group-hover:scale-110 transition-transform duration-300`}>
+              <span className="text-[10px] font-bold text-[#6B6B6B] uppercase tracking-widest">{label}</span>
+              <div className={`p-2 rounded-[10px] border ${iconBg} group-hover:scale-105 transition-transform duration-200 shadow-soft-1`}>
                 <Icon className="h-4 w-4" />
               </div>
             </div>
-            <span className={`text-xl font-extrabold font-mono tracking-tight relative z-10 ${color}`}>{value}</span>
+            <span className={`text-xl font-bold font-mono tracking-tight relative z-10 ${color}`}>{value}</span>
           </div>
         ))}
       </div>
 
       {/* ─── Charts Row ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 luxury-card space-y-5">
-          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest flex items-center gap-2 border-b border-[var(--border-subtle)] pb-3">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+        <div className="p-6 rounded-[18px] luxury-card space-y-5">
+          <h3 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-2 border-b border-[#E9E7E2] pb-3">
+            <Sparkles className="h-3.5 w-3.5 text-[#B08D57]" />
             <span>Monthly Revenue Trend</span>
           </h3>
           <RevenueAreaChart data={monthlyRevenue} />
         </div>
 
-        <div className="p-6 luxury-card space-y-5">
-          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest flex items-center gap-2 border-b border-[var(--border-subtle)] pb-3">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+        <div className="p-6 rounded-[18px] luxury-card space-y-5">
+          <h3 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-2 border-b border-[#E9E7E2] pb-3">
+            <Sparkles className="h-3.5 w-3.5 text-[#B08D57]" />
             <span>Revenue vs Expenses vs Net Profit</span>
           </h3>
           <MonthlyPLChart data={monthlyPL} />
@@ -212,25 +211,25 @@ export default async function DashboardPage() {
       {/* ─── Bottom Row: Best sellers + Low Stock ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Best Selling Products */}
-        <div className="p-6 luxury-card space-y-4">
-          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3">
+        <div className="p-6 rounded-[18px] luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest border-b border-[#E9E7E2] pb-3">
             Best Selling Products
           </h3>
           {bestSellers.length === 0 ? (
-            <p className="text-xs text-[var(--text-muted)] italic">No sales data yet.</p>
+            <p className="text-xs text-[#9E9E9E] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestSellers.map((p: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[#E9E7E2]/50 last:border-0">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-[10px] font-extrabold text-[var(--accent-gold)] w-4 font-mono">{i + 1}.</span>
-                    <span className="text-[var(--text-main)] font-semibold truncate max-w-[140px]">
+                    <span className="text-[10px] font-bold text-[#B08D57] w-4 font-mono">{i + 1}.</span>
+                    <span className="text-[#1A1A1A] font-semibold truncate max-w-[140px]">
                       {p.product_name}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[var(--accent-gold)] font-bold">{p.total_quantity_sold} sold</span>
-                    <span className="text-[var(--text-muted)] text-[10px] block font-mono">{formatBDT(p.revenue)}</span>
+                    <span className="text-[#1F3A2E] font-bold">{p.total_quantity_sold} sold</span>
+                    <span className="text-[#6B6B6B] text-[10px] block font-mono">{formatBDT(p.revenue)}</span>
                   </div>
                 </div>
               ))}
@@ -239,26 +238,26 @@ export default async function DashboardPage() {
         </div>
 
         {/* Best Selling Colors */}
-        <div className="p-6 luxury-card space-y-4">
-          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3">
+        <div className="p-6 rounded-[18px] luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest border-b border-[#E9E7E2] pb-3">
             Top Color Variants
           </h3>
           {bestColors.length === 0 ? (
-            <p className="text-xs text-[var(--text-muted)] italic">No sales data yet.</p>
+            <p className="text-xs text-[#9E9E9E] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestColors.map((c: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[#E9E7E2]/50 last:border-0">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-[10px] font-extrabold text-[var(--accent-gold)] w-4 font-mono">{i + 1}.</span>
+                    <span className="text-[10px] font-bold text-[#B08D57] w-4 font-mono">{i + 1}.</span>
                     <div>
-                      <span className="text-[var(--text-main)] font-semibold block truncate max-w-[130px]">
+                      <span className="text-[#1A1A1A] font-semibold block truncate max-w-[130px]">
                         {c.product_name}
                       </span>
-                      <span className="text-[var(--text-muted)] text-[10px] font-medium">{c.color_name}</span>
+                      <span className="text-[#6B6B6B] text-[10px] font-medium">{c.color_name}</span>
                     </div>
                   </div>
-                  <span className="text-[var(--accent-gold)] font-bold">{c.total_quantity_sold} sold</span>
+                  <span className="text-[#1F3A2E] font-bold">{c.total_quantity_sold} sold</span>
                 </div>
               ))}
             </div>
@@ -266,28 +265,28 @@ export default async function DashboardPage() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="p-6 luxury-card space-y-4">
-          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3 flex items-center gap-2">
-            <AlertCircle className="h-3.5 w-3.5 text-rose-500" />
+        <div className="p-6 rounded-[18px] luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest border-b border-[#E9E7E2] pb-3 flex items-center gap-2">
+            <AlertCircle className="h-3.5 w-3.5 text-[#DC2626]" />
             <span>Low Stock Alerts</span>
           </h3>
           {lowStock.length === 0 ? (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold italic">All stock levels healthy ✓</p>
+            <p className="text-xs text-[#9E9E9E] italic">All stock levels healthy ✓</p>
           ) : (
             <div className="space-y-3">
               {lowStock.map((s: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[#E9E7E2]/50 last:border-0">
                   <div>
-                    <span className="text-[var(--text-main)] font-semibold block truncate max-w-[140px]">
+                    <span className="text-[#1A1A1A] font-semibold block truncate max-w-[140px]">
                       {s.product_name}
                     </span>
-                    <span className="text-[var(--text-muted)] text-[10px] font-medium">{s.color_name}</span>
+                    <span className="text-[#6B6B6B] text-[10px] font-medium">{s.color_name}</span>
                   </div>
                   <span
                     className={`font-bold font-mono px-2.5 py-0.5 rounded-full text-[10px] border ${
                       s.available_stock === 0
-                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
-                        : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                        ? 'bg-[#DC2626]/10 text-[#B91C1C] border-[#DC2626]/30'
+                        : 'bg-[#B08D57]/10 text-[#6A4E3B] border-[#B08D57]/30'
                     }`}
                   >
                     {s.available_stock ?? 0} left

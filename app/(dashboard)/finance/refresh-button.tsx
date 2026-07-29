@@ -3,7 +3,8 @@
 import React, { useTransition } from 'react';
 import { refreshProfitLoss } from '@/actions/finance';
 import { toast } from 'sonner';
-import { RefreshCw, Loader2 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function RefreshButton() {
   const [isPending, startTransition] = useTransition();
@@ -22,17 +23,13 @@ export default function RefreshButton() {
   };
 
   return (
-    <button
+    <Button
       onClick={handleRefresh}
-      disabled={isPending}
-      className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer disabled:opacity-50"
+      loading={isPending}
+      variant="secondary"
+      icon={<RefreshCw className="h-4 w-4 shrink-0" />}
     >
-      {isPending ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : (
-        <RefreshCw className="h-4 w-4" />
-      )}
-      <span>Recalculate P&L</span>
-    </button>
+      Recalculate P&L
+    </Button>
   );
 }

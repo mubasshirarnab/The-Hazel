@@ -4,7 +4,8 @@ import React, { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { placePurchaseOrder, deletePurchaseOrder } from '@/actions/purchase-orders';
 import { toast } from 'sonner';
-import { Send, Trash2, Loader2 } from 'lucide-react';
+import { Send, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface POActionsProps {
   poId: number;
@@ -54,33 +55,25 @@ export default function POActions({ poId, statusCode }: POActionsProps) {
 
   return (
     <div className="flex items-center gap-3">
-      {/* Place Order */}
-      <button
+      <Button
         onClick={handlePlace}
-        disabled={isPending}
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-colors cursor-pointer disabled:opacity-50"
+        loading={isPending}
+        variant="primary"
+        size="sm"
+        icon={<Send className="h-4 w-4 shrink-0" />}
       >
-        {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Send className="h-4 w-4" />
-        )}
-        <span>Place Order</span>
-      </button>
+        Place Order
+      </Button>
 
-      {/* Delete PO */}
-      <button
+      <Button
         onClick={handleDelete}
-        disabled={isPending}
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 border border-zinc-750 text-zinc-300 transition-colors cursor-pointer disabled:opacity-50"
+        loading={isPending}
+        variant="danger"
+        size="sm"
+        icon={<Trash2 className="h-4 w-4 shrink-0" />}
       >
-        {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
-        ) : (
-          <Trash2 className="h-4 w-4" />
-        )}
-        <span>Delete Draft</span>
-      </button>
+        Delete Draft
+      </Button>
     </div>
   );
 }
