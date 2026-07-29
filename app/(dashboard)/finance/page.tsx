@@ -23,6 +23,8 @@ export default async function FinancePage() {
   const plSummary = plOverview[0] || {
     period_month: null,
     revenue: 0,
+    cogs: 0,
+    gross_profit: 0,
     expenses: 0,
     net_profit: 0,
   };
@@ -43,11 +45,13 @@ export default async function FinancePage() {
 
   const cashBalance = totalInflow - totalOutflow;
 
-  const grossProfit = parseFloat(plSummary.revenue || 0) - parseFloat(plSummary.expenses || 0);
-  const profitMargin =
-    parseFloat(plSummary.revenue || 0) > 0
-      ? (parseFloat(plSummary.net_profit || grossProfit) / parseFloat(plSummary.revenue)) * 100
-      : 0;
+  const revenueVal = parseFloat(plSummary.revenue || 0);
+  const cogsVal = parseFloat(plSummary.cogs || 0);
+  const grossProfitVal = parseFloat(plSummary.gross_profit || 0);
+  const expensesVal = parseFloat(plSummary.expenses || 0);
+  const netProfitVal = parseFloat(plSummary.net_profit || 0);
+
+  const profitMargin = revenueVal > 0 ? (netProfitVal / revenueVal) * 100 : 0;
 
   return (
     <div className="space-y-8">
@@ -63,33 +67,40 @@ export default async function FinancePage() {
       </PageHeader>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Net Profit</span>
-          <div className={`text-2xl font-bold tracking-tight mt-2 ${parseFloat(plSummary.net_profit || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            <Currency amount={plSummary.net_profit || 0} />
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
+          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Total Sales</span>
+          <div className="text-xl font-bold tracking-tight text-zinc-100 mt-2 font-mono">
+            <Currency amount={revenueVal} />
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Operating Revenue</span>
-          <div className="text-2xl font-bold tracking-tight text-zinc-100 mt-2">
-            <Currency amount={plSummary.revenue || 0} />
+        <div className="p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
+          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">COGS (Product Cost)</span>
+          <div className="text-xl font-bold tracking-tight text-amber-400 mt-2 font-mono">
+            <Currency amount={cogsVal} />
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Total Expenses</span>
-          <div className="text-2xl font-bold tracking-tight text-zinc-300 mt-2">
-            <Currency amount={plSummary.expenses || 0} />
+        <div className="p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
+          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Gross Profit</span>
+          <div className={`text-xl font-bold tracking-tight mt-2 font-mono ${grossProfitVal >= 0 ? 'text-sky-400' : 'text-rose-400'}`}>
+            <Currency amount={grossProfitVal} />
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Net Profit Margin</span>
-          <span className={`text-2xl font-bold tracking-tight mt-2 block font-mono ${profitMargin >= 0 ? 'text-rose-400' : 'text-zinc-400'}`}>
-            {profitMargin.toFixed(1)}%
-          </span>
+        <div className="p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
+          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Operating Expenses</span>
+          <div className="text-xl font-bold tracking-tight text-zinc-300 mt-2 font-mono">
+            <Currency amount={expensesVal} />
+          </div>
+        </div>
+
+        <div className="p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
+          <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Net Profit ({profitMargin.toFixed(1)}%)</span>
+          <div className={`text-xl font-bold tracking-tight mt-2 font-mono ${netProfitVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <Currency amount={netProfitVal} />
+          </div>
         </div>
       </div>
 
