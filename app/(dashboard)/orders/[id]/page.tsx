@@ -95,11 +95,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <PageHeader title={`Order details: ${order.orderNumber}`} description={`Created on ${new Date(order.createdAt).toLocaleDateString()}`}>
+      <PageHeader title={`Order: ${order.orderNumber}`} description={`Created on ${new Date(order.createdAt).toLocaleDateString()}`}>
         <div className="flex items-center gap-3">
           <Link
             href="/orders"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-amber-500/20 bg-[#0F1117] hover:bg-amber-500/5 text-zinc-400 hover:text-amber-200 transition-all text-sm font-semibold cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>All Orders</span>
@@ -113,54 +113,73 @@ export default async function OrderDetailPage({ params }: PageProps) {
         </div>
       </PageHeader>
 
+      {/* Status Row */}
+      <div className="flex flex-wrap items-center gap-3 px-1">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Order</span>
+          <StatusBadge status={order.orderStatus} />
+        </div>
+        <div className="w-px h-4 bg-amber-500/20" />
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Payment</span>
+          <StatusBadge status={order.paymentStatus} />
+        </div>
+        <div className="w-px h-4 bg-amber-500/20" />
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">Delivery</span>
+          <StatusBadge status={order.deliveryStatus} />
+        </div>
+      </div>
+
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Customer Profile & Statuses summary */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-5">
           {/* Customer Summary Card */}
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-5">
-            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <User className="h-4 w-4 text-rose-500" />
+          <div className="p-6 rounded-2xl luxury-card space-y-5">
+            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
+              <User className="h-4 w-4 text-amber-400" />
               <span>Customer Profile</span>
             </h3>
 
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3.5 text-sm">
               <div>
-                <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Customer Name</span>
-                <span className="text-zinc-200 font-medium">{order.customerName} ({order.customerCode})</span>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Customer Name</span>
+                <span className="text-zinc-100 font-semibold">{order.customerName}</span>
+                <span className="text-zinc-500 font-mono text-xs ml-1.5">({order.customerCode})</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Phone</span>
-                <span className="font-mono text-zinc-200">{order.phone || '—'}</span>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Phone</span>
+                <span className="font-mono text-amber-300">{order.phone || '—'}</span>
               </div>
               {order.facebookName && (
                 <div>
-                  <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Facebook Username</span>
-                  <span className="text-rose-400">{order.facebookName}</span>
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Facebook Username</span>
+                  <span className="text-rose-400 font-semibold">{order.facebookName}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Delivery Address Card */}
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-5">
-            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <MapPin className="h-4 w-4 text-rose-500" />
-              <span>Shipping details</span>
+          <div className="p-6 rounded-2xl luxury-card space-y-5">
+            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
+              <MapPin className="h-4 w-4 text-amber-400" />
+              <span>Shipping Details</span>
             </h3>
 
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3.5 text-sm">
               <div>
-                <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">District</span>
-                <span className="text-zinc-200 font-medium">{order.district || 'Not Specified'}</span>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">District</span>
+                <span className="text-zinc-100 font-semibold">{order.district || 'Not Specified'}</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Full Shipping Address</span>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Full Address</span>
                 <p className="text-zinc-300 mt-1 leading-relaxed text-xs">{order.address || 'No Address Listed'}</p>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">Payment Channel Preference</span>
-                <span className="text-zinc-200 font-medium text-xs bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded">
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">Payment Preference</span>
+                <span className="text-amber-300 font-semibold text-xs bg-amber-500/10 border border-amber-500/25 px-2.5 py-0.5 rounded-full inline-block mt-0.5">
                   {order.paymentPreference || 'Cash on Delivery'}
                 </span>
               </div>
@@ -169,9 +188,9 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
           {/* Order notes block */}
           {order.notes && (
-            <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-3">
-              <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest block">Order notes</h3>
-              <p className="text-zinc-300 leading-relaxed text-xs bg-zinc-900/50 p-3 rounded border border-zinc-850">
+            <div className="p-6 rounded-2xl luxury-card space-y-3">
+              <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest block">Order Notes</h3>
+              <p className="text-zinc-300 leading-relaxed text-xs bg-[#0A0C10] p-3 rounded-xl border border-amber-500/10">
                 {order.notes}
               </p>
             </div>
@@ -181,23 +200,23 @@ export default async function OrderDetailPage({ params }: PageProps) {
         {/* Right Column: Order Items, Financials, and Status History logs */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items card */}
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-6">
-            <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <ClipboardList className="h-5 w-5 text-rose-500" />
+          <div className="p-6 rounded-2xl luxury-card space-y-5">
+            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
+              <ClipboardList className="h-4.5 w-4.5 text-amber-400" />
               <span>Order Items</span>
             </h3>
 
             {/* Items Table */}
-            <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950/20">
-              <table className="min-w-full divide-y divide-zinc-800 text-sm">
-                <thead className="bg-zinc-900/40 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            <div className="overflow-x-auto rounded-xl border border-amber-500/15 bg-[#0A0C10]/80">
+              <table className="min-w-full divide-y divide-amber-500/10 text-sm">
+                <thead className="bg-[#141720] text-[11px] font-bold text-amber-300/80 uppercase tracking-wider">
                   <tr>
-                    <th className="px-6 py-3.5 text-left">Variant Code</th>
-                    <th className="px-6 py-3.5 text-left">Product / Color</th>
-                    <th className="px-6 py-3.5 text-right">Price</th>
-                    <th className="px-6 py-3.5 text-right">Qty</th>
-                    <th className="px-6 py-3.5 text-right">Discount</th>
-                    <th className="px-6 py-3.5 text-right">Total</th>
+                    <th className="px-5 py-3.5 text-left">Variant Code</th>
+                    <th className="px-5 py-3.5 text-left">Product / Color</th>
+                    <th className="px-5 py-3.5 text-right">Price</th>
+                    <th className="px-5 py-3.5 text-right">Qty</th>
+                    <th className="px-5 py-3.5 text-right">Discount</th>
+                    <th className="px-5 py-3.5 text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
@@ -208,24 +227,24 @@ export default async function OrderDetailPage({ params }: PageProps) {
                     const total = (price - discount) * qty;
 
                     return (
-                      <tr key={item.id}>
-                        <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-rose-400">
+                      <tr key={item.id} className="hover:bg-amber-500/5 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-amber-400 font-bold">
                           {item.variantCode}
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-zinc-200">{item.productName}</div>
+                        <td className="px-5 py-4">
+                          <div className="font-semibold text-zinc-100">{item.productName}</div>
                           <div className="text-xs text-zinc-500 mt-0.5">{item.colorName}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right font-mono">
+                        <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-zinc-300">
                           {formatBDT(price)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-zinc-200">
+                        <td className="px-5 py-4 whitespace-nowrap text-right font-bold text-zinc-100">
                           {qty}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-rose-400">
+                        <td className="px-5 py-4 whitespace-nowrap text-right font-mono text-rose-400">
                           {discount > 0 ? `-${formatBDT(discount)}` : '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right font-bold text-zinc-100 font-mono">
+                        <td className="px-5 py-4 whitespace-nowrap text-right font-bold text-amber-300 font-mono">
                           {formatBDT(total)}
                         </td>
                       </tr>
@@ -237,50 +256,56 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
             {/* Financial Summary */}
             <div className="flex flex-col items-end gap-2 text-sm text-zinc-400 pr-2">
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-805 pb-1">
+              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
                 <span>Subtotal:</span>
                 <span className="font-semibold text-zinc-300 font-mono">{formatBDT(order.subtotal)}</span>
               </div>
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-805 pb-1">
+              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
                 <span>Total Discount:</span>
                 <span className="font-semibold text-rose-400 font-mono">-{formatBDT(order.discountTotal)}</span>
               </div>
-              <div className="flex gap-12 justify-between w-64 border-b border-zinc-805 pb-1">
-                <span>Shipping Amount:</span>
+              <div className="flex gap-12 justify-between w-64 border-b border-zinc-800/50 pb-2">
+                <span>Shipping:</span>
                 <span className="font-semibold text-zinc-300 font-mono">+{formatBDT(order.shippingAmount)}</span>
               </div>
-              <div className="flex gap-12 justify-between w-64 text-base font-bold text-zinc-100 bg-zinc-950 px-4 py-2.5 rounded border border-zinc-800">
-                <span className="text-rose-400">Grand Total:</span>
-                <span className="font-mono">{formatBDT(order.grandTotal)}</span>
+              <div className="flex gap-12 justify-between w-64 text-base font-extrabold bg-gradient-to-r from-amber-500/10 to-rose-500/10 px-4 py-3 rounded-xl border border-amber-500/25">
+                <span className="text-amber-300">Grand Total:</span>
+                <span className="font-mono text-amber-200">{formatBDT(order.grandTotal)}</span>
               </div>
+              {Number(order.outstandingAmount) > 0 && (
+                <div className="flex gap-12 justify-between w-64 text-xs bg-rose-500/10 px-4 py-2 rounded-xl border border-rose-500/25">
+                  <span className="text-rose-400 font-semibold">Outstanding:</span>
+                  <span className="font-mono text-rose-400 font-bold">{formatBDT(order.outstandingAmount)}</span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Status logs audit history */}
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-6">
-            <h3 className="text-sm font-bold text-zinc-200 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <Clock className="h-5 w-5 text-rose-500" />
+          <div className="p-6 rounded-2xl luxury-card space-y-5">
+            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-2 border-b border-amber-500/15 pb-3">
+              <Clock className="h-4.5 w-4.5 text-amber-400" />
               <span>Status History Log</span>
             </h3>
 
             {statusHistory.length === 0 ? (
               <p className="text-xs text-zinc-500 italic">No status updates logged.</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {statusHistory.map((log: any) => (
                   <div
                     key={log.id}
-                    className="p-4 rounded-lg bg-zinc-950/60 border border-zinc-850 flex items-start justify-between gap-4 text-xs"
+                    className="p-4 rounded-xl bg-[#0A0C10] border border-amber-500/10 flex items-start justify-between gap-4 text-xs hover:border-amber-500/20 transition-colors"
                   >
                     <div className="space-y-1">
-                      <span className="font-semibold text-zinc-300 capitalize">
+                      <span className="font-bold text-amber-300 capitalize">
                         {log.statusName}
                       </span>
                       <p className="text-zinc-500 leading-relaxed">{log.notes || 'No description provided.'}</p>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-[10px] font-mono text-zinc-500 block">
+                      <span className="text-[10px] font-mono text-amber-400/80 block font-semibold">
                         by {log.changedBy}
                       </span>
                       <span className="text-[9px] text-zinc-600 font-mono block mt-1">

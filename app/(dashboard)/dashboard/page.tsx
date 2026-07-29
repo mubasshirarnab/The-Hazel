@@ -11,6 +11,8 @@ import {
   AlertCircle,
   BarChart2,
   Layers,
+  Crown,
+  Sparkles,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -82,13 +84,21 @@ export default async function DashboardPage() {
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
   return (
-    <div className="space-y-8">
-      {/* Page Title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Hazel ERP Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          Real-time overview of orders, inventory, finances and marketing performance.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Page Title Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-extrabold tracking-tight text-gold-gradient font-serif">Executive Command Center</h1>
+            <span className="px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[var(--accent-gold)] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-2xs">
+              <Crown className="h-3 w-3 text-amber-500" />
+              <span>Haute Couture Analytics</span>
+            </span>
+          </div>
+          <p className="text-xs text-[var(--text-muted)] mt-1 font-medium">
+            Real-time financial performance, inventory valuation, cogs breakdown, and sales analytics.
+          </p>
+        </div>
       </div>
 
       {/* ─── KPI Cards ─── */}
@@ -98,98 +108,102 @@ export default async function DashboardPage() {
             label: 'Total Sales',
             value: formatBDT(totalRevenue),
             icon: DollarSign,
-            color: 'text-emerald-400',
-            bgColor: 'bg-emerald-500/5 border-emerald-500/20',
+            color: 'text-[var(--accent-gold)]',
+            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
           },
           {
             label: 'COGS (Product Cost)',
             value: formatBDT(cogs),
             icon: Package,
-            color: 'text-amber-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--text-main)]',
+            iconBg: 'bg-slate-500/10 border-slate-500/20 text-slate-500',
           },
           {
             label: 'Gross Profit',
             value: formatBDT(grossProfit),
             icon: TrendingUp,
-            color: grossProfit >= 0 ? 'text-sky-400' : 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: grossProfit >= 0 ? 'text-sky-600 dark:text-sky-300' : 'text-rose-500',
+            iconBg: 'bg-sky-500/10 border-sky-500/30 text-sky-500',
           },
           {
             label: 'Operating Expenses',
             value: formatBDT(totalExpenses),
             icon: DollarSign,
-            color: 'text-zinc-300',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-rose-600 dark:text-rose-400',
+            iconBg: 'bg-rose-500/10 border-rose-500/30 text-rose-500',
           },
           {
             label: 'Net Profit',
             value: formatBDT(netProfit),
             icon: TrendingUp,
-            color: netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400',
-            bgColor: 'bg-emerald-500/5 border-emerald-500/20',
+            color: netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500',
+            iconBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500',
           },
           {
             label: 'Profit Margin',
             value: `${profitMargin.toFixed(1)}%`,
             icon: BarChart2,
-            color: profitMargin >= 20 ? 'text-emerald-400' : 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: profitMargin >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500',
+            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
           },
           {
             label: 'Total Orders',
             value: String(orderStats?.total_orders || 0),
             icon: ShoppingBag,
-            color: 'text-rose-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--accent-gold)]',
+            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
           },
           {
             label: 'Pending Orders',
             value: String(orderStats?.pending_orders || 0),
             icon: AlertCircle,
-            color: 'text-amber-400',
-            bgColor: 'bg-amber-500/5 border-amber-500/20',
+            color: 'text-rose-600 dark:text-rose-400',
+            iconBg: 'bg-rose-500/10 border-rose-500/30 text-rose-500',
           },
           {
             label: 'Inventory Value',
             value: formatBDT(inventoryStats?.total_inventory_value || 0),
             icon: Package,
-            color: 'text-amber-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--accent-gold)]',
+            iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-500',
           },
           {
             label: 'Stock Units',
             value: String(inventoryStats?.total_units || 0),
             icon: Layers,
-            color: 'text-zinc-300',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            color: 'text-[var(--text-main)]',
+            iconBg: 'bg-slate-500/10 border-slate-500/20 text-slate-500',
           },
-        ].map(({ label, value, icon: Icon, color, bgColor }) => (
+        ].map(({ label, value, icon: Icon, color, iconBg }) => (
           <div
             key={label}
-            className={`p-5 rounded-xl border backdrop-blur-md flex flex-col gap-3 ${bgColor}`}
+            className="p-5 luxury-card luxury-card-hover flex flex-col justify-between gap-3 group relative overflow-hidden"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">{label}</span>
-              <Icon className={`h-4 w-4 ${color} opacity-70`} />
+            <div className="flex items-center justify-between relative z-10">
+              <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{label}</span>
+              <div className={`p-2 rounded-xl border ${iconBg} group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className="h-4 w-4" />
+              </div>
             </div>
-            <span className={`text-xl font-bold font-mono tracking-tight ${color}`}>{value}</span>
+            <span className={`text-xl font-extrabold font-mono tracking-tight relative z-10 ${color}`}>{value}</span>
           </div>
         ))}
       </div>
 
       {/* ─── Charts Row ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-5">
-            Monthly Revenue Trend
+        <div className="p-6 luxury-card space-y-5">
+          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest flex items-center gap-2 border-b border-[var(--border-subtle)] pb-3">
+            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <span>Monthly Revenue Trend</span>
           </h3>
           <RevenueAreaChart data={monthlyRevenue} />
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-5">
-            Revenue vs Expenses vs Profit
+        <div className="p-6 luxury-card space-y-5">
+          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest flex items-center gap-2 border-b border-[var(--border-subtle)] pb-3">
+            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <span>Revenue vs Expenses vs Net Profit</span>
           </h3>
           <MonthlyPLChart data={monthlyPL} />
         </div>
@@ -198,25 +212,25 @@ export default async function DashboardPage() {
       {/* ─── Bottom Row: Best sellers + Low Stock ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Best Selling Products */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3">
+        <div className="p-6 luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3">
             Best Selling Products
           </h3>
           {bestSellers.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">No sales data yet.</p>
+            <p className="text-xs text-[var(--text-muted)] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestSellers.map((p: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-600 w-4">{i + 1}.</span>
-                    <span className="text-zinc-200 font-medium truncate max-w-[140px]">
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[10px] font-extrabold text-[var(--accent-gold)] w-4 font-mono">{i + 1}.</span>
+                    <span className="text-[var(--text-main)] font-semibold truncate max-w-[140px]">
                       {p.product_name}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-rose-400 font-bold">{p.total_quantity_sold} sold</span>
-                    <span className="text-zinc-500 ml-2">{formatBDT(p.revenue)}</span>
+                    <span className="text-[var(--accent-gold)] font-bold">{p.total_quantity_sold} sold</span>
+                    <span className="text-[var(--text-muted)] text-[10px] block font-mono">{formatBDT(p.revenue)}</span>
                   </div>
                 </div>
               ))}
@@ -225,26 +239,26 @@ export default async function DashboardPage() {
         </div>
 
         {/* Best Selling Colors */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3">
+        <div className="p-6 luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3">
             Top Color Variants
           </h3>
           {bestColors.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">No sales data yet.</p>
+            <p className="text-xs text-[var(--text-muted)] italic">No sales data yet.</p>
           ) : (
             <div className="space-y-3">
               {bestColors.map((c: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-600 w-4">{i + 1}.</span>
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[10px] font-extrabold text-[var(--accent-gold)] w-4 font-mono">{i + 1}.</span>
                     <div>
-                      <span className="text-zinc-200 font-medium block truncate max-w-[130px]">
+                      <span className="text-[var(--text-main)] font-semibold block truncate max-w-[130px]">
                         {c.product_name}
                       </span>
-                      <span className="text-zinc-500 text-[10px]">{c.color_name}</span>
+                      <span className="text-[var(--text-muted)] text-[10px] font-medium">{c.color_name}</span>
                     </div>
                   </div>
-                  <span className="text-rose-400 font-bold">{c.total_quantity_sold} sold</span>
+                  <span className="text-[var(--accent-gold)] font-bold">{c.total_quantity_sold} sold</span>
                 </div>
               ))}
             </div>
@@ -252,28 +266,28 @@ export default async function DashboardPage() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/20 space-y-4">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-3 flex items-center gap-2">
-            <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
+        <div className="p-6 luxury-card space-y-4">
+          <h3 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-3 flex items-center gap-2">
+            <AlertCircle className="h-3.5 w-3.5 text-rose-500" />
             <span>Low Stock Alerts</span>
           </h3>
           {lowStock.length === 0 ? (
-            <p className="text-xs text-zinc-600 italic">All stock levels healthy ✓</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold italic">All stock levels healthy ✓</p>
           ) : (
             <div className="space-y-3">
               {lowStock.map((s: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs">
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-subtle)] last:border-0">
                   <div>
-                    <span className="text-zinc-200 font-medium block truncate max-w-[140px]">
+                    <span className="text-[var(--text-main)] font-semibold block truncate max-w-[140px]">
                       {s.product_name}
                     </span>
-                    <span className="text-zinc-500 text-[10px]">{s.color_name}</span>
+                    <span className="text-[var(--text-muted)] text-[10px] font-medium">{s.color_name}</span>
                   </div>
                   <span
-                    className={`font-bold font-mono px-2 py-0.5 rounded text-[10px] ${
+                    className={`font-bold font-mono px-2.5 py-0.5 rounded-full text-[10px] border ${
                       s.available_stock === 0
-                        ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                        : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
                     }`}
                   >
                     {s.available_stock ?? 0} left

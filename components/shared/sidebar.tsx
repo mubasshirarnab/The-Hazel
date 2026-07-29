@@ -15,10 +15,10 @@ import {
   Percent,
   Landmark,
   Megaphone,
-  BarChart3,
   Settings,
   LogOut,
   User,
+  Crown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,17 +49,27 @@ export default function Sidebar() {
   const userRole = session?.user?.role || 'viewer';
 
   return (
-    <aside className="w-64 bg-zinc-950 border-r border-zinc-800/80 flex flex-col h-full shrink-0">
+    <aside className="w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col h-full shrink-0 z-20 shadow-xl relative transition-colors duration-300">
+      {/* Glow highlight */}
+      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-amber-500/10 via-amber-500/5 to-transparent pointer-events-none" />
+
       {/* Brand Header */}
-      <div className="h-16 flex items-center px-6 border-b border-zinc-800/80">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-wider text-rose-500 font-serif">HAZEL</span>
-          <span className="text-xs bg-zinc-800 px-2 py-0.5 rounded text-zinc-400 font-semibold uppercase">ERP</span>
+      <div className="h-16 flex items-center px-6 border-b border-[var(--border-subtle)] justify-between relative z-10">
+        <Link href="/dashboard" className="flex items-center gap-3 group">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-rose-600 p-0.5 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform duration-300">
+            <div className="h-full w-full bg-[var(--bg-surface)] rounded-[10px] flex items-center justify-center">
+              <Crown className="h-4.5 w-4.5 text-amber-500" />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base font-extrabold tracking-widest text-gold-gradient font-serif leading-none">HAZEL</span>
+            <span className="text-[9px] font-bold text-[var(--accent-gold)] tracking-widest uppercase mt-1">HAUTE COUTURE ERP</span>
+          </div>
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5 scrollbar-thin scrollbar-thumb-zinc-800">
+      {/* Navigation Links */}
+      <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1 scrollbar-thin relative z-10">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           const isAllowed = !item.adminOnly || userRole === 'admin';
@@ -73,13 +83,21 @@ export default function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
+                'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
                 isActive
-                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50 border border-transparent'
+                  ? 'bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-transparent text-[var(--accent-gold)] border border-amber-500/30 shadow-xs font-semibold'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)] border border-transparent'
               )}
             >
-              <Icon className={cn('h-4.5 w-4.5 shrink-0', isActive ? 'text-rose-400' : 'text-zinc-400 group-hover:text-zinc-200')} />
+              {isActive && (
+                <div className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-amber-400 to-rose-500 rounded-r-full shadow-xs" />
+              )}
+              <Icon
+                className={cn(
+                  'h-4.5 w-4.5 shrink-0 transition-transform duration-200 group-hover:scale-110',
+                  isActive ? 'text-amber-500' : 'text-[var(--text-subtle)] group-hover:text-[var(--accent-gold)]'
+                )}
+              />
               <span>{item.name}</span>
             </Link>
           );
@@ -87,16 +105,16 @@ export default function Sidebar() {
       </nav>
 
       {/* User Profile Card */}
-      <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/10">
+      <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] relative z-10">
         <div className="flex items-center gap-3 px-2 py-1">
-          <div className="h-9 w-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
-            <User className="h-4.5 w-4.5 text-rose-400" />
+          <div className="h-9 w-9 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+            <User className="h-4.5 w-4.5 text-amber-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-zinc-200 truncate leading-tight">
+            <p className="text-xs font-bold text-[var(--text-main)] truncate leading-tight">
               {session?.user?.name || 'User'}
             </p>
-            <p className="text-xs text-zinc-500 capitalize truncate mt-0.5">
+            <p className="text-[10px] font-semibold text-[var(--accent-gold)] uppercase tracking-widest truncate mt-0.5">
               {session?.user?.role || 'Viewer'}
             </p>
           </div>
@@ -104,7 +122,7 @@ export default function Sidebar() {
 
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-rose-400 hover:bg-rose-500/5 border border-zinc-800/60 hover:border-rose-500/25 transition-all duration-150 cursor-pointer"
+          className="mt-3.5 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/10 border border-[var(--border-subtle)] hover:border-rose-500/30 transition-all duration-200 cursor-pointer"
         >
           <LogOut className="h-3.5 w-3.5" />
           <span>Sign Out</span>

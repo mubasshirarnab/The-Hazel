@@ -12,6 +12,7 @@ import {
   SortingState,
   ColumnFiltersState,
 } from '@tanstack/react-table';
+import { Search } from 'lucide-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -25,7 +26,7 @@ export default function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder = 'Search records...',
   loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -54,22 +55,25 @@ export default function DataTable<TData, TValue>({
       {/* Search Input Filter */}
       {searchKey && (
         <div className="flex items-center">
-          <input
-            placeholder={searchPlaceholder}
-            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm px-4 py-2 text-sm bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-          />
+          <div className="relative max-w-sm w-full">
+            <Search className="h-4 w-4 text-[var(--accent-gold)] absolute left-3.5 top-3 pointer-events-none" />
+            <input
+              placeholder={searchPlaceholder}
+              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
+              onChange={(event) =>
+                table.getColumn(searchKey)?.setFilterValue(event.target.value)
+              }
+              className="w-full pl-10 pr-4 py-2.5 text-xs bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-gold)] focus:ring-2 focus:ring-amber-500/20 transition-all font-medium shadow-xs"
+            />
+          </div>
         </div>
       )}
 
       {/* Table Container */}
-      <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md overflow-hidden">
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] backdrop-blur-xl overflow-hidden shadow-sm transition-colors duration-300">
         <div className="overflow-x-auto w-full">
-          <table className="min-w-full divide-y divide-zinc-800/80 text-sm">
-            <thead className="bg-zinc-900/80 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+          <table className="min-w-full divide-y divide-[var(--border-subtle)] text-sm">
+            <thead className="bg-[var(--bg-elevated)] text-[11px] font-bold text-[var(--accent-gold)] uppercase tracking-wider">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -91,14 +95,14 @@ export default function DataTable<TData, TValue>({
               ))}
             </thead>
 
-            <tbody className="divide-y divide-zinc-800/50 bg-transparent text-zinc-300">
+            <tbody className="divide-y divide-[var(--border-subtle)] bg-transparent text-[var(--text-main)]">
               {loading ? (
                 // Skeleton Loader Rows
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {columns.map((_, colIndex) => (
                       <td key={colIndex} className="px-6 py-4.5">
-                        <div className="h-4 bg-zinc-800 rounded w-4/5" />
+                        <div className="h-4 bg-[var(--bg-elevated)] rounded-md w-4/5" />
                       </td>
                     ))}
                   </tr>
@@ -107,7 +111,7 @@ export default function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="hover:bg-zinc-800/25 transition-colors group"
+                    className="hover:bg-amber-500/5 transition-colors group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-6 py-4 whitespace-nowrap align-middle">
@@ -124,9 +128,9 @@ export default function DataTable<TData, TValue>({
                 <tr>
                   <td
                     colSpan={columns.length}
-                    className="h-28 text-center text-zinc-500 font-medium px-6 py-8"
+                    className="h-28 text-center text-[var(--text-muted)] font-medium px-6 py-8"
                   >
-                    No results found.
+                    No matching records found.
                   </td>
                 </tr>
               )}
@@ -137,21 +141,21 @@ export default function DataTable<TData, TValue>({
 
       {/* Pagination Controls */}
       {!loading && table.getRowModel().rows?.length > 0 && (
-        <div className="flex items-center justify-between text-xs text-zinc-400 mt-2 px-2">
+        <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mt-1 px-2 font-medium">
           <div>
             Showing{' '}
-            <span className="font-semibold text-zinc-200">
+            <span className="font-bold text-[var(--accent-gold)]">
               {pagination.pageIndex * pagination.pageSize + 1}
             </span>{' '}
             to{' '}
-            <span className="font-semibold text-zinc-200">
+            <span className="font-bold text-[var(--accent-gold)]">
               {Math.min(
                 (pagination.pageIndex + 1) * pagination.pageSize,
                 table.getFilteredRowModel().rows.length
               )}
             </span>{' '}
             of{' '}
-            <span className="font-semibold text-zinc-200">
+            <span className="font-bold text-[var(--accent-gold)]">
               {table.getFilteredRowModel().rows.length}
             </span>{' '}
             results
@@ -160,18 +164,18 @@ export default function DataTable<TData, TValue>({
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="px-3 py-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 disabled:opacity-40 disabled:hover:bg-zinc-900/60 transition-colors cursor-pointer disabled:cursor-not-allowed"
+              className="px-3.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed font-semibold shadow-xs"
             >
               Previous
             </button>
-            <span className="text-zinc-500 font-medium">
+            <span className="text-[var(--text-muted)] font-medium">
               Page {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </span>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="px-3 py-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 disabled:opacity-40 disabled:hover:bg-zinc-900/60 transition-colors cursor-pointer disabled:cursor-not-allowed"
+              className="px-3.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed font-semibold shadow-xs"
             >
               Next
             </button>

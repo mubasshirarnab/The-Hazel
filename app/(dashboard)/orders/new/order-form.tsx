@@ -84,13 +84,13 @@ function SearchableCustomerSelect({
             setSearch(e.target.value);
             setIsOpen(true);
           }}
-          className="w-full pl-9 pr-8 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors disabled:opacity-50"
+          className="w-full pl-9 pr-8 py-2.5 bg-[#0D0E14] border border-amber-500/20 rounded-xl text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all disabled:opacity-50 font-medium"
         />
         <ChevronDown className="h-4 w-4 text-zinc-500 absolute right-3 pointer-events-none" />
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
+        <div className="absolute left-0 top-full mt-1.5 w-full bg-[#0F1117] border border-amber-500/25 rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
           {filtered.length === 0 ? (
             <div className="p-3 text-xs text-zinc-500 italic text-center">No customer matching "{search}"</div>
           ) : (
@@ -102,10 +102,10 @@ function SearchableCustomerSelect({
                   setIsOpen(false);
                   setSearch('');
                 }}
-                className={`px-3 py-2 rounded text-xs cursor-pointer flex items-center justify-between transition-colors ${
+                className={`px-3 py-2 rounded-lg text-xs cursor-pointer flex items-center justify-between transition-colors ${
                   value === c.id.toString()
-                    ? 'bg-rose-500/20 text-rose-300 font-semibold'
-                    : 'text-zinc-300 hover:bg-zinc-800'
+                    ? 'bg-amber-500/20 text-amber-300 font-bold'
+                    : 'text-zinc-300 hover:bg-amber-500/5 hover:text-amber-200'
                 }`}
               >
                 <span>{c.customerName}</span>
@@ -170,13 +170,13 @@ function SearchableVariantSelect({
             setSearch(e.target.value);
             setIsOpen(true);
           }}
-          className="w-full pl-7 pr-7 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-colors disabled:opacity-50"
+          className="w-full pl-7 pr-7 py-2 bg-[#0D0E14] border border-amber-500/20 rounded-lg text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all disabled:opacity-50 font-medium"
         />
         <ChevronDown className="h-3.5 w-3.5 text-zinc-500 absolute right-2.5 pointer-events-none" />
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-72 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
+        <div className="absolute left-0 top-full mt-1 w-72 bg-[#0F1117] border border-amber-500/25 rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
           {filtered.length === 0 ? (
             <div className="p-3 text-xs text-zinc-500 italic text-center">No variant matching "{search}"</div>
           ) : (
@@ -188,10 +188,10 @@ function SearchableVariantSelect({
                   setIsOpen(false);
                   setSearch('');
                 }}
-                className={`px-3 py-2 rounded text-xs cursor-pointer flex flex-col gap-0.5 transition-colors ${
+                className={`px-3 py-2 rounded-lg text-xs cursor-pointer flex flex-col gap-0.5 transition-colors ${
                   value === v.id.toString()
-                    ? 'bg-rose-500/20 text-rose-300 font-semibold'
-                    : 'text-zinc-300 hover:bg-zinc-800'
+                    ? 'bg-amber-500/20 text-amber-300 font-bold'
+                    : 'text-zinc-300 hover:bg-amber-500/5 hover:text-amber-200'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -344,15 +344,15 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       {/* 1. Header Information Section */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-6">
-        <h3 className="text-base font-bold text-zinc-100 border-b border-zinc-800 pb-3">
+      <div className="p-6 rounded-2xl luxury-card space-y-6">
+        <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest border-b border-amber-500/15 pb-3">
           1. Customer & Order Settings
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Customer Search Select */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Customer</label>
+            <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider block">Customer</label>
             <SearchableCustomerSelect
               customers={customers}
               value={customerId}
@@ -363,16 +363,16 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
 
           {/* Order Type */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Order Type</label>
+            <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider block">Order Type</label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setOrderType('in_stock')}
                 disabled={loading}
-                className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg border text-center transition-colors cursor-pointer ${
+                className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl border text-center transition-all cursor-pointer ${
                   orderType === 'in_stock'
-                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    : 'bg-[#0D0E14] border-amber-500/15 text-zinc-400 hover:text-amber-200 hover:border-amber-500/30'
                 }`}
               >
                 In-Stock Fulfilled
@@ -381,10 +381,10 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                 type="button"
                 onClick={() => setOrderType('preorder')}
                 disabled={loading}
-                className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg border text-center transition-colors cursor-pointer ${
+                className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl border text-center transition-all cursor-pointer ${
                   orderType === 'preorder'
-                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    : 'bg-[#0D0E14] border-amber-500/15 text-zinc-400 hover:text-amber-200 hover:border-amber-500/30'
                 }`}
               >
                 Pre-Order Reserve
@@ -394,13 +394,13 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
 
           {/* Order Date */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Order Date</label>
+            <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider block">Order Date</label>
             <input
               type="date"
               value={orderDate}
               onChange={(e) => setOrderDate(e.target.value)}
               disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
+              className="w-full px-4 py-2.5 bg-[#0D0E14] border border-amber-500/20 rounded-xl text-zinc-100 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all font-medium"
               required
             />
           </div>
@@ -408,16 +408,16 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
       </div>
 
       {/* 2. Items list section */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-6">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h3 className="text-base font-bold text-zinc-100">
+      <div className="p-6 rounded-2xl luxury-card space-y-6">
+        <div className="flex items-center justify-between border-b border-amber-500/15 pb-3">
+          <h3 className="text-xs font-bold text-amber-300 uppercase tracking-widest">
             2. Selected Variant Items
           </h3>
           <button
             type="button"
             onClick={handleAddItem}
             disabled={loading}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-zinc-100 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Add Item</span>
@@ -428,11 +428,11 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
           {items.map((item, index) => (
             <div
               key={index}
-              className="p-4 rounded-lg bg-zinc-900/60 border border-zinc-800/80 grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group"
+              className="p-4 rounded-xl bg-[#0A0C10] border border-amber-500/15 grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group"
             >
               {/* Select Variant */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select variant</label>
+                <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider">Select variant</label>
                 <SearchableVariantSelect
                   variants={variants}
                   value={item.variantId}
@@ -443,21 +443,21 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
 
               {/* Price */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Price (BDT)</label>
+                <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider">Price (BDT)</label>
                 <input
                   type="number"
                   placeholder="0.00"
                   value={item.sellingPrice}
                   onChange={(e) => handleItemChange(index, 'sellingPrice', e.target.value)}
                   disabled={loading}
-                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
+                  className="w-full px-3 py-2 bg-[#0D0E14] border border-amber-500/20 rounded-lg text-zinc-100 text-xs focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all font-medium"
                   required
                 />
               </div>
 
               {/* Qty */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Quantity</label>
+                <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider">Quantity</label>
                 <input
                   type="number"
                   min="1"
@@ -465,7 +465,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                   value={item.quantity}
                   onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                   disabled={loading}
-                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
+                  className="w-full px-3 py-2 bg-[#0D0E14] border border-amber-500/20 rounded-lg text-zinc-100 text-xs focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all font-medium"
                   required
                 />
               </div>
@@ -473,14 +473,14 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
               <div className="flex items-center gap-2">
                 {/* Discount */}
                 <div className="flex-1 space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Unit Discount (BDT)</label>
+                  <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider">Unit Discount (BDT)</label>
                   <input
                     type="number"
                     placeholder="0.00"
                     value={item.discountAmount}
                     onChange={(e) => handleItemChange(index, 'discountAmount', e.target.value)}
                     disabled={loading}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
+                    className="w-full px-3 py-2 bg-[#0D0E14] border border-amber-500/20 rounded-lg text-zinc-100 text-xs focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all font-medium"
                   />
                 </div>
 
@@ -488,7 +488,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                   type="button"
                   onClick={() => handleRemoveItem(index)}
                   disabled={loading}
-                  className="p-2 rounded bg-zinc-950 border border-zinc-800 text-zinc-500 hover:text-rose-400 hover:border-rose-500/20 disabled:opacity-50 transition-colors cursor-pointer self-end mb-0.5"
+                  className="p-2 rounded-lg bg-[#0D0E14] border border-zinc-800/60 text-zinc-500 hover:text-rose-400 hover:border-rose-500/30 disabled:opacity-50 transition-colors cursor-pointer self-end mb-0.5"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -498,32 +498,32 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
         </div>
 
         {/* Computations Card */}
-        <div className="p-4 rounded-lg bg-zinc-950 border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 rounded-xl bg-[#0A0C10] border border-amber-500/15 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">Subtotal</span>
-            <span className="text-sm font-semibold text-zinc-300">{formatBDT(subtotal)}</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-bold">Subtotal</span>
+            <span className="text-sm font-semibold text-zinc-300 font-mono">{formatBDT(subtotal)}</span>
           </div>
           <div className="space-y-1">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-semibold">Total Discount</span>
-            <span className="text-sm font-semibold text-rose-400">-{formatBDT(discountTotal)}</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-bold">Total Discount</span>
+            <span className="text-sm font-semibold text-rose-400 font-mono">-{formatBDT(discountTotal)}</span>
           </div>
-          <div className="space-y-1 bg-zinc-900 px-4 py-2 rounded border border-zinc-800">
-            <span className="text-[10px] text-rose-400 uppercase tracking-widest block font-bold">Grand Total</span>
-            <span className="text-base font-bold text-zinc-50">{formatBDT(grandTotal)}</span>
+          <div className="space-y-1 bg-gradient-to-r from-amber-500/15 to-rose-500/10 px-5 py-3 rounded-xl border border-amber-500/30">
+            <span className="text-[10px] text-amber-300 uppercase tracking-widest block font-bold">Grand Total</span>
+            <span className="text-base font-extrabold text-amber-200 font-mono">{formatBDT(grandTotal)}</span>
           </div>
         </div>
       </div>
 
       {/* Notes text area */}
-      <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md space-y-2">
-        <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Order Notes</label>
+      <div className="p-6 rounded-2xl luxury-card space-y-2">
+        <label className="text-[10px] font-bold text-amber-300/90 uppercase tracking-wider block">Order Notes (Optional)</label>
         <textarea
           rows={3}
           placeholder="e.g. advance ৳1,000 paid via bKash (trx: BK128372)... COD collection for remainder..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           disabled={loading}
-          className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-600 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors disabled:opacity-50 resize-none"
+          className="w-full px-4 py-2.5 bg-[#0D0E14] border border-amber-500/20 rounded-xl text-zinc-100 placeholder-zinc-600 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all disabled:opacity-50 resize-none font-medium"
         />
       </div>
 
@@ -531,7 +531,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
       <div className="flex items-center justify-end gap-3 pt-4">
         <Link
           href="/orders"
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition-colors text-sm font-semibold cursor-pointer"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-amber-500/20 bg-[#0F1117] hover:bg-amber-500/5 text-zinc-400 hover:text-amber-200 transition-all text-sm font-semibold cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Cancel</span>
@@ -540,7 +540,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-zinc-50 transition-all font-semibold text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-zinc-950 transition-all font-extrabold text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20 hover:scale-[1.01]"
         >
           {loading ? (
             <>

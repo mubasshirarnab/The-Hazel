@@ -1,77 +1,147 @@
 @import "tailwindcss";
 
-:root {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-  
-  --card: 240 10% 6%;
-  --card-foreground: 0 0% 98%;
-  
-  --popover: 240 10% 4%;
-  --popover-foreground: 0 0% 98%;
-  
-  --primary: 346.8 77.2% 49.8%; /* Fashion rose accent color */
-  --primary-foreground: 355.7 100% 97.3%;
-  
-  --secondary: 240 4% 12%;
-  --secondary-foreground: 0 0% 98%;
-  
-  --muted: 240 4% 12%;
-  --muted-foreground: 240 5% 65%;
-  
-  --accent: 240 4% 15%;
-  --accent-foreground: 0 0% 98%;
-  
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  
-  --border: 240 4% 16%;
-  --input: 240 4% 16%;
-  --ring: 346.8 77.2% 49.8%;
+/* Design Tokens for Light & Dark Themes */
+:root,
+html.light {
+  --bg-app: #f8fafc; /* Crisp Slate 50 */
+  --bg-surface: #ffffff; /* Pure White Card */
+  --bg-elevated: #f1f5f9; /* Slate 100 */
+  --bg-sidebar: #ffffff;
+  --bg-header: rgba(255, 255, 255, 0.85);
+
+  --text-main: #0f172a; /* Slate 900 - High contrast, zero eye strain */
+  --text-muted: #64748b; /* Slate 500 */
+  --text-subtle: #94a3b8; /* Slate 400 */
+
+  --border-subtle: rgba(226, 232, 240, 0.9); /* Slate 200 */
+  --border-accent: rgba(217, 119, 6, 0.25); /* Gold accent border */
+
+  --accent-gold: #d97706; /* Warm Amber / Gold */
+  --accent-gold-light: #fef3c7;
+  --accent-rose: #e11d48;
+  --accent-emerald: #059669;
+
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --card-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
+  --card-hover-shadow: 0 20px 40px -10px rgba(217, 119, 6, 0.12), 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
 }
 
-@theme inline {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+html.dark {
+  --bg-app: #08090d; /* Deep Obsidian */
+  --bg-surface: #0f1117; /* Obsidian Card */
+  --bg-elevated: #141720;
+  --bg-sidebar: #0b0d12;
+  --bg-header: rgba(8, 9, 13, 0.85);
+
+  --text-main: #f8fafc; /* Crisp Slate White */
+  --text-muted: #94a3b8; /* Slate 400 */
+  --text-subtle: #64748b;
+
+  --border-subtle: rgba(245, 158, 11, 0.15);
+  --border-accent: rgba(245, 158, 11, 0.35);
+
+  --accent-gold: #f59e0b;
+  --accent-gold-light: rgba(245, 158, 11, 0.15);
+  --accent-rose: #f43f5e;
+  --accent-emerald: #10b981;
+
+  --card-bg: rgba(15, 17, 23, 0.85);
+  --card-border: rgba(245, 158, 11, 0.18);
+  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --card-hover-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.15), 0 0 20px 0 rgba(225, 29, 72, 0.1);
+
+  --input-bg: #0d0e14;
+  --input-border: rgba(245, 158, 11, 0.25);
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Glassmorphism styling helper for dashboards and widgets */
-.glass-card {
-  background: rgba(18, 18, 22, 0.4);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(63, 63, 70, 0.35);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+/* Metallic Gold Gradients */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.glass-card-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+html.light .text-gold-gradient {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.glass-card-hover:hover {
-  background: rgba(24, 24, 30, 0.55);
-  border-color: rgba(225, 29, 72, 0.35); /* glows with primary color border */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+.text-gold-rose-gradient {
+  background: linear-gradient(135deg, #fde68a 0%, #f43f5e 50%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.light .text-gold-rose-gradient {
+  background: linear-gradient(135deg, #d97706 0%, #e11d48 50%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dynamic Luxury Card Styling */
+.luxury-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-card-hover:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--card-hover-shadow);
   transform: translateY(-2px);
+}
+
+/* Micro-animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Ergonomic Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-subtle);
+  border-radius: 9999px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
 }

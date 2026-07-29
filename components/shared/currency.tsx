@@ -11,7 +11,6 @@ export function formatBDT(amount: number | string): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (isNaN(num)) return '৳0.00';
   
-  // Format with thousands separator and 2 decimal places
   return '৳' + num.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -35,13 +34,13 @@ export default function Currency({ amount, rmbAmount, rmbRate, className = '' }:
     const rateText = rmbRate !== undefined ? ` @ ${Number(rmbRate).toFixed(2)}` : '';
     return (
       <span className={`inline-flex flex-wrap items-center gap-1.5 ${className}`}>
-        <span className="font-semibold text-zinc-100">{formattedBDT}</span>
-        <span className="text-xs text-zinc-400">
+        <span className="font-bold text-[var(--text-main)]">{formattedBDT}</span>
+        <span className="text-xs text-[var(--text-muted)]">
           ({formattedRMB}{rateText})
         </span>
       </span>
     );
   }
 
-  return <span className={`font-semibold text-zinc-100 ${className}`}>{formattedBDT}</span>;
+  return <span className={`font-bold text-[var(--text-main)] ${className}`}>{formattedBDT}</span>;
 }
