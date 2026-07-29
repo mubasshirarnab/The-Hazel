@@ -74,7 +74,10 @@ export default async function DashboardPage() {
     LIMIT 8
   `);
 
-  const totalRevenue = parseFloat(orderStats?.total_revenue || 0);
+  const totalRevenue = parseFloat(plSummary?.revenue || 0);
+  const cogs = parseFloat(plSummary?.cogs || 0);
+  const grossProfit = parseFloat(plSummary?.gross_profit || 0);
+  const totalExpenses = parseFloat(plSummary?.expenses || 0);
   const netProfit = parseFloat(plSummary?.net_profit || 0);
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
@@ -89,20 +92,48 @@ export default async function DashboardPage() {
       </div>
 
       {/* ─── KPI Cards ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           {
-            label: 'Total Revenue',
+            label: 'Total Sales',
             value: formatBDT(totalRevenue),
             icon: DollarSign,
             color: 'text-emerald-400',
             bgColor: 'bg-emerald-500/5 border-emerald-500/20',
           },
           {
+            label: 'COGS (Product Cost)',
+            value: formatBDT(cogs),
+            icon: Package,
+            color: 'text-amber-400',
+            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+          },
+          {
+            label: 'Gross Profit',
+            value: formatBDT(grossProfit),
+            icon: TrendingUp,
+            color: grossProfit >= 0 ? 'text-sky-400' : 'text-rose-400',
+            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+          },
+          {
+            label: 'Operating Expenses',
+            value: formatBDT(totalExpenses),
+            icon: DollarSign,
+            color: 'text-zinc-300',
+            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+          },
+          {
             label: 'Net Profit',
             value: formatBDT(netProfit),
             icon: TrendingUp,
             color: netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400',
+            bgColor: 'bg-emerald-500/5 border-emerald-500/20',
+          },
+          {
+            label: 'Profit Margin',
+            value: `${profitMargin.toFixed(1)}%`,
+            icon: BarChart2,
+            color: profitMargin >= 20 ? 'text-emerald-400' : 'text-rose-400',
             bgColor: 'bg-zinc-900/40 border-zinc-800/80',
           },
           {
@@ -113,11 +144,11 @@ export default async function DashboardPage() {
             bgColor: 'bg-zinc-900/40 border-zinc-800/80',
           },
           {
-            label: 'Total Customers',
-            value: String(customerStats?.total_customers || 0),
-            icon: Users,
-            color: 'text-sky-400',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
+            label: 'Pending Orders',
+            value: String(orderStats?.pending_orders || 0),
+            icon: AlertCircle,
+            color: 'text-amber-400',
+            bgColor: 'bg-amber-500/5 border-amber-500/20',
           },
           {
             label: 'Inventory Value',
@@ -131,20 +162,6 @@ export default async function DashboardPage() {
             value: String(inventoryStats?.total_units || 0),
             icon: Layers,
             color: 'text-zinc-300',
-            bgColor: 'bg-zinc-900/40 border-zinc-800/80',
-          },
-          {
-            label: 'Pending Orders',
-            value: String(orderStats?.pending_orders || 0),
-            icon: AlertCircle,
-            color: 'text-amber-400',
-            bgColor: 'bg-amber-500/5 border-amber-500/20',
-          },
-          {
-            label: 'Profit Margin',
-            value: `${profitMargin.toFixed(1)}%`,
-            icon: BarChart2,
-            color: profitMargin >= 20 ? 'text-emerald-400' : 'text-rose-400',
             bgColor: 'bg-zinc-900/40 border-zinc-800/80',
           },
         ].map(({ label, value, icon: Icon, color, bgColor }) => (

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrder } from '@/actions/orders';
 import { toast } from 'sonner';
-import { Trash2, Plus, ArrowLeft, Loader2, Save } from 'lucide-react';
+import { Trash2, Plus, ArrowLeft, Loader2, Save, Search, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { formatBDT } from '@/components/shared/currency';
 
@@ -32,6 +32,183 @@ interface SelectedItem {
   quantity: string;
   sellingPrice: string;
   discountAmount: string;
+}
+
+function SearchableCustomerSelect({
+  customers,
+  value,
+  onChange,
+  disabled,
+}: {
+  customers: CustomerOption[];
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selected = customers.find((c) => c.id.toString() === value);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filtered = customers.filter(
+    (c) =>
+      c.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      c.customerCode.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      <div className="relative flex items-center">
+        <Search className="h-3.5 w-3.5 text-zinc-500 absolute left-3.5 pointer-events-none" />
+        <input
+          type="text"
+          disabled={disabled}
+          placeholder="Search customer by name or code..."
+          value={isOpen ? search : selected ? `${selected.customerCode} — ${selected.customerName}` : ''}
+          onFocus={() => {
+            setSearch('');
+            setIsOpen(true);
+          }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setIsOpen(true);
+          }}
+          className="w-full pl-9 pr-8 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors disabled:opacity-50"
+        />
+        <ChevronDown className="h-4 w-4 text-zinc-500 absolute right-3 pointer-events-none" />
+      </div>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-1.5 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
+          {filtered.length === 0 ? (
+            <div className="p-3 text-xs text-zinc-500 italic text-center">No customer matching "{search}"</div>
+          ) : (
+            filtered.map((c) => (
+              <div
+                key={c.id}
+                onClick={() => {
+                  onChange(c.id.toString());
+                  setIsOpen(false);
+                  setSearch('');
+                }}
+                className={`px-3 py-2 rounded text-xs cursor-pointer flex items-center justify-between transition-colors ${
+                  value === c.id.toString()
+                    ? 'bg-rose-500/20 text-rose-300 font-semibold'
+                    : 'text-zinc-300 hover:bg-zinc-800'
+                }`}
+              >
+                <span>{c.customerName}</span>
+                <span className="text-[10px] font-mono text-zinc-500">{c.customerCode}</span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SearchableVariantSelect({
+  variants,
+  value,
+  onChange,
+  disabled,
+}: {
+  variants: VariantOption[];
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selected = variants.find((v) => v.id.toString() === value);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filtered = variants.filter(
+    (v) =>
+      v.productName.toLowerCase().includes(search.toLowerCase()) ||
+      v.colorName.toLowerCase().includes(search.toLowerCase()) ||
+      v.variantCode.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      <div className="relative flex items-center">
+        <Search className="h-3 w-3 text-zinc-500 absolute left-2.5 pointer-events-none" />
+        <input
+          type="text"
+          disabled={disabled}
+          placeholder="Search variant..."
+          value={isOpen ? search : selected ? `${selected.productName} (${selected.colorName})` : ''}
+          onFocus={() => {
+            setSearch('');
+            setIsOpen(true);
+          }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setIsOpen(true);
+          }}
+          className="w-full pl-7 pr-7 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-colors disabled:opacity-50"
+        />
+        <ChevronDown className="h-3.5 w-3.5 text-zinc-500 absolute right-2.5 pointer-events-none" />
+      </div>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-1 w-72 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
+          {filtered.length === 0 ? (
+            <div className="p-3 text-xs text-zinc-500 italic text-center">No variant matching "{search}"</div>
+          ) : (
+            filtered.map((v) => (
+              <div
+                key={v.id}
+                onClick={() => {
+                  onChange(v.id.toString());
+                  setIsOpen(false);
+                  setSearch('');
+                }}
+                className={`px-3 py-2 rounded text-xs cursor-pointer flex flex-col gap-0.5 transition-colors ${
+                  value === v.id.toString()
+                    ? 'bg-rose-500/20 text-rose-300 font-semibold'
+                    : 'text-zinc-300 hover:bg-zinc-800'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium truncate max-w-[150px]">{v.productName}</span>
+                  <span className="text-[10px] font-mono text-zinc-400">{v.sellingPrice} BDT</span>
+                </div>
+                <div className="flex items-center justify-between text-[10px] text-zinc-500">
+                  <span>{v.colorName}</span>
+                  <span className="font-mono">{v.variantCode}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function OrderForm({ customers, variants }: OrderFormProps) {
@@ -173,23 +350,15 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Customer Dropdown */}
+          {/* Customer Search Select */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Customer</label>
-            <select
+            <SearchableCustomerSelect
+              customers={customers}
               value={customerId}
-              onChange={(e) => setCustomerId(e.target.value)}
+              onChange={(val) => setCustomerId(val)}
               disabled={loading}
-              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 text-sm focus:outline-none focus:border-rose-500/80 focus:ring-1 focus:ring-rose-500/80 transition-colors"
-              required
-            >
-              <option value="">Select Customer...</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.customerCode} — {c.customerName}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           {/* Order Type */}
@@ -264,20 +433,12 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
               {/* Select Variant */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select variant</label>
-                <select
+                <SearchableVariantSelect
+                  variants={variants}
                   value={item.variantId}
-                  onChange={(e) => handleItemChange(index, 'variantId', e.target.value)}
+                  onChange={(val) => handleItemChange(index, 'variantId', val)}
                   disabled={loading}
-                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-zinc-100 text-xs focus:outline-none focus:border-rose-500"
-                  required
-                >
-                  <option value="">Select Variant...</option>
-                  {variants.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.variantCode} — {v.productName} ({v.colorName})
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               {/* Price */}

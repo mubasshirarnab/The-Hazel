@@ -168,22 +168,27 @@ export async function processOrderReturn(orderId: number, returnReason: string) 
   try {
     await dbReturnOrder(orderId, returnReason);
 
-    // Log status history (Returned)
-    // Fetch return status ID (or log to history as special notes)
-    // Stored procedure sets return_status_id and refund_status_id to completed
-    await db.insert(tblOrderStatusHistory).values({
-      orderId,
-      statusId: 6, // Keep as Cancelled/Returned code or custom
-      changedBy: user.userCode,
-      notes: `Order returned. Reason: ${returnReason}`,
-    });
+    // Dynamically fetch the 'returned' order status ID
+    const [returnedStatusRows]: any = await poolConnection.query(
+      "SELECT id FROM tbl_order_statuses WHERE status_code = 'returned' LIMIT 1"
+    );
+    const returnedStatusId = returnedStatusRows[0]?.id;
+
+    if (returnedStatusId) {
+      await db.insert(tblOrderStatusHistory).values({
+        orderId,
+        statusId: returnedStatusId,
+        changedBy: user.userCode,
+        notes: `Customer return received. Reason: ${returnReason}. Goods restocked to inventory.`,
+      });
+    }
 
     revalidatePath('/orders');
     revalidatePath('/inventory');
     revalidatePath('/dashboard');
     return { success: true };
   } catch (error: any) {
-    console.error('Error returning order:', error);
-    throw new Error(error.message || 'Failed to return order.');
+    console.error('Error processing customer return:', error);
+    throw new Error(error.message || 'Failed to process customer return.');
   }
 }

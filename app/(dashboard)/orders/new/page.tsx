@@ -1,7 +1,5 @@
 import React from 'react';
-import { db } from '@/lib/db/db';
-import { tblCustomers, tblProductVariants, tblProducts } from '@/lib/db/schema';
-import { eq, and, isNull } from 'drizzle-orm';
+import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
 import OrderForm from './order-form';
 
@@ -9,28 +7,29 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewOrderPage() {
   // 1. Fetch active customers
-  const customers = await db
-    .select({
-      id: tblCustomers.id,
-      customerCode: tblCustomers.customerCode,
-      customerName: tblCustomers.customerName,
-    })
-    .from(tblCustomers)
-    .where(isNull(tblCustomers.deletedAt))
-    .orderBy(tblCustomers.customerName);
+  const [customers]: any = await poolConnection.query(`
+    SELECT
+      id,
+      customer_code AS customerCode,
+      customer_name AS customerName
+    FROM tbl_customers
+    WHERE deleted_at IS NULL
+    ORDER BY customer_name ASC
+  `);
 
   // 2. Fetch active variants with product names
-  const variants = await db
-    .select({
-      id: tblProductVariants.id,
-      variantCode: tblProductVariants.variantCode,
-      colorName: tblProductVariants.colorName,
-      productName: tblProducts.productName,
-      sellingPrice: tblProductVariants.sellingPrice,
-    })
-    .from(tblProductVariants)
-    .innerJoin(tblProducts, eq(tblProductVariants.productId, tblProducts.id))
-    .where(and(isNull(tblProductVariants.deletedAt), isNull(tblProducts.deletedAt)));
+  const [variants]: any = await poolConnection.query(`
+    SELECT
+      v.id,
+      v.variant_code AS variantCode,
+      v.color_name AS colorName,
+      p.product_name AS productName,
+      v.selling_price AS sellingPrice
+    FROM tbl_product_variants v
+    INNER JOIN tbl_products p ON p.id = v.product_id
+    WHERE v.deleted_at IS NULL AND p.deleted_at IS NULL
+    ORDER BY p.product_name ASC, v.color_name ASC
+  `);
 
   return (
     <div className="space-y-6">

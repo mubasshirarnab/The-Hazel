@@ -1,13 +1,5 @@
 import React from 'react';
-import { db } from '@/lib/db/db';
-import {
-  tblOrders,
-  tblCustomers,
-  tblOrderStatuses,
-  tblPaymentStatuses,
-  tblDeliveryStatuses,
-} from '@/lib/db/schema';
-import { eq, and, isNull, desc } from 'drizzle-orm';
+import { poolConnection } from '@/lib/db/db';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
@@ -18,25 +10,25 @@ export const dynamic = 'force-dynamic';
 
 export default async function OrdersPage() {
   // Query all active orders joined with their statuses and customer info
-  const orders = await db
-    .select({
-      id: tblOrders.id,
-      orderNumber: tblOrders.orderNumber,
-      customerName: tblCustomers.customerName,
-      orderDate: tblOrders.orderDate,
-      orderType: tblOrders.orderType,
-      grandTotal: tblOrders.grandTotal,
-      orderStatus: tblOrderStatuses.statusCode,
-      paymentStatus: tblPaymentStatuses.statusCode,
-      deliveryStatus: tblDeliveryStatuses.statusCode,
-    })
-    .from(tblOrders)
-    .innerJoin(tblCustomers, eq(tblOrders.customerId, tblCustomers.id))
-    .innerJoin(tblOrderStatuses, eq(tblOrders.orderStatusId, tblOrderStatuses.id))
-    .innerJoin(tblPaymentStatuses, eq(tblOrders.paymentStatusId, tblPaymentStatuses.id))
-    .innerJoin(tblDeliveryStatuses, eq(tblOrders.deliveryStatusId, tblDeliveryStatuses.id))
-    .where(isNull(tblOrders.deletedAt))
-    .orderBy(desc(tblOrders.orderDate), desc(tblOrders.id));
+  const [orders]: any = await poolConnection.query(`
+    SELECT
+      o.id,
+      o.order_number AS orderNumber,
+      c.customer_name AS customerName,
+      o.order_date AS orderDate,
+      o.order_type AS orderType,
+      o.grand_total AS grandTotal,
+      os.status_code AS orderStatus,
+      ps.status_code AS paymentStatus,
+      ds.status_code AS deliveryStatus
+    FROM tbl_orders o
+    INNER JOIN tbl_customers c ON o.customer_id = c.id
+    INNER JOIN tbl_order_statuses os ON o.order_status_id = os.id
+    INNER JOIN tbl_payment_statuses ps ON o.payment_status_id = ps.id
+    INNER JOIN tbl_delivery_statuses ds ON o.delivery_status_id = ds.id
+    WHERE o.deleted_at IS NULL
+    ORDER BY o.order_date DESC, o.id DESC
+  `);
 
   return (
     <div className="space-y-6">

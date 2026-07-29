@@ -1,25 +1,11 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { db } from '@/lib/db/db';
-import {
-  tblOrders,
-  tblCustomers,
-  tblOrderStatuses,
-  tblPaymentStatuses,
-  tblDeliveryStatuses,
-  tblRefundStatuses,
-  tblReturnStatuses,
-  tblOrderItems,
-  tblProductVariants,
-  tblProducts,
-  tblOrderStatusHistory,
-} from '@/lib/db/schema';
-import { eq, and, isNull, desc } from 'drizzle-orm';
-import Link from 'next/link';
-import { ArrowLeft, User, MapPin, ClipboardList, Clock } from 'lucide-react';
+import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
 import Currency, { formatBDT } from '@/components/shared/currency';
 import StatusBadge from '@/components/shared/status-badge';
+import Link from 'next/link';
+import { ArrowLeft, Clock, User, ClipboardList, MapPin } from 'lucide-react';
 import OrderActions from './order-actions';
 
 export const dynamic = 'force-dynamic';
@@ -36,43 +22,40 @@ export default async function OrderDetailPage({ params }: PageProps) {
   }
 
   // 1. Fetch Order details
-  const orders = await db
-    .select({
-      id: tblOrders.id,
-      orderNumber: tblOrders.orderNumber,
-      orderDate: tblOrders.orderDate,
-      orderType: tblOrders.orderType,
-      subtotal: tblOrders.subtotal,
-      discountTotal: tblOrders.discountTotal,
-      shippingAmount: tblOrders.shippingAmount,
-      grandTotal: tblOrders.grandTotal,
-      paidAmount: tblOrders.paidAmount,
-      outstandingAmount: tblOrders.outstandingAmount,
-      currency: tblOrders.currency,
-      notes: tblOrders.notes,
-      createdAt: tblOrders.createdAt,
-      customerName: tblCustomers.customerName,
-      customerCode: tblCustomers.customerCode,
-      phone: tblCustomers.phone,
-      facebookName: tblCustomers.facebookName,
-      address: tblCustomers.address,
-      district: tblCustomers.district,
-      paymentPreference: tblCustomers.paymentPreference,
-      orderStatus: tblOrderStatuses.statusCode,
-      paymentStatus: tblPaymentStatuses.statusCode,
-      deliveryStatus: tblDeliveryStatuses.statusCode,
-      refundStatus: tblRefundStatuses.statusCode,
-      returnStatus: tblReturnStatuses.statusCode,
-    })
-    .from(tblOrders)
-    .innerJoin(tblCustomers, eq(tblOrders.customerId, tblCustomers.id))
-    .innerJoin(tblOrderStatuses, eq(tblOrders.orderStatusId, tblOrderStatuses.id))
-    .innerJoin(tblPaymentStatuses, eq(tblOrders.paymentStatusId, tblPaymentStatuses.id))
-    .innerJoin(tblDeliveryStatuses, eq(tblOrders.deliveryStatusId, tblDeliveryStatuses.id))
-    .innerJoin(tblRefundStatuses, eq(tblOrders.refundStatusId, tblRefundStatuses.id))
-    .innerJoin(tblReturnStatuses, eq(tblOrders.returnStatusId, tblReturnStatuses.id))
-    .where(and(eq(tblOrders.id, orderId), isNull(tblOrders.deletedAt)))
-    .limit(1);
+  const [orders]: any = await poolConnection.query(`
+    SELECT
+      o.id,
+      o.order_number AS orderNumber,
+      o.order_date AS orderDate,
+      o.order_type AS orderType,
+      o.subtotal,
+      o.discount_total AS discountTotal,
+      o.shipping_amount AS shippingAmount,
+      o.grand_total AS grandTotal,
+      o.paid_amount AS paidAmount,
+      o.outstanding_amount AS outstandingAmount,
+      o.currency,
+      o.notes,
+      o.created_at AS createdAt,
+      c.customer_name AS customerName,
+      c.customer_code AS customerCode,
+      c.phone,
+      c.facebook_name AS facebookName,
+      c.address,
+      c.district,
+      c.payment_preference AS paymentPreference,
+      os.status_code AS orderStatus,
+      ps.status_code AS paymentStatus,
+      ds.status_code AS deliveryStatus,
+      rs.status_code AS returnStatus
+    FROM tbl_orders o
+    INNER JOIN tbl_customers c ON o.customer_id = c.id
+    INNER JOIN tbl_order_statuses os ON o.order_status_id = os.id
+    INNER JOIN tbl_payment_statuses ps ON o.payment_status_id = ps.id
+    INNER JOIN tbl_delivery_statuses ds ON o.delivery_status_id = ds.id
+    LEFT JOIN tbl_return_statuses rs ON o.return_status_id = rs.id
+    WHERE o.id = ? AND o.deleted_at IS NULL
+  `, [orderId]);
 
   const order = orders[0];
   if (!order) {
@@ -80,34 +63,34 @@ export default async function OrderDetailPage({ params }: PageProps) {
   }
 
   // 2. Fetch Order items
-  const orderItems = await db
-    .select({
-      id: tblOrderItems.id,
-      quantity: tblOrderItems.quantity,
-      sellingPrice: tblOrderItems.sellingPrice,
-      discountAmount: tblOrderItems.discountAmount,
-      variantCode: tblProductVariants.variantCode,
-      colorName: tblProductVariants.colorName,
-      productName: tblProducts.productName,
-    })
-    .from(tblOrderItems)
-    .innerJoin(tblProductVariants, eq(tblOrderItems.variantId, tblProductVariants.id))
-    .innerJoin(tblProducts, eq(tblProductVariants.productId, tblProducts.id))
-    .where(eq(tblOrderItems.orderId, orderId));
+  const [orderItems]: any = await poolConnection.query(`
+    SELECT
+      oi.id,
+      oi.quantity,
+      oi.selling_price AS sellingPrice,
+      oi.discount_amount AS discountAmount,
+      v.variant_code AS variantCode,
+      v.color_name AS colorName,
+      p.product_name AS productName
+    FROM tbl_order_items oi
+    INNER JOIN tbl_product_variants v ON oi.variant_id = v.id
+    INNER JOIN tbl_products p ON v.product_id = p.id
+    WHERE oi.order_id = ?
+  `, [orderId]);
 
   // 3. Fetch status history
-  const statusHistory = await db
-    .select({
-      id: tblOrderStatusHistory.id,
-      changedAt: tblOrderStatusHistory.changedAt,
-      changedBy: tblOrderStatusHistory.changedBy,
-      notes: tblOrderStatusHistory.notes,
-      statusName: tblOrderStatuses.statusName,
-    })
-    .from(tblOrderStatusHistory)
-    .innerJoin(tblOrderStatuses, eq(tblOrderStatusHistory.statusId, tblOrderStatuses.id))
-    .where(eq(tblOrderStatusHistory.orderId, orderId))
-    .orderBy(desc(tblOrderStatusHistory.changedAt));
+  const [statusHistory]: any = await poolConnection.query(`
+    SELECT
+      h.id,
+      h.changed_at AS changedAt,
+      h.changed_by AS changedBy,
+      h.notes,
+      os.status_name AS statusName
+    FROM tbl_order_status_history h
+    INNER JOIN tbl_order_statuses os ON h.status_id = os.id
+    WHERE h.order_id = ?
+    ORDER BY h.changed_at DESC
+  `, [orderId]);
 
   return (
     <div className="space-y-8">
@@ -218,7 +201,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                  {orderItems.map((item) => {
+                  {orderItems.map((item: any) => {
                     const price = Number(item.sellingPrice);
                     const qty = item.quantity;
                     const discount = Number(item.discountAmount);
@@ -284,7 +267,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
               <p className="text-xs text-zinc-500 italic">No status updates logged.</p>
             ) : (
               <div className="space-y-4">
-                {statusHistory.map((log) => (
+                {statusHistory.map((log: any) => (
                   <div
                     key={log.id}
                     className="p-4 rounded-lg bg-zinc-950/60 border border-zinc-850 flex items-start justify-between gap-4 text-xs"
