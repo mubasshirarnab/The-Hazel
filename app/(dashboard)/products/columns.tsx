@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useTransition } from 'react';
 import Link from 'next/link';
@@ -7,12 +7,14 @@ import { deleteProduct } from '@/actions/products';
 import { toast } from 'sonner';
 import { Eye, Trash2, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import Currency from '@/components/shared/currency';
 
 export interface ProductRow {
   id: number;
   productCode: string;
   sku: string;
   productName: string;
+  unitCost: string | number | null;
   productStatus: string;
   categoryName: string | null;
   createdAt: Date;
@@ -56,6 +58,15 @@ export const columns: ColumnDef<ProductRow>[] = [
     ),
   },
   {
+    accessorKey: 'unitCost',
+    header: 'Unit Cost',
+    cell: ({ row }) => (
+      <span className="font-mono font-bold text-[#1F3A2E]">
+        <Currency amount={row.original.unitCost || 0} />
+      </span>
+    ),
+  },
+  {
     accessorKey: 'productStatus',
     header: 'Status',
     cell: ({ row }) => {
@@ -82,7 +93,7 @@ function ActionCell({ id, productName }: { id: number; productName: string }) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
-    if (confirm(`Are you sure you want to delete "${productName}"? This will soft-delete all variants and inventory records associated with it.`)) {
+    if (confirm(`Are you sure you want to delete "${productName}"? This will delete all variants and inventory records associated with it.`)) {
       startTransition(async () => {
         try {
           const res = await deleteProduct(id);

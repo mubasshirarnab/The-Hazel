@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -13,9 +13,7 @@ export interface InventoryRow {
   warehouse_name: string;
   current_stock: number;
   reserved_stock: number;
-  available_stock: number;
-  returned_stock: number;
-  damaged_stock: number;
+  stock_out: number;
   unit_cost: number | string;
   inventory_value: number | string;
 }
@@ -36,15 +34,6 @@ export const columns: ColumnDef<InventoryRow>[] = [
     cell: ({ row }) => (
       <span className="text-[#6B6B6B] font-medium">
         {row.original.color_name}
-      </span>
-    ),
-  },
-  {
-    accessorKey: 'warehouse_name',
-    header: 'Warehouse',
-    cell: ({ row }) => (
-      <span className="text-[#6B6B6B] font-medium text-xs">
-        {row.original.warehouse_name}
       </span>
     ),
   },
@@ -74,27 +63,11 @@ export const columns: ColumnDef<InventoryRow>[] = [
     },
   },
   {
-    accessorKey: 'available_stock',
-    header: 'Available',
-    cell: ({ row }) => {
-      const available = row.original.available_stock;
-      return (
-        <span
-          className={`font-bold font-mono ${
-            available > 0 ? 'text-[#15803D]' : 'text-[#DC2626]'
-          }`}
-        >
-          {available}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: 'returned_stock',
-    header: 'Returned / Damaged',
+    accessorKey: 'stock_out',
+    header: 'Stock Out',
     cell: ({ row }) => (
-      <span className="text-xs text-[#6B6B6B]">
-        R: {row.original.returned_stock} / D: {row.original.damaged_stock}
+      <span className="font-bold font-mono text-[#1F3A2E]">
+        {row.original.stock_out || 0}
       </span>
     ),
   },

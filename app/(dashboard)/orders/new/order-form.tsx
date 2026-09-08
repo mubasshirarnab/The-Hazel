@@ -1,21 +1,15 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrder } from '@/actions/orders';
 import { toast } from 'sonner';
-import { Trash2, Plus, ArrowLeft, Save, Search, ChevronDown } from 'lucide-react';
+import { Trash2, Plus, ArrowLeft, Save, Search, ChevronDown, User, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { formatBDT } from '@/components/shared/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input, Textarea } from '@/components/ui/input';
-
-interface CustomerOption {
-  id: number;
-  customerCode: string;
-  customerName: string;
-}
+import { Input, Select, Textarea } from '@/components/ui/input';
 
 interface VariantOption {
   id: number;
@@ -26,7 +20,6 @@ interface VariantOption {
 }
 
 interface OrderFormProps {
-  customers: CustomerOption[];
   variants: VariantOption[];
 }
 
@@ -37,90 +30,15 @@ interface SelectedItem {
   discountAmount: string;
 }
 
-function SearchableCustomerSelect({
-  customers,
-  value,
-  onChange,
-  disabled,
-}: {
-  customers: CustomerOption[];
-  value: string;
-  onChange: (val: string) => void;
-  disabled?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const selected = customers.find((c) => c.id.toString() === value);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const filtered = customers.filter(
-    (c) =>
-      c.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      c.customerCode.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div ref={containerRef} className="relative w-full">
-      <div className="relative flex items-center">
-        <Search className="h-3.5 w-3.5 text-[#B08D57] absolute left-3.5 pointer-events-none" />
-        <input
-          type="text"
-          disabled={disabled}
-          placeholder="Search customer by name or code..."
-          value={isOpen ? search : selected ? `${selected.customerCode} — ${selected.customerName}` : ''}
-          onFocus={() => {
-            setSearch('');
-            setIsOpen(true);
-          }}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setIsOpen(true);
-          }}
-          className="w-full pl-9 pr-8 py-2.5 bg-[#FAFAF8] focus:bg-white border border-[#E9E7E2] rounded-[12px] text-[#1A1A1A] placeholder-[#9E9E9E] text-xs focus:outline-none focus:border-[#1F3A2E] focus:ring-2 focus:ring-[#1F3A2E]/15 transition-all disabled:opacity-50 font-medium shadow-soft-1"
-        />
-        <ChevronDown className="h-4 w-4 text-[#9E9E9E] absolute right-3 pointer-events-none" />
-      </div>
-
-      {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-full bg-white border border-[#E9E7E2] rounded-[12px] shadow-soft-3 z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
-          {filtered.length === 0 ? (
-            <div className="p-3 text-xs text-[#9E9E9E] italic text-center">No customer matching "{search}"</div>
-          ) : (
-            filtered.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => {
-                  onChange(c.id.toString());
-                  setIsOpen(false);
-                  setSearch('');
-                }}
-                className={`px-3 py-2 rounded-[8px] text-xs cursor-pointer flex items-center justify-between transition-colors ${
-                  value === c.id.toString()
-                    ? 'bg-[#1F3A2E] text-white font-bold'
-                    : 'text-[#1A1A1A] hover:bg-[#F7F6F3]'
-                }`}
-              >
-                <span>{c.customerName}</span>
-                <span className="text-[10px] font-mono opacity-80">{c.customerCode}</span>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+const PAYMENT_METHODS = [
+  'Cash on Delivery',
+  'bKash',
+  'Nagad',
+  'Bank Transfer',
+  'Rocket',
+  'Card Payment',
+  'Other',
+];
 
 function SearchableVariantSelect({
   variants,
@@ -214,11 +132,15 @@ function SearchableVariantSelect({
   );
 }
 
-export default function OrderForm({ customers, variants }: OrderFormProps) {
+export default function OrderForm({ variants }: OrderFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [customerId, setCustomerId] = useState('');
+  // Customer & Order Info
+  const [customerName, setCustomerName] = useState('');
+  const [contact, setContact] = useState('');
+  const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
   const [orderType, setOrderType] = useState<'in_stock' | 'preorder'>('in_stock');
   const [orderDate, setOrderDate] = useState(() => {
     const today = new Date();
@@ -226,6 +148,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
   });
   const [notes, setNotes] = useState('');
 
+  // Items
   const [items, setItems] = useState<SelectedItem[]>([
     { variantId: '', quantity: '1', sellingPrice: '0', discountAmount: '0' },
   ]);
@@ -276,8 +199,8 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!customerId) {
-      toast.error('Please select a customer.');
+    if (!customerName.trim()) {
+      toast.error('Please enter Customer Name.');
       return;
     }
 
@@ -312,7 +235,10 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
 
     try {
       const payload = {
-        customerId: Number(customerId),
+        customerName: customerName.trim(),
+        contact: contact.trim() || null,
+        address: address.trim() || null,
+        paymentMethod,
         orderType,
         orderDate,
         notes: notes || null,
@@ -320,7 +246,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
           variantId: Number(item.variantId),
           quantity: parseInt(item.quantity),
           sellingPrice: parseFloat(item.sellingPrice),
-          discountAmount: parseFloat(item.discountAmount),
+          discountAmount: parseFloat(item.discountAmount) || 0,
         })),
       };
 
@@ -341,25 +267,56 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-fade-in">
-      {/* 1. Header Information Section */}
+      {/* 1. Customer & Order Settings */}
       <Card hoverEffect={false}>
         <CardHeader>
-          <CardTitle>1. Customer & Order Settings</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-4 w-4 text-[#B08D57]" />
+            <span>1. Customer & Order Details</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pt-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <CardContent className="space-y-6 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">Customer</label>
-              <SearchableCustomerSelect
-                customers={customers}
-                value={customerId}
-                onChange={(val) => setCustomerId(val)}
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Customer Name *</label>
+              <Input
+                placeholder="e.g. Sarah Ahmed"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
                 disabled={loading}
+                required
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">Order Type</label>
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Contact (Phone / Mobile)</label>
+              <Input
+                placeholder="e.g. +880 1712 345678"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Payment Method</label>
+              <Select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                disabled={loading}
+              >
+                {PAYMENT_METHODS.map((pm) => (
+                  <option key={pm} value={pm}>
+                    {pm}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Order Type</label>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -371,7 +328,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                       : 'bg-white border-[#E9E7E2] text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F7F6F3]'
                   }`}
                 >
-                  In-Stock Fulfilled
+                  In-Stock
                 </button>
                 <button
                   type="button"
@@ -383,13 +340,13 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                       : 'bg-white border-[#E9E7E2] text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F7F6F3]'
                   }`}
                 >
-                  Pre-Order Reserve
+                  Pre-Order
                 </button>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider block">Order Date</label>
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Order Date</label>
               <Input
                 type="date"
                 value={orderDate}
@@ -398,6 +355,17 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Delivery Address</label>
+            <Textarea
+              rows={2}
+              placeholder="e.g. House 12, Road 5, Block B, Banani, Dhaka"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              disabled={loading}
+            />
           </div>
         </CardContent>
       </Card>
@@ -427,7 +395,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
               className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group hover:border-[#B08D57]/40 transition-colors"
             >
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider">Select variant</label>
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider">Select Variant</label>
                 <SearchableVariantSelect
                   variants={variants}
                   value={item.variantId}
@@ -503,7 +471,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
         </CardContent>
       </Card>
 
-      {/* Notes text area */}
+      {/* Notes */}
       <Card hoverEffect={false}>
         <CardHeader>
           <CardTitle className="text-sm uppercase tracking-widest">Order Notes (Optional)</CardTitle>
@@ -511,7 +479,7 @@ export default function OrderForm({ customers, variants }: OrderFormProps) {
         <CardContent className="pt-2">
           <Textarea
             rows={3}
-            placeholder="e.g. advance ৳1,000 paid via bKash (trx: BK128372)... COD collection for remainder..."
+            placeholder="e.g. Special packaging request or delivery timing notes..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             disabled={loading}

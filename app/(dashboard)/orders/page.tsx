@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { poolConnection } from '@/lib/db/db';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
@@ -15,7 +15,7 @@ export default async function OrdersPage() {
     SELECT
       o.id,
       o.order_number AS orderNumber,
-      c.customer_name AS customerName,
+      o.customer_name AS customerName,
       o.order_date AS orderDate,
       o.order_type AS orderType,
       o.grand_total AS grandTotal,
@@ -23,7 +23,6 @@ export default async function OrdersPage() {
       ps.status_code AS paymentStatus,
       ds.status_code AS deliveryStatus
     FROM tbl_orders o
-    INNER JOIN tbl_customers c ON o.customer_id = c.id
     INNER JOIN tbl_order_statuses os ON o.order_status_id = os.id
     INNER JOIN tbl_payment_statuses ps ON o.payment_status_id = ps.id
     INNER JOIN tbl_delivery_statuses ds ON o.delivery_status_id = ds.id
@@ -35,7 +34,7 @@ export default async function OrdersPage() {
     <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Sales Orders"
-        description="Fulfill in-stock shipments, track preorder collections, manage cancellations and product returns."
+        description="Fulfill in-stock shipments, track preorder collections, and manage sales orders."
       >
         <Link href="/orders/new">
           <Button variant="primary" icon={<Plus className="h-4 w-4 shrink-0" />}>

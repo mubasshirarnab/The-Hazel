@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -8,13 +8,8 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Box,
-  Users,
   ShoppingCart,
-  FileText,
-  Truck,
-  Percent,
-  Landmark,
-  Megaphone,
+  Receipt,
   Settings,
   LogOut,
   User,
@@ -33,13 +28,8 @@ const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Products', href: '/products', icon: ShoppingBag },
   { name: 'Inventory', href: '/inventory', icon: Box },
-  { name: 'Customers', href: '/customers', icon: Users },
   { name: 'Orders', href: '/orders', icon: ShoppingCart },
-  { name: 'Purchase Orders', href: '/purchase-orders', icon: FileText },
-  { name: 'Shipments', href: '/shipments', icon: Truck },
-  { name: 'Cost Allocation', href: '/cost-allocation', icon: Percent },
-  { name: 'Finance', href: '/finance', icon: Landmark, adminOnly: true },
-  { name: 'Marketing', href: '/marketing', icon: Megaphone },
+  { name: 'Business Expenses', href: '/business-expenses', icon: Receipt },
   { name: 'Settings', href: '/settings', icon: Settings, adminOnly: true },
 ];
 

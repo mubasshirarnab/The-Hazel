@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { notFound } from 'next/navigation';
 import { db, poolConnection } from '@/lib/db/db';
 import { tblProducts, tblCategories, tblProductVariants } from '@/lib/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Box, Tag, DollarSign } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Tag, Truck } from 'lucide-react';
 import PageHeader from '@/components/shared/page-header';
 import { formatBDT } from '@/components/shared/currency';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
       productName: tblProducts.productName,
       productStatus: tblProducts.productStatus,
       purchaseLink: tblProducts.purchaseLink,
-      notes: tblProducts.notes,
+      productDescription: tblProducts.productDescription,
+      totalWeight: tblProducts.totalWeight,
+      quantity: tblProducts.quantity,
+      shippingRoute: tblProducts.shippingRoute,
+      shippingRate: tblProducts.shippingRate,
+      shippingCost: tblProducts.shippingCost,
+      otherImportCost: tblProducts.otherImportCost,
+      totalCost: tblProducts.totalCost,
+      unitCost: tblProducts.unitCost,
+      unitWeight: tblProducts.unitWeight,
       categoryName: tblCategories.categoryName,
     })
     .from(tblProducts)
@@ -52,248 +61,197 @@ export default async function ProductDetailPage({ params }: PageProps) {
     .from(tblProductVariants)
     .where(and(eq(tblProductVariants.productId, productId), isNull(tblProductVariants.deletedAt)));
 
-  // 3. Fetch true product cost breakdown from view
-  const [costBreakdowns]: any = await poolConnection.query(
-    'SELECT * FROM vw_true_product_cost WHERE product_id = ?',
-    [productId]
-  );
-
-  // 4. Fetch variant stock levels from view
+  // 3. Fetch variant stock levels from view
   const [stockLevels]: any = await poolConnection.query(
     'SELECT * FROM vw_inventory_value WHERE product_id = ?',
     [productId]
   );
 
-  // Map variant statistics
-  const variantData = variants.map((v) => {
-    const cost = costBreakdowns.find((cb: any) => cb.variant_id === v.id) || {
-      purchase_cost: Number(v.purchasePriceBdt),
-      import_cost: 0,
-      shipping_cost: 0,
-      packaging_cost: 0,
-      advertising_cost: 0,
-      photoshoot_cost: 0,
-      pr_cost: 0,
-      influencer_cost: 0,
-      miscellaneous_cost: 0,
-      true_product_cost: Number(v.purchasePriceBdt),
-    };
-
-    const stocks = stockLevels.filter((s: any) => s.variant_id === v.id);
-    const totalCurrentStock = stocks.reduce((acc: number, s: any) => acc + (s.current_stock || 0), 0);
-    const totalReservedStock = stocks.reduce((acc: number, s: any) => acc + (s.reserved_stock || 0), 0);
-    const totalAvailableStock = totalCurrentStock - totalReservedStock;
-    const totalReturnedStock = stocks.reduce((acc: number, s: any) => acc + (s.returned_stock || 0), 0);
-    const totalDamagedStock = stocks.reduce((acc: number, s: any) => acc + (s.damaged_stock || 0), 0);
-
-    const sellPrice = Number(v.sellingPrice);
-    const trueCost = Number(cost.true_product_cost || cost.purchase_cost || v.purchasePriceBdt);
-    const profit = sellPrice - trueCost;
-    const margin = sellPrice > 0 ? (profit / sellPrice) * 100 : 0;
-
-    return {
-      ...v,
-      cost,
-      stocks,
-      totalCurrentStock,
-      totalReservedStock,
-      totalAvailableStock,
-      totalReturnedStock,
-      totalDamagedStock,
-      sellPrice,
-      trueCost,
-      profit,
-      margin,
-    };
-  });
-
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Page Header */}
-      <PageHeader title={product.productName} description={`Business Code: ${product.productCode}`}>
-        <Link href="/products">
-          <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
-            Back to List
-          </Button>
-        </Link>
+      <PageHeader
+        title={product.productName}
+        description={`SKU: ${product.sku} | Code: ${product.productCode}`}
+      >
+        <div className="flex items-center gap-3">
+          <Link href="/products">
+            <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
+              Back to Catalog
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
-      {/* Main Details Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Product Meta Details */}
-        <Card hoverEffect={false} className="lg:col-span-1 h-fit">
-          <CardHeader>
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#1F3A2E]">
-              Product Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-4 text-xs">
-            <div>
-              <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">SKU Reference</span>
-              <span className="font-mono text-[#1A1A1A] font-semibold mt-1 block">{product.sku}</span>
-            </div>
-
-            <div>
-              <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Category</span>
-              <span className="text-[#1A1A1A] font-medium mt-1 block">{product.categoryName || 'Uncategorized'}</span>
-            </div>
-
-            {product.purchaseLink && (
-              <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Purchase Source</span>
-                <a
-                  href={product.purchaseLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[#B08D57] hover:underline font-semibold mt-1 transition-colors"
-                >
-                  <span>1688 / Supplier Link</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-            )}
-
-            {product.notes && (
-              <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Internal Notes</span>
-                <p className="text-[#1A1A1A] mt-1 leading-relaxed text-xs bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
-                  {product.notes}
-                </p>
-              </div>
-            )}
-          </CardContent>
+      {/* Top Level Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Batch Units</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">
+            {product.quantity || 0} units
+          </span>
         </Card>
 
-        {/* Variants Cost Breakdowns & Stocks */}
-        <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-xl font-bold font-serif text-[#1F3A2E] flex items-center gap-2">
-            <Tag className="h-5 w-5 text-[#B08D57]" />
-            <span>Variants ({variantData.length})</span>
-          </h3>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Batch Cost</span>
+          <span className="text-2xl font-bold tracking-tight text-[#15803D] mt-2 block font-mono">
+            {formatBDT(product.totalCost || 0)}
+          </span>
+        </Card>
 
-          {variantData.length === 0 ? (
-            <Card hoverEffect={false} className="p-8 text-center text-[#6B6B6B]">
-              No variants defined for this product.
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              {variantData.map((v) => (
-                <div
-                  key={v.id}
-                  className="rounded-[18px] border border-[#E9E7E2] bg-white overflow-hidden shadow-soft-1"
-                >
-                  {/* Variant Header Summary */}
-                  <div className="px-6 py-4 bg-[#F7F6F3] border-b border-[#E9E7E2] flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <Badge variant="forest">{v.variantCode}</Badge>
-                      <h4 className="text-base font-bold text-[#1F3A2E] mt-1">{v.colorName}</h4>
-                    </div>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Calculated Unit Cost</span>
+          <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">
+            {formatBDT(product.unitCost || 0)}
+          </span>
+        </Card>
 
-                    <div className="flex items-center gap-4 text-right">
-                      <div>
-                        <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Selling Price</span>
-                        <span className="text-sm font-bold font-mono text-[#1A1A1A]">{formatBDT(v.sellPrice)}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">True Cost</span>
-                        <span className="text-sm font-bold font-mono text-[#6A4E3B]">{formatBDT(v.trueCost)}</span>
-                      </div>
-                      <div className="bg-white px-3 py-1.5 rounded-[10px] border border-[#E9E7E2] shadow-soft-1">
-                        <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Est. Margin</span>
-                        <span className={v.profit >= 0 ? 'text-sm font-bold font-mono text-[#15803D]' : 'text-sm font-bold font-mono text-[#DC2626]'}>
-                          {v.margin.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+        <Card hoverEffect={true} className="p-6">
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Batch Weight</span>
+          <span className="text-2xl font-bold tracking-tight text-[#B08D57] mt-2 block font-mono">
+            {product.totalWeight ? `${product.totalWeight} kg` : '—'}
+          </span>
+        </Card>
+      </div>
 
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Cost Ledger Breakdown */}
-                    <div className="space-y-4">
-                      <h5 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-1.5 border-b border-[#E9E7E2] pb-2">
-                        <DollarSign className="h-4 w-4 text-[#15803D]" />
-                        <span>True Cost Breakdown</span>
-                      </h5>
-
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">Purchase Cost:</span>
-                          <span className="font-mono text-[#1A1A1A] font-semibold">{formatBDT(v.cost.purchase_cost || v.purchasePriceBdt)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">China Local Delivery:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.import_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">International Shipping:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.shipping_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">Packaging:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.packaging_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">Photoshoot:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.photoshoot_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">Advertising:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.advertising_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">PR / Influencers:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.pr_cost || v.cost.influencer_cost)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#6B6B6B]">Miscellaneous:</span>
-                          <span className="font-mono text-[#1A1A1A]">{formatBDT(v.cost.miscellaneous_cost)}</span>
-                        </div>
-                        <div className="flex justify-between border-t border-[#E9E7E2] pt-2 font-bold text-[#1F3A2E]">
-                          <span>True Product Cost:</span>
-                          <span className="font-mono">{formatBDT(v.trueCost)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stock Inventory summary */}
-                    <div className="space-y-4">
-                      <h5 className="text-xs font-bold text-[#1F3A2E] uppercase tracking-widest flex items-center gap-1.5 border-b border-[#E9E7E2] pb-2">
-                        <Box className="h-4 w-4 text-[#B08D57]" />
-                        <span>Inventory & Stock</span>
-                      </h5>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
-                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Current Stock</span>
-                          <span className="text-lg font-bold font-mono text-[#1A1A1A] mt-0.5 block">{v.totalCurrentStock} units</span>
-                        </div>
-                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
-                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Reserved Stock</span>
-                          <span className="text-lg font-bold font-mono text-[#D97706] mt-0.5 block">{v.totalReservedStock} units</span>
-                        </div>
-                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
-                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Available Stock</span>
-                          <span className="text-lg font-bold font-mono text-[#15803D] mt-0.5 block">{v.totalAvailableStock} units</span>
-                        </div>
-                        <div className="bg-[#FAFAF8] p-3 rounded-[12px] border border-[#E9E7E2]">
-                          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Returned / Damaged</span>
-                          <span className="text-xs font-semibold text-[#6B6B6B] mt-1 block">
-                            Returned: {v.totalReturnedStock} / Damaged: {v.totalDamagedStock}
-                          </span>
-                        </div>
-                      </div>
-
-                      {v.notes && (
-                        <div className="mt-2 text-xs text-[#6B6B6B] italic bg-[#FAFAF8] p-2.5 rounded-[10px] border border-[#E9E7E2]">
-                          Note: {v.notes}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Product Info & Shipping Details */}
+        <div className="space-y-6 lg:col-span-1">
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-[#1F3A2E]">
+                Product Specification
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-xs">
+              <div>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Category</span>
+                <span className="text-[#1A1A1A] font-semibold">{product.categoryName || 'Uncategorized'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Product Status</span>
+                <Badge variant={product.productStatus === 'active' ? 'forest' : 'outline'}>
+                  {product.productStatus}
+                </Badge>
+              </div>
+              {product.purchaseLink && (
+                <div>
+                  <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Supplier Purchase Link</span>
+                  <a
+                    href={product.purchaseLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#B08D57] hover:underline flex items-center gap-1 font-medium break-all"
+                  >
+                    <span>View Supplier Link</span>
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                  </a>
                 </div>
-              ))}
-            </div>
-          )}
+              )}
+              {product.productDescription && (
+                <div>
+                  <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Product Description</span>
+                  <p className="text-[#1A1A1A] leading-relaxed bg-[#FAFAF8] p-3 rounded-[10px] border border-[#E9E7E2]">
+                    {product.productDescription}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Shipping & Import Costs */}
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-[#1F3A2E] flex items-center gap-2">
+                <Truck className="h-4 w-4 text-[#B08D57]" />
+                <span>Shipping & Cost Breakdown</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3.5 text-xs">
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Shipping Route:</span>
+                <span className="font-semibold text-[#1A1A1A]">{product.shippingRoute || '—'}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Total Weight:</span>
+                <span className="font-mono text-[#1A1A1A]">{product.totalWeight ? `${product.totalWeight} kg` : '—'}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Unit Weight:</span>
+                <span className="font-mono text-[#1A1A1A]">{product.unitWeight ? `${product.unitWeight} kg / unit` : '—'}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Shipping Rate:</span>
+                <span className="font-mono text-[#1A1A1A]">{product.shippingRate ? `${product.shippingRate} BDT/kg` : '—'}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Shipping Cost:</span>
+                <span className="font-mono font-semibold text-[#1A1A1A]">{formatBDT(product.shippingCost || 0)}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E9E7E2] pb-2">
+                <span className="text-[#6B6B6B]">Other Import Cost:</span>
+                <span className="font-mono text-[#1A1A1A]">{formatBDT(product.otherImportCost || 0)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-sm bg-[#1F3A2E] text-white p-3 rounded-[10px]">
+                <span>Unit Cost:</span>
+                <span className="font-mono">{formatBDT(product.unitCost || 0)}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Color Variants and Inventory */}
+        <div className="space-y-6 lg:col-span-2">
+          <Card hoverEffect={false}>
+            <CardHeader>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-[#1F3A2E] flex items-center gap-2">
+                <Tag className="h-4 w-4 text-[#B08D57]" />
+                <span>Color Variants & Pricing</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0">
+              <div className="overflow-x-auto rounded-[12px] border border-[#E9E7E2]">
+                <table className="min-w-full divide-y divide-[#E9E7E2] text-xs">
+                  <thead className="bg-[#F7F6F3] text-[11px] font-bold text-[#1F3A2E] uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Code</th>
+                      <th className="px-4 py-3 text-left">Color</th>
+                      <th className="px-4 py-3 text-right">RMB Price</th>
+                      <th className="px-4 py-3 text-right">RMB Rate</th>
+                      <th className="px-4 py-3 text-right">Buying Price</th>
+                      <th className="px-4 py-3 text-right">Selling Price</th>
+                      <th className="px-4 py-3 text-right">Stock</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E9E7E2] text-[#1A1A1A]">
+                    {variants.map((v) => {
+                      const stock = stockLevels?.find((s: any) => s.variant_id === v.id);
+                      return (
+                        <tr key={v.id} className="hover:bg-[#F7F6F3]/50 transition-colors">
+                          <td className="px-4 py-3 font-mono font-bold text-[#1F3A2E]">{v.variantCode}</td>
+                          <td className="px-4 py-3 font-semibold">{v.colorName}</td>
+                          <td className="px-4 py-3 text-right font-mono text-[#6B6B6B]">
+                            {v.rmbPrice ? `¥${v.rmbPrice}` : '—'}
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono text-[#6B6B6B]">
+                            {v.rmbRate || '—'}
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono font-bold text-[#6A4E3B]">
+                            {formatBDT(v.purchasePriceBdt)}
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono font-bold text-[#15803D]">
+                            {formatBDT(v.sellingPrice)}
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono font-bold">
+                            {stock?.current_stock ?? 0}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

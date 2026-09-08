@@ -1,23 +1,26 @@
-'use server';
+﻿'use server';
 
 import { db, poolConnection } from '@/lib/db/db';
 import { tblOrders, tblOrderItems, tblStockReservations, tblOrderStatusHistory } from '@/lib/db/schema';
-import { dbCreateOrder, dbCompleteOrder, dbCancelOrder, dbReturnOrder, dbGenerateBusinessCode } from '@/lib/db/procedures';
-import { eq, and, isNull } from 'drizzle-orm';
+import { dbCreateOrder, dbCompleteOrder, dbCancelOrder, dbGenerateBusinessCode } from '@/lib/db/procedures';
+import { eq } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const orderItemSchema = z.object({
-  variantId: z.number().int().positive(),
+  variantId: z.number().int().positive('Please select a variant.'),
   quantity: z.number().int().positive('Quantity must be a positive integer.'),
   sellingPrice: z.number().min(0, 'Selling price must be non-negative.'),
   discountAmount: z.number().min(0, 'Discount must be non-negative.').default(0),
 });
 
 const orderSchema = z.object({
-  customerId: z.number().int().positive('Please select a valid customer.'),
+  customerName: z.string().min(1, 'Customer name is required.'),
+  contact: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  paymentMethod: z.string().min(1, 'Please select a payment method.').default('Cash on Delivery'),
   orderType: z.enum(['in_stock', 'preorder']),
   orderDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD).'),
   items: z.array(orderItemSchema).min(1, 'At least one item is required.'),
@@ -39,7 +42,10 @@ export async function createOrder(formData: z.infer<typeof orderSchema>) {
   return await db.transaction(async (tx) => {
     // 1. Call stored procedure to create order in DB
     const res = await dbCreateOrder(
-      data.customerId,
+      data.customerName,
+      data.contact || '',
+      data.address || '',
+      data.paymentMethod || 'Cash on Delivery',
       data.orderType,
       data.orderDate,
       data.items.map((i) => ({
@@ -54,7 +60,6 @@ export async function createOrder(formData: z.infer<typeof orderSchema>) {
     const orderId = res.orderId;
 
     // 2. Log initial status history (Pending)
-    // Fetch pending status ID from lookup table
     const [pendingStatus]: any = await poolConnection.query(
       "SELECT id FROM tbl_order_statuses WHERE status_code = 'pending' LIMIT 1"
     );
@@ -69,7 +74,6 @@ export async function createOrder(formData: z.infer<typeof orderSchema>) {
 
     // 3. If preorder, register stock reservations
     if (data.orderType === 'preorder') {
-      // Fetch order items created to associate them
       const itemsCreated = await tx
         .select()
         .from(tblOrderItems)
@@ -104,18 +108,16 @@ export async function completeOrder(orderId: number) {
   try {
     await dbCompleteOrder(orderId);
 
-    // Fetch delivered status ID from lookup table
     const [deliveredStatus]: any = await poolConnection.query(
       "SELECT id FROM tbl_order_statuses WHERE status_code = 'delivered' LIMIT 1"
     );
     const deliveredStatusId = deliveredStatus[0]?.id || 5;
 
-    // Log status history (Delivered)
     await db.insert(tblOrderStatusHistory).values({
       orderId,
       statusId: deliveredStatusId,
       changedBy: user.userCode,
-      notes: 'Order completed and delivered.',
+      notes: 'Order completed and delivered. Inventory updated.',
     });
 
     revalidatePath('/orders');
@@ -134,18 +136,16 @@ export async function cancelOrder(orderId: number) {
   try {
     await dbCancelOrder(orderId);
 
-    // Fetch cancelled status ID from lookup table
     const [cancelledStatus]: any = await poolConnection.query(
       "SELECT id FROM tbl_order_statuses WHERE status_code = 'cancelled' LIMIT 1"
     );
     const cancelledStatusId = cancelledStatus[0]?.id || 6;
 
-    // Log status history (Cancelled)
     await db.insert(tblOrderStatusHistory).values({
       orderId,
       statusId: cancelledStatusId,
       changedBy: user.userCode,
-      notes: 'Order cancelled. Reserved/current stock returned.',
+      notes: 'Order cancelled. Reserved/current stock restored.',
     });
 
     revalidatePath('/orders');
@@ -155,40 +155,5 @@ export async function cancelOrder(orderId: number) {
   } catch (error: any) {
     console.error('Error cancelling order:', error);
     throw new Error(error.message || 'Failed to cancel order.');
-  }
-}
-
-export async function processOrderReturn(orderId: number, returnReason: string) {
-  const user = await authorizeUser();
-
-  if (!returnReason || returnReason.length < 3) {
-    throw new Error('Return reason must be at least 3 characters.');
-  }
-
-  try {
-    await dbReturnOrder(orderId, returnReason);
-
-    // Dynamically fetch the 'returned' order status ID
-    const [returnedStatusRows]: any = await poolConnection.query(
-      "SELECT id FROM tbl_order_statuses WHERE status_code = 'returned' LIMIT 1"
-    );
-    const returnedStatusId = returnedStatusRows[0]?.id;
-
-    if (returnedStatusId) {
-      await db.insert(tblOrderStatusHistory).values({
-        orderId,
-        statusId: returnedStatusId,
-        changedBy: user.userCode,
-        notes: `Customer return received. Reason: ${returnReason}. Goods restocked to inventory.`,
-      });
-    }
-
-    revalidatePath('/orders');
-    revalidatePath('/inventory');
-    revalidatePath('/dashboard');
-    return { success: true };
-  } catch (error: any) {
-    console.error('Error processing customer return:', error);
-    throw new Error(error.message || 'Failed to process customer return.');
   }
 }

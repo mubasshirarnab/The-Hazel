@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
 import OrderForm from './order-form';
@@ -6,18 +6,7 @@ import OrderForm from './order-form';
 export const dynamic = 'force-dynamic';
 
 export default async function NewOrderPage() {
-  // 1. Fetch active customers
-  const [customers]: any = await poolConnection.query(`
-    SELECT
-      id,
-      customer_code AS customerCode,
-      customer_name AS customerName
-    FROM tbl_customers
-    WHERE deleted_at IS NULL
-    ORDER BY customer_name ASC
-  `);
-
-  // 2. Fetch active variants with product names
+  // Fetch active variants with product names
   const [variants]: any = await poolConnection.query(`
     SELECT
       v.id,
@@ -35,10 +24,10 @@ export default async function NewOrderPage() {
     <div className="space-y-6">
       <PageHeader
         title="Create New Order"
-        description="Register a sale, choose in-stock or preorder fulfillment, select variants, and apply discounts."
+        description="Register a sale, enter customer details, choose fulfillment type, and select variants."
       />
 
-      <OrderForm customers={customers} variants={variants} />
+      <OrderForm variants={variants} />
     </div>
   );
 }

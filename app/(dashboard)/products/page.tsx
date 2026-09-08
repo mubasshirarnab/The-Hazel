@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { db } from '@/lib/db/db';
 import { tblProducts, tblCategories } from '@/lib/db/schema';
 import { isNull, eq, desc } from 'drizzle-orm';
@@ -18,6 +18,7 @@ export default async function ProductsPage() {
       productCode: tblProducts.productCode,
       sku: tblProducts.sku,
       productName: tblProducts.productName,
+      unitCost: tblProducts.unitCost,
       productStatus: tblProducts.productStatus,
       categoryName: tblCategories.categoryName,
       createdAt: tblProducts.createdAt,
@@ -31,7 +32,7 @@ export default async function ProductsPage() {
     <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Products & Variants"
-        description="View and manage women's handbag catalog items and their specific color variants."
+        description="View and manage women's handbag catalog items, batch costing, and color variants."
       >
         <Link href="/products/new">
           <Button variant="primary" icon={<Plus className="h-4 w-4 shrink-0" />}>

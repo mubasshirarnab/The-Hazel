@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { db, poolConnection } from '@/lib/db/db';
 import { tblWarehouses, tblProductVariants, tblProducts } from '@/lib/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
@@ -43,13 +43,13 @@ export default async function InventoryPage() {
   const totalValue = stocks.reduce((acc: number, s: any) => acc + parseFloat(s.inventory_value || 0), 0);
   const totalUnits = stocks.reduce((acc: number, s: any) => acc + (s.current_stock || 0), 0);
   const totalReserved = stocks.reduce((acc: number, s: any) => acc + (s.reserved_stock || 0), 0);
-  const totalAvailable = totalUnits - totalReserved;
+  const totalStockOut = stocks.reduce((acc: number, s: any) => acc + (s.stock_out || 0), 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Warehouse Inventory"
-        description="Monitor physical stock levels, pending preorder reservations, stock conditions, and valuation."
+        description="Monitor physical stock levels, pending preorder reservations, stock out totals, and inventory valuation."
       >
         <AdjustmentDialog variants={variants} warehouses={warehouses} />
       </PageHeader>
@@ -64,23 +64,23 @@ export default async function InventoryPage() {
         </Card>
 
         <Card hoverEffect={true} className="p-6">
-          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Physical Units</span>
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Current Stock</span>
           <span className="text-2xl font-bold tracking-tight text-[#1A1A1A] mt-2 block font-mono">
             {totalUnits} units
           </span>
         </Card>
 
         <Card hoverEffect={true} className="p-6">
-          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Preorder Reserved</span>
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Reserved (Pre-Order)</span>
           <span className="text-2xl font-bold tracking-tight text-[#D97706] mt-2 block font-mono">
             {totalReserved} units
           </span>
         </Card>
 
         <Card hoverEffect={true} className="p-6">
-          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Available to Sell</span>
+          <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Stock Out</span>
           <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">
-            {totalAvailable} units
+            {totalStockOut} units
           </span>
         </Card>
       </div>

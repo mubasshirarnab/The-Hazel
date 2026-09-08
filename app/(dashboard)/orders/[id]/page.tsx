@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { notFound } from 'next/navigation';
 import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
@@ -28,6 +28,10 @@ export default async function OrderDetailPage({ params }: PageProps) {
     SELECT
       o.id,
       o.order_number AS orderNumber,
+      o.customer_name AS customerName,
+      o.contact,
+      o.address,
+      o.payment_method AS paymentMethod,
       o.order_date AS orderDate,
       o.order_type AS orderType,
       o.subtotal,
@@ -39,23 +43,13 @@ export default async function OrderDetailPage({ params }: PageProps) {
       o.currency,
       o.notes,
       o.created_at AS createdAt,
-      c.customer_name AS customerName,
-      c.customer_code AS customerCode,
-      c.phone,
-      c.facebook_name AS facebookName,
-      c.address,
-      c.district,
-      c.payment_preference AS paymentPreference,
       os.status_code AS orderStatus,
       ps.status_code AS paymentStatus,
-      ds.status_code AS deliveryStatus,
-      rs.status_code AS returnStatus
+      ds.status_code AS deliveryStatus
     FROM tbl_orders o
-    INNER JOIN tbl_customers c ON o.customer_id = c.id
     INNER JOIN tbl_order_statuses os ON o.order_status_id = os.id
     INNER JOIN tbl_payment_statuses ps ON o.payment_status_id = ps.id
     INNER JOIN tbl_delivery_statuses ds ON o.delivery_status_id = ds.id
-    LEFT JOIN tbl_return_statuses rs ON o.return_status_id = rs.id
     WHERE o.id = ? AND o.deleted_at IS NULL
   `, [orderId]);
 
@@ -108,7 +102,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
           <OrderActions
             orderId={order.id}
             orderStatus={order.orderStatus}
-            returnStatus={order.returnStatus}
           />
         </div>
       </PageHeader>
@@ -117,48 +110,47 @@ export default async function OrderDetailPage({ params }: PageProps) {
       <div className="flex flex-wrap items-center gap-3 px-1">
         <div className="flex items-center gap-2 text-xs">
           <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Order</span>
-          <StatusBadge status={order.orderStatus} />
+          <StatusBadge status={order.orderStatus} type="order" />
         </div>
         <div className="w-px h-4 bg-[#E9E7E2]" />
         <div className="flex items-center gap-2 text-xs">
           <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Payment</span>
-          <StatusBadge status={order.paymentStatus} />
+          <StatusBadge status={order.paymentStatus} type="payment" />
         </div>
         <div className="w-px h-4 bg-[#E9E7E2]" />
         <div className="flex items-center gap-2 text-xs">
           <span className="text-[#6B6B6B] font-bold uppercase tracking-wider text-[10px]">Delivery</span>
-          <StatusBadge status={order.deliveryStatus} />
+          <StatusBadge status={order.deliveryStatus} type="delivery" />
         </div>
       </div>
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Customer Profile & Statuses summary */}
+        {/* Left Column: Customer Profile & Delivery Details */}
         <div className="lg:col-span-1 space-y-5">
           {/* Customer Summary Card */}
           <Card hoverEffect={false}>
             <CardHeader>
               <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
                 <User className="h-4 w-4 text-[#B08D57]" />
-                <span>Customer Profile</span>
+                <span>Customer & Payment</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3.5 text-xs pt-4">
               <div>
                 <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Customer Name</span>
-                <span className="text-[#1A1A1A] font-semibold">{order.customerName}</span>
-                <span className="text-[#6B6B6B] font-mono text-xs ml-1.5">({order.customerCode})</span>
+                <span className="text-[#1A1A1A] font-semibold text-sm">{order.customerName}</span>
               </div>
               <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Phone</span>
-                <span className="font-mono text-[#1F3A2E] font-semibold">{order.phone || '—'}</span>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Contact</span>
+                <span className="font-mono text-[#1F3A2E] font-semibold">{order.contact || '—'}</span>
               </div>
-              {order.facebookName && (
-                <div>
-                  <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Facebook Username</span>
-                  <span className="text-[#B08D57] font-semibold">{order.facebookName}</span>
-                </div>
-              )}
+              <div>
+                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Payment Method</span>
+                <span className="text-[#1F3A2E] font-semibold text-xs bg-[#1F3A2E]/10 border border-[#1F3A2E]/20 px-2.5 py-0.5 rounded-full inline-block mt-0.5 shadow-soft-1">
+                  {order.paymentMethod || 'Cash on Delivery'}
+                </span>
+              </div>
             </CardContent>
           </Card>
 
@@ -167,24 +159,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
             <CardHeader>
               <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#1F3A2E]">
                 <MapPin className="h-4 w-4 text-[#B08D57]" />
-                <span>Shipping Details</span>
+                <span>Delivery Address</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3.5 text-xs pt-4">
-              <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">District</span>
-                <span className="text-[#1A1A1A] font-semibold">{order.district || 'Not Specified'}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Full Address</span>
-                <p className="text-[#1A1A1A] mt-1 leading-relaxed text-xs">{order.address || 'No Address Listed'}</p>
-              </div>
-              <div>
-                <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block mb-0.5">Payment Preference</span>
-                <span className="text-[#1F3A2E] font-semibold text-xs bg-[#1F3A2E]/10 border border-[#1F3A2E]/20 px-2.5 py-0.5 rounded-full inline-block mt-0.5 shadow-soft-1">
-                  {order.paymentPreference || 'Cash on Delivery'}
-                </span>
-              </div>
+              <p className="text-[#1A1A1A] leading-relaxed text-xs">{order.address || 'No Address Listed'}</p>
             </CardContent>
           </Card>
 
@@ -272,20 +251,10 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   <span>Total Discount:</span>
                   <span className="font-semibold text-[#DC2626] font-mono">-{formatBDT(order.discountTotal)}</span>
                 </div>
-                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
-                  <span>Shipping:</span>
-                  <span className="font-semibold text-[#1A1A1A] font-mono">+{formatBDT(order.shippingAmount)}</span>
-                </div>
                 <div className="flex gap-12 justify-between w-64 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
                   <span>Grand Total:</span>
                   <span className="font-mono">{formatBDT(order.grandTotal)}</span>
                 </div>
-                {Number(order.outstandingAmount) > 0 && (
-                  <div className="flex gap-12 justify-between w-64 text-xs bg-[#DC2626]/10 border border-[#DC2626]/20 px-4 py-2 rounded-[12px]">
-                    <span className="text-[#DC2626] font-semibold">Outstanding:</span>
-                    <span className="font-mono text-[#DC2626] font-bold">{formatBDT(order.outstandingAmount)}</span>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
