@@ -133,9 +133,6 @@ Ensure you have the following installed:
    ```bash
    node lib/db/seed-admin.js
    ```
-   *Default Credentials:*
-   * **Email**: `admin@hazel.com`
-   * **Password**: `hazel@admin2024`
 
 6. **Start the Development Server**:
    ```bash
