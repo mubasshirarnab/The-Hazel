@@ -64,7 +64,7 @@ export async function createProduct(formData: {
 
   // Calculate Buying Price for calculation
   const firstVariant = formData.variants[0];
-  const buyingPrice = firstVariant.purchasePriceBdt || (firstVariant.rmbPrice && firstVariant.rmbRate ? firstVariant.rmbPrice * firstVariant.rmbRate : 0);
+  const buyingPrice = (firstVariant.rmbPrice && firstVariant.rmbRate ? firstVariant.rmbPrice * firstVariant.rmbRate : 0);
 
   const otherImportCost = productData.otherImportCost || 0;
   const totalCost = productData.totalCost ?? (qty > 0 ? Number((qty * buyingPrice + (shippingCost || 0) + otherImportCost).toFixed(2)) : null);
