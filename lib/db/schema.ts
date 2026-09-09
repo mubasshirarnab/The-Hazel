@@ -1,4 +1,4 @@
-﻿import { mysqlTable, serial, varchar, text, decimal, int, bigint, tinyint, datetime, date, char } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, text, decimal, int, bigint, tinyint, datetime, date, char } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 
 // 1. Users Table
@@ -115,7 +115,24 @@ export const tblInventory = mysqlTable('tbl_inventory', {
   deletedAt: datetime('deleted_at'),
 });
 
-// 7. Order Statuses Lookup Table
+// 7. Inventory Transactions Table
+export const tblInventoryTransactions = mysqlTable('tbl_inventory_transactions', {
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
+  transactionCode: varchar('transaction_code', { length: 32 }).notNull().unique(),
+  transactionTypeId: int('transaction_type_id').notNull(),
+  variantId: int('variant_id').notNull(),
+  batchId: bigint('batch_id', { mode: 'number' }),
+  warehouseId: int('warehouse_id').notNull(),
+  quantity: int('quantity').notNull(),
+  unitCost: decimal('unit_cost', { precision: 12, scale: 2 }).notNull().default('0.00'),
+  referenceType: varchar('reference_type', { length: 50 }),
+  referenceId: int('reference_id'),
+  notes: text('notes'),
+  createdAt: datetime('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  createdBy: varchar('created_by', { length: 100 }),
+});
+
+// 8. Order Statuses Lookup Table
 export const tblOrderStatuses = mysqlTable('tbl_order_statuses', {
   id: int('id').primaryKey(),
   statusCode: varchar('status_code', { length: 50 }).notNull(),
@@ -158,6 +175,7 @@ export const tblOrders = mysqlTable('tbl_orders', {
   grandTotal: decimal('grand_total', { precision: 14, scale: 2 }).notNull().default('0.00'),
   paidAmount: decimal('paid_amount', { precision: 14, scale: 2 }).notNull().default('0.00'),
   outstandingAmount: decimal('outstanding_amount', { precision: 14, scale: 2 }).notNull().default('0.00'),
+  advancePayment: decimal('advance_payment', { precision: 14, scale: 2 }).notNull().default('0.00'),
   currency: char('currency', { length: 3 }).notNull().default('BDT'),
   notes: text('notes'),
   createdAt: datetime('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),

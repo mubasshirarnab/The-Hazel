@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -15,6 +15,7 @@ export interface OrderRow {
   orderDate: Date | string;
   orderType: string;
   shippingAmount: number | string;
+  advancePayment: number | string;
   grandTotal: number | string;
   orderStatus: string;
   paymentStatus: string;
@@ -73,6 +74,22 @@ export const columns: ColumnDef<OrderRow>[] = [
         <Currency amount={row.original.shippingAmount || 0} />
       </span>
     ),
+  },
+  {
+    accessorKey: 'advancePayment',
+    header: 'Advance Paid',
+    cell: ({ row }) => {
+      const advance = Number(row.original.advancePayment) || 0;
+      const isPre = row.original.orderType === 'preorder';
+      if (!isPre && advance === 0) {
+        return <span className="text-xs text-[#9E9E9E]">—</span>;
+      }
+      return (
+        <span className="font-mono text-xs font-semibold text-[#B08D57]">
+          <Currency amount={advance} />
+        </span>
+      );
+    },
   },
   {
     accessorKey: 'grandTotal',

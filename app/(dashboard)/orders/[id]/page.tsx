@@ -37,6 +37,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
       o.subtotal,
       o.discount_total AS discountTotal,
       o.shipping_amount AS shippingAmount,
+      o.advance_payment AS advancePayment,
       o.grand_total AS grandTotal,
       o.paid_amount AS paidAmount,
       o.outstanding_amount AS outstandingAmount,
@@ -255,10 +256,22 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   <span>Delivery Charge:</span>
                   <span className="font-semibold text-[#1F3A2E] font-mono">+{formatBDT(order.shippingAmount || 0)}</span>
                 </div>
+                {order.orderType === 'preorder' && (
+                  <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                    <span className="text-[#B08D57] font-semibold">Advance Paid:</span>
+                    <span className="font-semibold text-[#B08D57] font-mono">{formatBDT(order.advancePayment || 0)}</span>
+                  </div>
+                )}
                 <div className="flex gap-12 justify-between w-64 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
                   <span>Grand Total:</span>
                   <span className="font-mono">{formatBDT(order.grandTotal)}</span>
                 </div>
+                {order.orderType === 'preorder' && (
+                  <div className="flex gap-12 justify-between w-64 text-xs font-semibold bg-[#FAFAF8] text-[#1F3A2E] border border-[#E9E7E2] px-4 py-2.5 rounded-[12px]">
+                    <span>Due / Outstanding:</span>
+                    <span className="font-mono text-[#B08D57] font-bold">{formatBDT(order.outstandingAmount || 0)}</span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

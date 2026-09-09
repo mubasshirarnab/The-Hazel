@@ -1,4 +1,4 @@
-﻿import { poolConnection } from './db';
+import { poolConnection } from './db';
 
 /**
  * Helper to call sp_generate_business_code and get the code.
@@ -30,6 +30,7 @@ export async function dbCreateOrder(
   address: string,
   paymentMethod: string,
   deliveryCharge: number,
+  advancePayment: number,
   orderType: 'in_stock' | 'preorder',
   orderDate: string,
   items: OrderItemInput[],
@@ -39,8 +40,8 @@ export async function dbCreateOrder(
   try {
     const itemsJson = JSON.stringify(items);
     await connection.query(
-      'CALL sp_create_order(?, ?, ?, ?, ?, ?, ?, ?, ?, @p_order_id, @p_order_number)',
-      [customerName, contact, address, paymentMethod, deliveryCharge, orderType, orderDate, itemsJson, notes]
+      'CALL sp_create_order(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @p_order_id, @p_order_number)',
+      [customerName, contact, address, paymentMethod, deliveryCharge, advancePayment, orderType, orderDate, itemsJson, notes]
     );
     const [rows]: any = await connection.query(
       'SELECT @p_order_id AS order_id, @p_order_number AS order_number'

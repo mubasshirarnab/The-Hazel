@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -142,6 +142,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
   const [deliveryCharge, setDeliveryCharge] = useState('');
+  const [advancePayment, setAdvancePayment] = useState('');
   const [orderType, setOrderType] = useState<'in_stock' | 'preorder'>('in_stock');
   const [orderDate, setOrderDate] = useState(() => {
     const today = new Date();
@@ -196,7 +197,9 @@ export default function OrderForm({ variants }: OrderFormProps) {
   }, 0);
 
   const calcDeliveryCharge = parseFloat(deliveryCharge) || 0;
+  const calcAdvancePayment = orderType === 'preorder' ? (parseFloat(advancePayment) || 0) : 0;
   const grandTotal = Math.max(subtotal - discountTotal + calcDeliveryCharge, 0);
+  const dueAmount = Math.max(grandTotal - calcAdvancePayment, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,6 +245,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
         address: address.trim() || null,
         paymentMethod,
         deliveryCharge: calcDeliveryCharge,
+        advancePayment: calcAdvancePayment,
         orderType,
         orderDate,
         notes: notes || null,
@@ -335,7 +339,10 @@ export default function OrderForm({ variants }: OrderFormProps) {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setOrderType('in_stock')}
+                  onClick={() => {
+                    setOrderType('in_stock');
+                    setAdvancePayment('');
+                  }}
                   disabled={loading}
                   className={`flex-1 py-2 px-3 text-xs font-semibold rounded-[10px] border text-center transition-all cursor-pointer ${
                     orderType === 'in_stock'
@@ -370,6 +377,23 @@ export default function OrderForm({ variants }: OrderFormProps) {
                 required
               />
             </div>
+
+            {orderType === 'preorder' && (
+              <div className="space-y-1.5 animate-fade-in sm:col-span-2 md:col-span-4 lg:col-span-2">
+                <label className="text-xs font-bold text-[#B08D57] uppercase tracking-wider block flex items-center gap-1.5">
+                  <span>Advance Payment (BDT)</span>
+                  <span className="text-[10px] bg-[#B08D57]/15 text-[#B08D57] px-1.5 py-0.5 rounded font-mono font-medium">Pre-Order Only</span>
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 500"
+                  value={advancePayment}
+                  onChange={(e) => setAdvancePayment(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -469,7 +493,9 @@ export default function OrderForm({ variants }: OrderFormProps) {
           ))}
 
           {/* Computations Card */}
-          <div className="p-4 rounded-[12px] bg-[#F7F6F3] border border-[#E9E7E2] grid grid-cols-2 md:grid-cols-4 items-center justify-between gap-4 mt-6">
+          <div className={`p-4 rounded-[12px] bg-[#F7F6F3] border border-[#E9E7E2] grid items-center justify-between gap-4 mt-6 ${
+            orderType === 'preorder' ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-2 md:grid-cols-4'
+          }`}>
             <div className="space-y-1">
               <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Subtotal</span>
               <span className="text-sm font-semibold text-[#1A1A1A] font-mono">{formatBDT(subtotal)}</span>
@@ -482,10 +508,22 @@ export default function OrderForm({ variants }: OrderFormProps) {
               <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Delivery Charge</span>
               <span className="text-sm font-semibold text-[#1F3A2E] font-mono">+{formatBDT(calcDeliveryCharge)}</span>
             </div>
+            {orderType === 'preorder' && (
+              <div className="space-y-1">
+                <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Advance Paid</span>
+                <span className="text-sm font-semibold text-[#B08D57] font-mono">{formatBDT(calcAdvancePayment)}</span>
+              </div>
+            )}
             <div className="space-y-1 bg-[#1F3A2E] text-white px-5 py-3 rounded-[12px] shadow-soft-1">
               <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Grand Total</span>
               <span className="text-base font-bold font-mono">{formatBDT(grandTotal)}</span>
             </div>
+            {orderType === 'preorder' && (
+              <div className="space-y-1 bg-[#B08D57] text-white px-5 py-3 rounded-[12px] shadow-soft-1">
+                <span className="text-[10px] text-white/90 uppercase tracking-widest block font-bold">Due / Balance</span>
+                <span className="text-base font-bold font-mono">{formatBDT(dueAmount)}</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { poolConnection } from '@/lib/db/db';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
@@ -19,6 +19,7 @@ export default async function OrdersPage() {
       o.order_date AS orderDate,
       o.order_type AS orderType,
       o.shipping_amount AS shippingAmount,
+      o.advance_payment AS advancePayment,
       o.grand_total AS grandTotal,
       os.status_code AS orderStatus,
       ps.status_code AS paymentStatus,
