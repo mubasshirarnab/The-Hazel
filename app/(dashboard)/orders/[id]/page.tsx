@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { notFound } from 'next/navigation';
 import { poolConnection } from '@/lib/db/db';
 import PageHeader from '@/components/shared/page-header';
@@ -250,6 +250,10 @@ export default async function OrderDetailPage({ params }: PageProps) {
                 <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
                   <span>Total Discount:</span>
                   <span className="font-semibold text-[#DC2626] font-mono">-{formatBDT(order.discountTotal)}</span>
+                </div>
+                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                  <span>Delivery Charge:</span>
+                  <span className="font-semibold text-[#1F3A2E] font-mono">+{formatBDT(order.shippingAmount || 0)}</span>
                 </div>
                 <div className="flex gap-12 justify-between w-64 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
                   <span>Grand Total:</span>

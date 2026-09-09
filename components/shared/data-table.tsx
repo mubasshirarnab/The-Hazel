@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import {
@@ -13,6 +13,7 @@ import {
   ColumnFiltersState,
 } from '@tanstack/react-table';
 import { Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -108,21 +109,36 @@ export default function DataTable<TData, TValue>({
                   </tr>
                 ))
               ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-[#F7F6F3]/70 transition-colors group"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-6 py-4 whitespace-nowrap align-middle">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const rawItem: any = row.original;
+                  const isDelivered = rawItem?.orderStatus === 'delivered' || rawItem?.deliveryStatus === 'delivered';
+                  const isCancelled = rawItem?.orderStatus === 'cancelled';
+
+                  const rowClass = isDelivered
+                    ? 'bg-[#15803D]/[0.06] hover:bg-[#15803D]/[0.10]'
+                    : isCancelled
+                    ? 'bg-[#DC2626]/[0.03] opacity-60'
+                    : 'hover:bg-[#F7F6F3]/70';
+
+                  return (
+                    <tr
+                      key={row.id}
+                      className={cn(
+                        'transition-colors group',
+                        rowClass
+                      )}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="px-6 py-4 whitespace-nowrap align-middle">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
               ) : (
                 // Empty State Row
                 <tr>

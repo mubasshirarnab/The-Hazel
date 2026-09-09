@@ -27,6 +27,7 @@ const productSchema = z.object({
 
 const variantSchema = z.object({
   colorName: z.string().min(1, 'Color variant name is required.'),
+  quantity: z.number().int().min(0, 'Quantity must be non-negative.').default(0),
   sellingPrice: z.number().min(0, 'Selling price must be non-negative.'),
   rmbPrice: z.number().min(0, 'RMB price must be non-negative.').optional().nullable(),
   rmbRate: z.number().min(0, 'RMB rate must be non-negative.').optional().nullable(),
@@ -53,8 +54,11 @@ export async function createProduct(formData: {
     throw new Error('At least one color variant must be provided.');
   }
 
+  // Compute total quantity across all color variants
+  const totalVariantsQty = formData.variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+  const qty = totalVariantsQty > 0 ? totalVariantsQty : (productData.quantity || 1);
+
   // Calculate unit weight
-  const qty = productData.quantity || 1;
   const totalWeight = productData.totalWeight || 0;
   const unitWeight = qty > 0 && totalWeight > 0 ? Number((totalWeight / qty).toFixed(3)) : null;
 
@@ -62,9 +66,9 @@ export async function createProduct(formData: {
   const shippingRate = productData.shippingRate || 0;
   const shippingCost = totalWeight > 0 && shippingRate > 0 ? Number((totalWeight * shippingRate).toFixed(2)) : (productData.shippingCost ?? null);
 
-  // Calculate Buying Price for calculation
+  // Calculate weighted or primary Buying Price
   const firstVariant = formData.variants[0];
-  const buyingPrice = (firstVariant.rmbPrice && firstVariant.rmbRate ? firstVariant.rmbPrice * firstVariant.rmbRate : 0);
+  const buyingPrice = firstVariant.purchasePriceBdt || (firstVariant.rmbPrice && firstVariant.rmbRate ? firstVariant.rmbPrice * firstVariant.rmbRate : 0);
 
   const otherImportCost = productData.otherImportCost || 0;
   const totalCost = productData.totalCost ?? (qty > 0 ? Number((qty * buyingPrice + (shippingCost || 0) + otherImportCost).toFixed(2)) : null);
@@ -83,7 +87,7 @@ export async function createProduct(formData: {
       purchaseLink: productData.purchaseLink,
       productDescription: productData.productDescription,
       totalWeight: productData.totalWeight?.toString(),
-      quantity: productData.quantity,
+      quantity: qty,
       shippingRoute: productData.shippingRoute,
       shippingRate: productData.shippingRate?.toString(),
       shippingCost: shippingCost?.toString(),
@@ -97,7 +101,7 @@ export async function createProduct(formData: {
 
     const productId = prodResult.insertId;
 
-    // 2. Insert variants and inventory records
+    // 2. Insert variants and inventory records with individual variant quantities
     for (const v of formData.variants) {
       const parsedVariant = variantSchema.parse(v);
       const variantCode = `VAR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -121,17 +125,18 @@ export async function createProduct(formData: {
       });
 
       const variantId = varResult.insertId;
+      const varQty = parsedVariant.quantity ?? 0;
 
-      // Initialize inventory row
+      // Initialize inventory row for this specific color variant with its individual quantity
       await tx.insert(tblInventory).values({
         variantId,
-        warehouseId: 1, // WH001
-        currentStock: qty,
+        warehouseId: 1, // WH001 Dhaka Central
+        currentStock: varQty,
         reservedStock: 0,
-        totalPurchased: qty,
+        totalPurchased: varQty,
         totalSold: 0,
         unitCost: unitCost.toString(),
-        inventoryValue: (qty * unitCost).toFixed(2),
+        inventoryValue: (varQty * unitCost).toFixed(2),
         createdBy: user.userCode,
       });
     }
@@ -240,6 +245,8 @@ export async function createVariant(
     ? parsedData.rmbPrice * parsedData.rmbRate 
     : parsedData.purchasePriceBdt;
 
+  const varQty = parsedData.quantity ?? 0;
+
   return await db.transaction(async (tx) => {
     const [result] = await tx.insert(tblProductVariants).values({
       productId,
@@ -260,12 +267,12 @@ export async function createVariant(
     await tx.insert(tblInventory).values({
       variantId,
       warehouseId: 1,
-      currentStock: 0,
+      currentStock: varQty,
       reservedStock: 0,
-      totalPurchased: 0,
+      totalPurchased: varQty,
       totalSold: 0,
       unitCost: vBuyingPrice.toString(),
-      inventoryValue: '0.00',
+      inventoryValue: (varQty * vBuyingPrice).toFixed(2),
       createdBy: user.userCode,
     });
 

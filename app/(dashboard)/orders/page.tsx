@@ -18,6 +18,7 @@ export default async function OrdersPage() {
       o.customer_name AS customerName,
       o.order_date AS orderDate,
       o.order_type AS orderType,
+      o.shipping_amount AS shippingAmount,
       o.grand_total AS grandTotal,
       os.status_code AS orderStatus,
       ps.status_code AS paymentStatus,

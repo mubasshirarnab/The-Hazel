@@ -141,6 +141,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
+  const [deliveryCharge, setDeliveryCharge] = useState('');
   const [orderType, setOrderType] = useState<'in_stock' | 'preorder'>('in_stock');
   const [orderDate, setOrderDate] = useState(() => {
     const today = new Date();
@@ -194,7 +195,8 @@ export default function OrderForm({ variants }: OrderFormProps) {
     return acc + qty * disc;
   }, 0);
 
-  const grandTotal = Math.max(subtotal - discountTotal, 0);
+  const calcDeliveryCharge = parseFloat(deliveryCharge) || 0;
+  const grandTotal = Math.max(subtotal - discountTotal + calcDeliveryCharge, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,6 +241,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
         contact: contact.trim() || null,
         address: address.trim() || null,
         paymentMethod,
+        deliveryCharge: calcDeliveryCharge,
         orderType,
         orderDate,
         notes: notes || null,
@@ -299,7 +302,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Payment Method</label>
               <Select
@@ -313,6 +316,18 @@ export default function OrderForm({ variants }: OrderFormProps) {
                   </option>
                 ))}
               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Delivery Charge (BDT)</label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="e.g. 100"
+                value={deliveryCharge}
+                onChange={(e) => setDeliveryCharge(e.target.value)}
+                disabled={loading}
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -454,7 +469,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
           ))}
 
           {/* Computations Card */}
-          <div className="p-4 rounded-[12px] bg-[#F7F6F3] border border-[#E9E7E2] flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
+          <div className="p-4 rounded-[12px] bg-[#F7F6F3] border border-[#E9E7E2] grid grid-cols-2 md:grid-cols-4 items-center justify-between gap-4 mt-6">
             <div className="space-y-1">
               <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Subtotal</span>
               <span className="text-sm font-semibold text-[#1A1A1A] font-mono">{formatBDT(subtotal)}</span>
@@ -462,6 +477,10 @@ export default function OrderForm({ variants }: OrderFormProps) {
             <div className="space-y-1">
               <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Total Discount</span>
               <span className="text-sm font-semibold text-[#DC2626] font-mono">-{formatBDT(discountTotal)}</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Delivery Charge</span>
+              <span className="text-sm font-semibold text-[#1F3A2E] font-mono">+{formatBDT(calcDeliveryCharge)}</span>
             </div>
             <div className="space-y-1 bg-[#1F3A2E] text-white px-5 py-3 rounded-[12px] shadow-soft-1">
               <span className="text-[10px] text-[#B08D57] uppercase tracking-widest block font-bold">Grand Total</span>

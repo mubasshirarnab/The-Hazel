@@ -29,6 +29,7 @@ export async function dbCreateOrder(
   contact: string,
   address: string,
   paymentMethod: string,
+  deliveryCharge: number,
   orderType: 'in_stock' | 'preorder',
   orderDate: string,
   items: OrderItemInput[],
@@ -38,8 +39,8 @@ export async function dbCreateOrder(
   try {
     const itemsJson = JSON.stringify(items);
     await connection.query(
-      'CALL sp_create_order(?, ?, ?, ?, ?, ?, ?, ?, @p_order_id, @p_order_number)',
-      [customerName, contact, address, paymentMethod, orderType, orderDate, itemsJson, notes]
+      'CALL sp_create_order(?, ?, ?, ?, ?, ?, ?, ?, ?, @p_order_id, @p_order_number)',
+      [customerName, contact, address, paymentMethod, deliveryCharge, orderType, orderDate, itemsJson, notes]
     );
     const [rows]: any = await connection.query(
       'SELECT @p_order_id AS order_id, @p_order_number AS order_number'

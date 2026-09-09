@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createProduct } from '@/actions/products';
 import { toast } from 'sonner';
-import { Trash2, Plus, ArrowLeft, Save, Calculator, Truck } from 'lucide-react';
+import { Trash2, Plus, ArrowLeft, Save, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -22,6 +22,7 @@ interface ProductFormProps {
 
 interface VariantState {
   colorName: string;
+  quantity: string;
   sellingPrice: string;
   rmbPrice: string;
   rmbRate: string;
@@ -42,18 +43,21 @@ export default function ProductForm({ categories }: ProductFormProps) {
 
   // 2. Shipping & Cost State
   const [totalWeight, setTotalWeight] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [customQuantity, setCustomQuantity] = useState('');
   const [shippingRoute, setShippingRoute] = useState('');
   const [shippingRate, setShippingRate] = useState('');
   const [otherImportCost, setOtherImportCost] = useState('');
 
   // 3. Variants State
   const [variants, setVariants] = useState<VariantState[]>([
-    { colorName: '', sellingPrice: '', rmbPrice: '', rmbRate: '', purchasePriceBdt: '', notes: '' }
+    { colorName: '', quantity: '10', sellingPrice: '', rmbPrice: '', rmbRate: '', purchasePriceBdt: '', notes: '' }
   ]);
 
   const addVariant = () => {
-    setVariants([...variants, { colorName: '', sellingPrice: '', rmbPrice: '', rmbRate: '', purchasePriceBdt: '', notes: '' }]);
+    setVariants([
+      ...variants,
+      { colorName: '', quantity: '10', sellingPrice: '', rmbPrice: '', rmbRate: '', purchasePriceBdt: '', notes: '' }
+    ]);
   };
 
   const removeVariant = (index: number) => {
@@ -82,7 +86,9 @@ export default function ProductForm({ categories }: ProductFormProps) {
   };
 
   // Calculations
-  const calcQty = parseFloat(quantity) || 0;
+  const sumVariantQty = variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0);
+  const calcQty = sumVariantQty > 0 ? sumVariantQty : (parseFloat(customQuantity) || 0);
+
   const calcWeight = parseFloat(totalWeight) || 0;
   const calcShippingRate = parseFloat(shippingRate) || 0;
   const calcOtherImportCost = parseFloat(otherImportCost) || 0;
@@ -90,7 +96,7 @@ export default function ProductForm({ categories }: ProductFormProps) {
   const unitWeight = calcQty > 0 && calcWeight > 0 ? (calcWeight / calcQty).toFixed(3) : '0.000';
   const shippingCost = (calcWeight * calcShippingRate).toFixed(2);
 
-  // Average or first variant buying price for batch cost estimate
+  // Weighted or first variant buying price for batch cost estimate
   const firstVariantBuyingPrice = parseFloat(variants[0]?.purchasePriceBdt) || 0;
   const totalCost = (calcQty * firstVariantBuyingPrice + parseFloat(shippingCost) + calcOtherImportCost).toFixed(2);
   const unitCost = calcQty > 0 ? (parseFloat(totalCost) / calcQty).toFixed(2) : '0.00';
@@ -98,24 +104,29 @@ export default function ProductForm({ categories }: ProductFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!productName || !sku) {
+    if (!productName.trim() || !sku.trim()) {
       toast.error('Product Name and SKU are required.');
       return;
     }
 
     for (const [i, v] of variants.entries()) {
-      if (!v.colorName) {
+      if (!v.colorName.trim()) {
         toast.error(`Variant ${i + 1} is missing a color name.`);
+        return;
+      }
+      const qtyVal = parseInt(v.quantity);
+      if (isNaN(qtyVal) || qtyVal < 0) {
+        toast.error(`Variant ${i + 1} (${v.colorName}) must have a valid non-negative quantity.`);
         return;
       }
       const sellVal = parseFloat(v.sellingPrice);
       if (isNaN(sellVal) || sellVal < 0) {
-        toast.error(`Variant ${i + 1} must have a valid selling price.`);
+        toast.error(`Variant ${i + 1} (${v.colorName}) must have a valid selling price.`);
         return;
       }
       const buyVal = parseFloat(v.purchasePriceBdt);
       if (isNaN(buyVal) || buyVal < 0) {
-        toast.error(`Variant ${i + 1} must have a valid buying price (RMB Price × RMB Rate).`);
+        toast.error(`Variant ${i + 1} (${v.colorName}) must have a valid buying price (RMB Price × RMB Rate).`);
         return;
       }
     }
@@ -125,14 +136,14 @@ export default function ProductForm({ categories }: ProductFormProps) {
     try {
       const payload = {
         product: {
-          productName,
-          sku,
+          productName: productName.trim(),
+          sku: sku.trim(),
           categoryId: categoryId || null,
-          purchaseLink: purchaseLink || null,
-          productDescription: productDescription || null,
+          purchaseLink: purchaseLink.trim() || null,
+          productDescription: productDescription.trim() || null,
           totalWeight: calcWeight || null,
           quantity: calcQty > 0 ? Math.round(calcQty) : null,
-          shippingRoute: shippingRoute || null,
+          shippingRoute: shippingRoute.trim() || null,
           shippingRate: calcShippingRate || null,
           shippingCost: parseFloat(shippingCost) || null,
           otherImportCost: calcOtherImportCost || null,
@@ -141,19 +152,20 @@ export default function ProductForm({ categories }: ProductFormProps) {
           unitWeight: parseFloat(unitWeight) || null,
         },
         variants: variants.map((v) => ({
-          colorName: v.colorName,
+          colorName: v.colorName.trim(),
+          quantity: parseInt(v.quantity) || 0,
           sellingPrice: parseFloat(v.sellingPrice),
           rmbPrice: v.rmbPrice ? parseFloat(v.rmbPrice) : null,
           rmbRate: v.rmbRate ? parseFloat(v.rmbRate) : null,
           purchasePriceBdt: parseFloat(v.purchasePriceBdt) || 0,
-          notes: v.notes || null,
+          notes: v.notes.trim() || null,
         })),
       };
 
       const res = await createProduct(payload);
 
       if (res.success) {
-        toast.success('Product created successfully!');
+        toast.success('Product and color inventory created successfully!');
         router.push('/products');
         router.refresh();
       }
@@ -166,7 +178,7 @@ export default function ProductForm({ categories }: ProductFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-fade-in">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl animate-fade-in">
       {/* 1. Product Information Section */}
       <Card hoverEffect={false}>
         <CardHeader>
@@ -259,12 +271,12 @@ export default function ProductForm({ categories }: ProductFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Quantity (Total Units)</label>
+              <label className="text-xs font-bold text-[#1F3A2E] uppercase tracking-wider block">Total Quantity (Units)</label>
               <Input
                 type="number"
                 placeholder="e.g. 100"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                value={calcQty}
+                onChange={(e) => setCustomQuantity(e.target.value)}
                 disabled={loading}
               />
             </div>
@@ -320,7 +332,7 @@ export default function ProductForm({ categories }: ProductFormProps) {
               <span className="text-sm font-semibold text-[#1A1A1A] font-mono">{formatBDT(calcOtherImportCost)}</span>
             </div>
             <div>
-              <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Total Cost</span>
+              <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest block font-bold">Total Batch Cost</span>
               <span className="text-sm font-bold text-[#1F3A2E] font-mono">{formatBDT(totalCost)}</span>
             </div>
             <div className="bg-[#1F3A2E] text-white p-3 rounded-[10px]">
@@ -334,9 +346,14 @@ export default function ProductForm({ categories }: ProductFormProps) {
       {/* 3. Color Variants Section */}
       <Card hoverEffect={false}>
         <div className="flex items-center justify-between border-b border-[#E9E7E2] pb-4 mb-4">
-          <h3 className="text-xl font-bold font-serif text-[#1F3A2E]">
-            3. Color Variants & Pricing
-          </h3>
+          <div>
+            <h3 className="text-xl font-bold font-serif text-[#1F3A2E]">
+              3. Color Variants, Quantity & Pricing
+            </h3>
+            <p className="text-xs text-[#6B6B6B] mt-0.5">
+              Set individual stock quantities for each color variant. These quantities will appear directly on the Inventory page.
+            </p>
+          </div>
           <Button
             type="button"
             variant="gold"
@@ -353,10 +370,11 @@ export default function ProductForm({ categories }: ProductFormProps) {
           {variants.map((v, index) => (
             <div
               key={index}
-              className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 md:grid-cols-6 gap-3 items-end relative group hover:border-[#B08D57]/40 transition-colors"
+              className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 items-end relative group hover:border-[#B08D57]/40 transition-colors"
             >
-              <div className="space-y-1.5 md:col-span-1">
-                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Color</label>
+              {/* Color Name */}
+              <div className="space-y-1.5 lg:col-span-1">
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Color *</label>
                 <Input
                   placeholder="e.g. Classic Black"
                   value={v.colorName}
@@ -366,8 +384,25 @@ export default function ProductForm({ categories }: ProductFormProps) {
                 />
               </div>
 
-              <div className="space-y-1.5 md:col-span-1">
-                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Selling Price (BDT)</label>
+              {/* Quantity for this specific color */}
+              <div className="space-y-1.5 lg:col-span-1">
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">
+                  Quantity *
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 50"
+                  value={v.quantity}
+                  onChange={(e) => handleVariantChange(index, 'quantity', e.target.value)}
+                  disabled={loading}
+                  required
+                />
+              </div>
+
+              {/* Selling Price */}
+              <div className="space-y-1.5 lg:col-span-1">
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Selling (BDT) *</label>
                 <Input
                   type="number"
                   placeholder="e.g. 3500"
@@ -378,8 +413,9 @@ export default function ProductForm({ categories }: ProductFormProps) {
                 />
               </div>
 
-              <div className="space-y-1.5 md:col-span-1">
-                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">RMB Price (¥)</label>
+              {/* RMB Price */}
+              <div className="space-y-1.5 lg:col-span-1">
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">RMB (¥)</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -390,7 +426,8 @@ export default function ProductForm({ categories }: ProductFormProps) {
                 />
               </div>
 
-              <div className="space-y-1.5 md:col-span-1">
+              {/* RMB Rate */}
+              <div className="space-y-1.5 lg:col-span-1">
                 <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">RMB Rate</label>
                 <Input
                   type="number"
@@ -402,8 +439,9 @@ export default function ProductForm({ categories }: ProductFormProps) {
                 />
               </div>
 
-              <div className="space-y-1.5 md:col-span-1">
-                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Buying Price (BDT)</label>
+              {/* Buying Price */}
+              <div className="space-y-1.5 lg:col-span-1">
+                <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Buying (BDT) *</label>
                 <Input
                   type="number"
                   placeholder="e.g. 1487.50"
@@ -414,11 +452,12 @@ export default function ProductForm({ categories }: ProductFormProps) {
                 />
               </div>
 
-              <div className="flex items-center gap-2 md:col-span-1">
+              {/* Notes and Delete */}
+              <div className="flex items-center gap-2 lg:col-span-1">
                 <div className="flex-1 space-y-1.5">
                   <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-widest block">Notes</label>
                   <Input
-                    placeholder="e.g. Matte finish"
+                    placeholder="e.g. Matte"
                     value={v.notes}
                     onChange={(e) => handleVariantChange(index, 'notes', e.target.value)}
                     disabled={loading}
@@ -430,6 +469,7 @@ export default function ProductForm({ categories }: ProductFormProps) {
                   onClick={() => removeVariant(index)}
                   disabled={loading}
                   className="p-2.5 rounded-[10px] bg-white border border-[#E9E7E2] text-[#9E9E9E] hover:text-[#DC2626] hover:border-[#DC2626]/30 disabled:opacity-50 transition-all cursor-pointer self-end mb-0.5"
+                  title="Remove Color Variant"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

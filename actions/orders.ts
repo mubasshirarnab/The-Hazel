@@ -21,6 +21,7 @@ const orderSchema = z.object({
   contact: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   paymentMethod: z.string().min(1, 'Please select a payment method.').default('Cash on Delivery'),
+  deliveryCharge: z.number().min(0, 'Delivery charge must be non-negative.').default(0),
   orderType: z.enum(['in_stock', 'preorder']),
   orderDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD).'),
   items: z.array(orderItemSchema).min(1, 'At least one item is required.'),
@@ -46,6 +47,7 @@ export async function createOrder(formData: z.infer<typeof orderSchema>) {
       data.contact || '',
       data.address || '',
       data.paymentMethod || 'Cash on Delivery',
+      data.deliveryCharge || 0,
       data.orderType,
       data.orderDate,
       data.items.map((i) => ({

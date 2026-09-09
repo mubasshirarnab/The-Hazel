@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ export interface OrderRow {
   customerName: string;
   orderDate: Date | string;
   orderType: string;
+  shippingAmount: number | string;
   grandTotal: number | string;
   orderStatus: string;
   paymentStatus: string;
@@ -63,6 +64,15 @@ export const columns: ColumnDef<OrderRow>[] = [
         </Badge>
       );
     },
+  },
+  {
+    accessorKey: 'shippingAmount',
+    header: 'Delivery Charge',
+    cell: ({ row }) => (
+      <span className="font-mono text-xs font-medium text-[#6B6B6B]">
+        <Currency amount={row.original.shippingAmount || 0} />
+      </span>
+    ),
   },
   {
     accessorKey: 'grandTotal',

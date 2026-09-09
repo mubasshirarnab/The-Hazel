@@ -26,12 +26,10 @@ export default async function DashboardPage() {
   `);
   const totalInvestment = parseFloat(investmentData?.total_investment || 0);
 
-  // 2. Total Sales (Delivered / completed orders grand_total)
+  // 2. Total Sales (Product revenue only: subtotal - discount_total for delivered sales, EXCLUDING delivery charge)
   const [[salesData]]: any = await poolConnection.query(`
     SELECT
-      COALESCE(SUM(o.grand_total), 0) AS total_sales,
-      COUNT(*) AS total_orders,
-      SUM(CASE WHEN os.status_code = 'pending' THEN 1 ELSE 0 END) AS pending_orders
+      COALESCE(SUM(o.subtotal - o.discount_total), 0) AS total_sales
     FROM tbl_orders o
     INNER JOIN tbl_order_statuses os ON os.id = o.order_status_id
     WHERE o.deleted_at IS NULL AND os.status_code = 'delivered'
@@ -166,7 +164,7 @@ export default async function DashboardPage() {
             <div className="text-2xl font-bold font-mono text-[#15803D] mt-3 tracking-tight">
               {formatBDT(totalSales)}
             </div>
-            <p className="text-[10px] text-[#6B6B6B] mt-1">Total revenue from confirmed delivered sales</p>
+            <p className="text-[10px] text-[#6B6B6B] mt-1">Product revenue from delivered sales (excluding delivery)</p>
           </Card>
 
           {/* 3. Total Expenses */}
