@@ -2338,7 +2338,24 @@ CREATE OR REPLACE VIEW `vw_customer_analytics`  AS SELECT `c`.`id` AS `id`, `c`.
 --
 DROP TABLE IF EXISTS `vw_inventory_value`;
 
-CREATE OR REPLACE VIEW `vw_inventory_value`  AS SELECT `i`.`variant_id` AS `variant_id`, `v`.`product_id` AS `product_id`, `p`.`product_name` AS `product_name`, `v`.`color_name` AS `color_name`, `i`.`warehouse_id` AS `warehouse_id`, `w`.`warehouse_name` AS `warehouse_name`, `i`.`current_stock` AS `current_stock`, `i`.`reserved_stock` AS `reserved_stock`, `i`.`available_stock` AS `available_stock`, `i`.`returned_stock` AS `returned_stock`, `i`.`damaged_stock` AS `damaged_stock`, `i`.`unit_cost` AS `unit_cost`, `i`.`inventory_value` AS `inventory_value` FROM (((`tbl_inventory` `i` join `tbl_product_variants` `v` on(`v`.`id` = `i`.`variant_id`)) join `tbl_products` `p` on(`p`.`id` = `v`.`product_id`)) join `tbl_warehouses` `w` on(`w`.`id` = `i`.`warehouse_id`)) ;
+CREATE OR REPLACE VIEW `vw_inventory_value` AS
+SELECT 
+  i.variant_id,
+  v.product_id,
+  p.product_name,
+  v.color_name,
+  i.warehouse_id,
+  w.warehouse_name,
+  COALESCE(i.current_stock, 0) AS current_stock,
+  COALESCE(i.reserved_stock, 0) AS reserved_stock,
+  COALESCE(i.total_sold, 0) AS stock_out,
+  COALESCE(i.current_stock - i.reserved_stock, 0) AS available_stock,
+  COALESCE(p.unit_cost, v.purchase_price_bdt, 0.00) AS unit_cost,
+  COALESCE(i.current_stock * COALESCE(p.unit_cost, v.purchase_price_bdt, 0.00), 0.00) AS inventory_value
+FROM tbl_inventory i
+JOIN tbl_product_variants v ON v.id = i.variant_id
+JOIN tbl_products p ON p.id = v.product_id
+JOIN tbl_warehouses w ON w.id = i.warehouse_id;
 
 -- --------------------------------------------------------
 
