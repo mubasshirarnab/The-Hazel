@@ -53,7 +53,7 @@ export default function LoginForm() {
         <Input
           type="email"
           icon={<Mail className="h-4 w-4 shrink-0" />}
-          placeholder="admin@hazel.com"
+          placeholder="johndoe12@company.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
