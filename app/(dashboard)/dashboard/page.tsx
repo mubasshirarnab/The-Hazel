@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { poolConnection } from '@/lib/db/db';
 import { formatBDT } from '@/components/shared/currency';
 import {
@@ -118,8 +118,8 @@ export default async function DashboardPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#E9E7E2]">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-3xl font-bold tracking-tight text-[#1F3A2E] font-serif">Executive Dashboard</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F3A2E] font-serif">Executive Dashboard</h1>
             <span className="px-3 py-0.5 rounded-full bg-[#1F3A2E]/10 border border-[#1F3A2E]/20 text-[#1F3A2E] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-soft-1">
               <Crown className="h-3 w-3 text-[#B08D57]" />
               <span>Business KPI Summary</span>
@@ -226,7 +226,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ─── Operational Metrics Summary Row ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-5 rounded-[16px] bg-white border border-[#E9E7E2] shadow-soft-1">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-[#6B6B6B] uppercase tracking-widest">Total Orders</span>

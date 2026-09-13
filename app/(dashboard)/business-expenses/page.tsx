@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { poolConnection } from '@/lib/db/db';
 import Link from 'next/link';
 import { Plus, Receipt } from 'lucide-react';
@@ -52,7 +52,7 @@ export default async function BusinessExpensesPage() {
       </PageHeader>
 
       {/* Summary KPI Widget */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <Card hoverEffect={true} className="p-6">
           <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Expenses</span>
           <div className="text-2xl font-bold tracking-tight text-[#DC2626] mt-2 font-mono">

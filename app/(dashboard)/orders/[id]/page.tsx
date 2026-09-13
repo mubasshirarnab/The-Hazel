@@ -243,36 +243,37 @@ export default async function OrderDetailPage({ params }: PageProps) {
               </div>
 
               {/* Financial Summary */}
-              <div className="flex flex-col items-end gap-2 text-xs text-[#6B6B6B] pr-2">
-                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+              <div className="flex flex-col items-stretch sm:items-end gap-2 text-xs text-[#6B6B6B] pr-0 sm:pr-2">
+                <div className="flex justify-between w-full sm:w-72 border-b border-[#E9E7E2] pb-2">
                   <span>Subtotal:</span>
                   <span className="font-semibold text-[#1A1A1A] font-mono">{formatBDT(order.subtotal)}</span>
                 </div>
-                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                <div className="flex justify-between w-full sm:w-72 border-b border-[#E9E7E2] pb-2">
                   <span>Total Discount:</span>
                   <span className="font-semibold text-[#DC2626] font-mono">-{formatBDT(order.discountTotal)}</span>
                 </div>
-                <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                <div className="flex justify-between w-full sm:w-72 border-b border-[#E9E7E2] pb-2">
                   <span>Delivery Charge:</span>
                   <span className="font-semibold text-[#1F3A2E] font-mono">+{formatBDT(order.shippingAmount || 0)}</span>
                 </div>
                 {order.orderType === 'preorder' && (
-                  <div className="flex gap-12 justify-between w-64 border-b border-[#E9E7E2] pb-2">
+                  <div className="flex justify-between w-full sm:w-72 border-b border-[#E9E7E2] pb-2">
                     <span className="text-[#B08D57] font-semibold">Advance Paid:</span>
                     <span className="font-semibold text-[#B08D57] font-mono">{formatBDT(order.advancePayment || 0)}</span>
                   </div>
                 )}
-                <div className="flex gap-12 justify-between w-64 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
+                <div className="flex justify-between w-full sm:w-72 text-sm font-bold bg-[#1F3A2E] text-white px-4 py-3 rounded-[12px] shadow-soft-1">
                   <span>Grand Total:</span>
                   <span className="font-mono">{formatBDT(order.grandTotal)}</span>
                 </div>
                 {order.orderType === 'preorder' && (
-                  <div className="flex gap-12 justify-between w-64 text-xs font-semibold bg-[#FAFAF8] text-[#1F3A2E] border border-[#E9E7E2] px-4 py-2.5 rounded-[12px]">
+                  <div className="flex justify-between w-full sm:w-72 text-xs font-semibold bg-[#FAFAF8] text-[#1F3A2E] border border-[#E9E7E2] px-4 py-2.5 rounded-[12px]">
                     <span>Due / Outstanding:</span>
                     <span className="font-mono text-[#B08D57] font-bold">{formatBDT(order.outstandingAmount || 0)}</span>
                   </div>
                 )}
               </div>
+
             </CardContent>
           </Card>
 

@@ -49,7 +49,7 @@ export const Dialog: React.FC<DialogProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -67,28 +67,28 @@ export const Dialog: React.FC<DialogProps> = ({
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'relative w-full bg-white rounded-[22px] border border-[#E9E7E2] p-6 sm:p-8 shadow-soft-3 z-10 my-8',
+              'relative w-full max-w-[96vw] bg-white rounded-[20px] sm:rounded-[22px] border border-[#E9E7E2] p-4 sm:p-6 md:p-8 shadow-soft-3 z-10 my-4 sm:my-8',
               maxWClasses[maxWidth],
               className
             )}
           >
             {/* Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-[#E9E7E2] mb-6">
-              <div>
+            <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-[#E9E7E2] mb-4 sm:mb-6 gap-2">
+              <div className="min-w-0">
                 {title && (
-                  <h3 className="text-xl font-bold font-serif text-[#1F3A2E] tracking-tight">
+                  <h3 className="text-lg sm:text-xl font-bold font-serif text-[#1F3A2E] tracking-tight">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-xs text-[#6B6B6B] font-medium mt-1">
+                  <p className="text-xs text-[#6B6B6B] font-medium mt-1 leading-relaxed">
                     {description}
                   </p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 text-[#9E9E9E] hover:text-[#1A1A1A] hover:bg-[#F7F6F3] rounded-full transition-colors cursor-pointer"
+                className="p-1.5 text-[#9E9E9E] hover:text-[#1A1A1A] hover:bg-[#F7F6F3] rounded-full transition-colors cursor-pointer shrink-0"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -104,3 +104,4 @@ export const Dialog: React.FC<DialogProps> = ({
 };
 
 export default Dialog;
+

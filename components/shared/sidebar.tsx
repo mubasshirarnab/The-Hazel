@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -14,8 +14,10 @@ import {
   LogOut,
   User,
   Crown,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSidebar } from './sidebar-context';
 
 interface NavItem {
   name: string;
@@ -37,12 +39,17 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const userRole = session?.user?.role || 'viewer';
+  const { isMobileOpen, closeMobileSidebar } = useSidebar();
 
-  return (
-    <aside className="w-64 bg-white border-r border-[#E9E7E2] flex flex-col h-full shrink-0 z-20 shadow-soft-1 relative select-none">
+  const renderNavContent = (isMobile: boolean = false) => (
+    <div className="flex flex-col h-full select-none bg-white">
       {/* Brand Header */}
       <div className="h-16 flex items-center px-6 border-b border-[#E9E7E2] justify-between relative z-10">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
+        <Link
+          href="/dashboard"
+          onClick={() => isMobile && closeMobileSidebar()}
+          className="flex items-center gap-3 group"
+        >
           <div className="h-9 w-9 rounded-[12px] bg-[#1F3A2E] flex items-center justify-center shadow-soft-1 group-hover:bg-[#162A21] transition-colors">
             <Crown className="h-4.5 w-4.5 text-[#B08D57]" />
           </div>
@@ -51,6 +58,16 @@ export default function Sidebar() {
             <span className="text-[9px] font-bold text-[#B08D57] tracking-widest uppercase mt-1">HAUTE COUTURE ERP</span>
           </div>
         </Link>
+
+        {isMobile && (
+          <button
+            onClick={closeMobileSidebar}
+            className="p-2 rounded-[10px] text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F7F6F3] border border-[#E9E7E2] transition-colors cursor-pointer"
+            aria-label="Close sidebar"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
@@ -67,6 +84,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => isMobile && closeMobileSidebar()}
               className={cn(
                 'flex items-center gap-3 px-3.5 py-2.5 rounded-[12px] text-xs font-medium transition-all duration-200 group relative',
                 isActive
@@ -113,6 +131,32 @@ export default function Sidebar() {
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* ─── Desktop Fixed Sidebar (lg and above) ─── */}
+      <aside className="hidden lg:flex w-64 bg-white border-r border-[#E9E7E2] flex-col h-full shrink-0 z-20 shadow-soft-1 relative">
+        {renderNavContent(false)}
+      </aside>
+
+      {/* ─── Mobile Drawer Overlay & Drawer (below lg) ─── */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#1F3A2E]/40 backdrop-blur-xs transition-opacity duration-300"
+            onClick={closeMobileSidebar}
+            aria-hidden="true"
+          />
+
+          {/* Sliding Drawer */}
+          <aside className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white border-r border-[#E9E7E2] shadow-2xl z-50 flex flex-col h-full animate-in slide-in-from-left duration-300">
+            {renderNavContent(true)}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

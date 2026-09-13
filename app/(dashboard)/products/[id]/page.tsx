@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { notFound } from 'next/navigation';
 import { db, poolConnection } from '@/lib/db/db';
 import { tblProducts, tblCategories, tblProductVariants } from '@/lib/db/schema';
@@ -83,7 +83,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       </PageHeader>
 
       {/* Top Level Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
         <Card hoverEffect={true} className="p-6">
           <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Batch Units</span>
           <span className="text-2xl font-bold tracking-tight text-[#1F3A2E] mt-2 block font-mono">

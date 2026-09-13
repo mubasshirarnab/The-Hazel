@@ -480,7 +480,7 @@ export default function ProductForm({ categories }: ProductFormProps) {
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4">
         <Link href="/products">
           <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
             Cancel

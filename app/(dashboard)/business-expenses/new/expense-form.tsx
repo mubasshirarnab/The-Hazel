@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -220,7 +220,7 @@ export default function ExpenseForm({ products }: ExpenseFormProps) {
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
         <Link href="/business-expenses">
           <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
             Cancel

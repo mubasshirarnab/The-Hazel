@@ -97,7 +97,7 @@ function SearchableVariantSelect({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-72 bg-white border border-[#E9E7E2] rounded-[12px] shadow-soft-3 z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
+        <div className="absolute left-0 top-full mt-1 w-full sm:w-80 min-w-[260px] bg-white border border-[#E9E7E2] rounded-[12px] shadow-soft-3 z-[100] max-h-56 overflow-y-auto p-1 space-y-0.5">
           {filtered.length === 0 ? (
             <div className="p-3 text-xs text-[#9E9E9E] italic text-center">No variant matching "{search}"</div>
           ) : (
@@ -431,7 +431,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
           {items.map((item, index) => (
             <div
               key={index}
-              className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 md:grid-cols-4 gap-4 items-end relative group hover:border-[#B08D57]/40 transition-colors"
+              className="p-4 rounded-[12px] bg-[#FAFAF8] border border-[#E9E7E2] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end relative group hover:border-[#B08D57]/40 transition-colors"
             >
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-[#1F3A2E] uppercase tracking-wider">Select Variant</label>
@@ -545,7 +545,7 @@ export default function OrderForm({ variants }: OrderFormProps) {
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4">
         <Link href="/orders">
           <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4 shrink-0" />}>
             Cancel

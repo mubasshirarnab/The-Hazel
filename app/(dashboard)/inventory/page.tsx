@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { db, poolConnection } from '@/lib/db/db';
 import { tblWarehouses, tblProductVariants, tblProducts } from '@/lib/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
@@ -55,7 +55,7 @@ export default async function InventoryPage() {
       </PageHeader>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
         <Card hoverEffect={true} className="p-6">
           <span className="text-[10px] text-[#6B6B6B] font-bold uppercase tracking-wider block">Total Valuation</span>
           <div className="text-2xl font-bold tracking-tight text-[#15803D] mt-2 font-mono">

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import {
@@ -55,8 +55,8 @@ export default function DataTable<TData, TValue>({
     <div className="w-full flex flex-col gap-4">
       {/* Search Input Filter */}
       {searchKey && (
-        <div className="flex items-center">
-          <div className="relative max-w-sm w-full">
+        <div className="flex items-center w-full">
+          <div className="relative w-full sm:max-w-sm">
             <Search className="h-4 w-4 text-[#B08D57] absolute left-3.5 top-3 pointer-events-none" />
             <input
               placeholder={searchPlaceholder}
@@ -71,7 +71,7 @@ export default function DataTable<TData, TValue>({
       )}
 
       {/* Table Container */}
-      <div className="rounded-[18px] border border-[#E9E7E2] bg-white overflow-hidden shadow-soft-1">
+      <div className="rounded-[18px] border border-[#E9E7E2] bg-white overflow-hidden shadow-soft-1 w-full">
         <div className="overflow-x-auto w-full">
           <table className="min-w-full divide-y divide-[#E9E7E2] text-xs">
             <thead className="bg-[#F7F6F3] text-[11px] font-bold text-[#1F3A2E] uppercase tracking-wider sticky top-0 z-10">
@@ -81,7 +81,7 @@ export default function DataTable<TData, TValue>({
                     return (
                       <th
                         key={header.id}
-                        className="px-6 py-4 text-left select-none"
+                        className="px-4 sm:px-6 py-3.5 sm:py-4 text-left select-none whitespace-nowrap"
                       >
                         {header.isPlaceholder
                           ? null
@@ -102,7 +102,7 @@ export default function DataTable<TData, TValue>({
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {columns.map((_, colIndex) => (
-                      <td key={colIndex} className="px-6 py-4.5">
+                      <td key={colIndex} className="px-4 sm:px-6 py-3.5 sm:py-4.5">
                         <div className="h-4 bg-[#F7F6F3] rounded-[8px] w-4/5" />
                       </td>
                     ))}
@@ -129,7 +129,7 @@ export default function DataTable<TData, TValue>({
                       )}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-6 py-4 whitespace-nowrap align-middle">
+                        <td key={cell.id} className="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap align-middle">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -157,8 +157,8 @@ export default function DataTable<TData, TValue>({
 
       {/* Pagination Controls */}
       {!loading && table.getRowModel().rows?.length > 0 && (
-        <div className="flex items-center justify-between text-xs text-[#6B6B6B] mt-1 px-2 font-medium">
-          <div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B6B6B] mt-1 px-1 sm:px-2 font-medium">
+          <div className="text-center sm:text-left">
             Showing{' '}
             <span className="font-bold text-[#1F3A2E] font-mono">
               {pagination.pageIndex * pagination.pageSize + 1}
@@ -184,7 +184,7 @@ export default function DataTable<TData, TValue>({
             >
               Previous
             </button>
-            <span className="text-[#6B6B6B] font-medium">
+            <span className="text-[#6B6B6B] font-medium px-1">
               Page {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </span>
