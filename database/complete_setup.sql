@@ -1,3 +1,6 @@
+SET SESSION sql_require_primary_key = 0;
+USE test;
+
 -- =========================================================
 -- THE HAZEL ERP - COMPLETE DATABASE SETUP SCRIPT
 -- Compatible with MySQL 8.0+, TiDB Cloud, Aiven, Railway, etc.
@@ -29,10 +32,11 @@ SET time_zone = "+00:00";
 -- Database: `hazel_erp`
 --
 
-DELIMITER $$
+
 --
 -- Procedures
 --
+DROP PROCEDURE IF EXISTS `sp_adjust_inventory`;
 CREATE PROCEDURE `sp_adjust_inventory` (IN `p_variant_id` INT, IN `p_warehouse_id` INT, IN `p_adjustment_type` VARCHAR(20), IN `p_quantity` INT, IN `p_reason` VARCHAR(255), IN `p_created_by` VARCHAR(100))   BEGIN
     DECLARE v_adjustment_code VARCHAR(32);
     DECLARE v_current_stock INT;
@@ -61,8 +65,9 @@ CREATE PROCEDURE `sp_adjust_inventory` (IN `p_variant_id` INT, IN `p_warehouse_i
            updated_at = CURRENT_TIMESTAMP,
            updated_by = p_created_by
      WHERE variant_id = p_variant_id AND warehouse_id = p_warehouse_id;
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_allocate_product_costs`;
 CREATE PROCEDURE `sp_allocate_product_costs` (IN `p_expense_id` BIGINT, IN `p_allocation_method_code` VARCHAR(50), IN `p_target_type` VARCHAR(30), IN `p_target_id` INT, IN `p_quantity_basis` DECIMAL(14,2), IN `p_value_basis` DECIMAL(14,2), IN `p_allocation_amount` DECIMAL(14,2), IN `p_notes` TEXT)   BEGIN
     DECLARE v_method_id INT UNSIGNED;
     SELECT id INTO v_method_id FROM tbl_allocation_methods WHERE method_code = p_allocation_method_code LIMIT 1;
@@ -72,8 +77,9 @@ CREATE PROCEDURE `sp_allocate_product_costs` (IN `p_expense_id` BIGINT, IN `p_al
     ) VALUES (
         p_expense_id, v_method_id, p_target_type, p_target_id, p_quantity_basis, p_value_basis, p_allocation_amount, p_notes
     );
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_cancel_order`;
 CREATE PROCEDURE `sp_cancel_order` (IN `p_order_id` INT)   BEGIN
     DECLARE v_order_type VARCHAR(20);
     DECLARE done INT DEFAULT FALSE;
@@ -113,8 +119,9 @@ CREATE PROCEDURE `sp_cancel_order` (IN `p_order_id` INT)   BEGIN
            payment_status_id = (SELECT id FROM tbl_payment_statuses WHERE status_code = 'refunded' LIMIT 1),
            updated_at = CURRENT_TIMESTAMP
      WHERE id = p_order_id;
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_complete_order`;
 CREATE PROCEDURE `sp_complete_order` (IN `p_order_id` INT)   BEGIN
     DECLARE v_order_type VARCHAR(20);
     DECLARE v_order_status_id INT;
@@ -194,8 +201,9 @@ CREATE PROCEDURE `sp_complete_order` (IN `p_order_id` INT)   BEGIN
 
     INSERT INTO tbl_cash_flow(cash_flow_code, entry_date, entry_type, amount, currency, source_type, source_id, description)
     VALUES (CONCAT('CF', LPAD((SELECT IFNULL(MAX(id), 0) + 1 FROM tbl_cash_flow), 8, '0')), CURDATE(), 'inflow', (SELECT grand_total FROM tbl_orders WHERE id = p_order_id), 'BDT', 'orders', p_order_id, 'Order collection');
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_create_order`;
 CREATE PROCEDURE `sp_create_order` (IN `p_customer_id` INT, IN `p_order_type` VARCHAR(20), IN `p_order_date` DATE, IN `p_items_json` JSON, IN `p_notes` TEXT, OUT `p_order_id` INT, OUT `p_order_number` VARCHAR(32))   BEGIN
     DECLARE v_order_status_id INT;
     DECLARE v_payment_status_id INT;
@@ -269,8 +277,9 @@ CREATE PROCEDURE `sp_create_order` (IN `p_customer_id` INT, IN `p_order_type` VA
            grand_total = v_grand_total,
            outstanding_amount = v_grand_total - paid_amount
      WHERE id = p_order_id;
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_generate_business_code`;
 CREATE PROCEDURE `sp_generate_business_code` (IN `p_entity_name` VARCHAR(64), IN `p_prefix` VARCHAR(16), OUT `p_code` VARCHAR(64))   BEGIN
     DECLARE v_next_number INT UNSIGNED DEFAULT 0;
     DECLARE v_digit_length TINYINT UNSIGNED DEFAULT 6;
@@ -294,8 +303,9 @@ CREATE PROCEDURE `sp_generate_business_code` (IN `p_entity_name` VARCHAR(64), IN
     COMMIT;
 
     SET p_code = CONCAT(p_prefix, LPAD(v_next_number, v_digit_length, '0'));
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_receive_shipment`;
 CREATE PROCEDURE `sp_receive_shipment` (IN `p_shipment_id` INT, IN `p_purchase_order_id` INT)   BEGIN
     DECLARE v_shipment_cost DECIMAL(12,2) DEFAULT 0.00;
     DECLARE v_total_qty INT DEFAULT 0;
@@ -376,8 +386,9 @@ CREATE PROCEDURE `sp_receive_shipment` (IN `p_shipment_id` INT, IN `p_purchase_o
        SET status_id = (SELECT id FROM tbl_purchase_order_statuses WHERE status_code = 'received' LIMIT 1),
            updated_at = CURRENT_TIMESTAMP
      WHERE id = p_purchase_order_id;
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_refresh_profit_loss`;
 CREATE PROCEDURE `sp_refresh_profit_loss` ()   BEGIN
     INSERT INTO tbl_profit_loss(period_start, period_end, revenue, cogs, gross_profit, expenses, net_profit)
     VALUES (
@@ -396,8 +407,9 @@ CREATE PROCEDURE `sp_refresh_profit_loss` ()   BEGIN
         expenses = VALUES(expenses),
         net_profit = VALUES(net_profit),
         updated_at = CURRENT_TIMESTAMP;
-END$$
+END;
 
+DROP PROCEDURE IF EXISTS `sp_return_order`;
 CREATE PROCEDURE `sp_return_order` (IN `p_order_id` INT, IN `p_return_reason` VARCHAR(255))   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE v_variant_id INT UNSIGNED;
@@ -439,11 +451,12 @@ CREATE PROCEDURE `sp_return_order` (IN `p_order_id` INT, IN `p_return_reason` VA
         (SELECT grand_total FROM tbl_orders WHERE id = p_order_id),
         'Returned goods processed'
     );
-END$$
+END;
 
 --
 -- Functions
 --
+DROP FUNCTION IF EXISTS `fn_calculate_true_product_cost`;
 CREATE FUNCTION `fn_calculate_true_product_cost` (`p_product_id` INT) RETURNS DECIMAL(14,2) READS SQL DATA BEGIN
     DECLARE v_purchase DECIMAL(14,2) DEFAULT 0.00;
     DECLARE v_import DECIMAL(14,2) DEFAULT 0.00;
@@ -503,8 +516,9 @@ CREATE FUNCTION `fn_calculate_true_product_cost` (`p_product_id` INT) RETURNS DE
      WHERE ea.target_type = 'product' AND ea.target_id = p_product_id;
 
     RETURN v_purchase + v_import + v_shipping + v_photoshoot + v_advertising + v_pr + v_packaging + v_misc;
-END$$
+END;
 
+DROP FUNCTION IF EXISTS `fn_get_available_stock`;
 CREATE FUNCTION `fn_get_available_stock` (`p_variant_id` INT, `p_warehouse_id` INT) RETURNS INT(11) READS SQL DATA BEGIN
     DECLARE v_available INT DEFAULT 0;
     SELECT COALESCE(current_stock - reserved_stock, 0)
@@ -512,9 +526,9 @@ CREATE FUNCTION `fn_get_available_stock` (`p_variant_id` INT, `p_warehouse_id` I
       FROM tbl_inventory
      WHERE variant_id = p_variant_id AND warehouse_id = p_warehouse_id;
     RETURN v_available;
-END$$
+END;
 
-DELIMITER ;
+
 
 -- --------------------------------------------------------
 
@@ -743,7 +757,7 @@ CREATE TABLE `tbl_customers` (
 --
 -- Triggers `tbl_customers`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_customers_before_insert` BEFORE INSERT ON `tbl_customers` FOR EACH ROW BEGIN
     IF NEW.customer_code IS NULL OR NEW.customer_code = '' THEN
         CALL sp_generate_business_code('customers', 'CUS', @generated_code);
@@ -753,8 +767,8 @@ CREATE TRIGGER `trg_customers_before_insert` BEFORE INSERT ON `tbl_customers` FO
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -811,7 +825,7 @@ CREATE TABLE `tbl_expenses` (
 --
 -- Triggers `tbl_expenses`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_expenses_before_insert` BEFORE INSERT ON `tbl_expenses` FOR EACH ROW BEGIN
     IF NEW.expense_code IS NULL OR NEW.expense_code = '' THEN
         CALL sp_generate_business_code('expenses', 'EXP', @generated_code);
@@ -821,8 +835,8 @@ CREATE TRIGGER `trg_expenses_before_insert` BEFORE INSERT ON `tbl_expenses` FOR 
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -937,7 +951,7 @@ CREATE TABLE `tbl_income` (
 --
 -- Triggers `tbl_income`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_income_before_insert` BEFORE INSERT ON `tbl_income` FOR EACH ROW BEGIN
     IF NEW.income_code IS NULL OR NEW.income_code = '' THEN
         CALL sp_generate_business_code('income', 'INC', @generated_code);
@@ -947,8 +961,8 @@ CREATE TRIGGER `trg_income_before_insert` BEFORE INSERT ON `tbl_income` FOR EACH
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1029,14 +1043,14 @@ CREATE TABLE `tbl_inventory_batches` (
 --
 -- Triggers `tbl_inventory_batches`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_inventory_batches_before_insert` BEFORE INSERT ON `tbl_inventory_batches` FOR EACH ROW BEGIN
     IF NEW.batch_number IS NULL OR NEW.batch_number = '' THEN
         SET NEW.batch_number = CONCAT('BAT', LPAD((SELECT IFNULL(MAX(id), 0) + 1 FROM tbl_inventory_batches), 8, '0'));
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1063,7 +1077,7 @@ CREATE TABLE `tbl_inventory_transactions` (
 --
 -- Triggers `tbl_inventory_transactions`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_inventory_transactions_after_insert` AFTER INSERT ON `tbl_inventory_transactions` FOR EACH ROW BEGIN
     IF NEW.batch_id IS NULL AND NEW.quantity > 0 THEN
         INSERT INTO tbl_inventory_batches (
@@ -1090,8 +1104,8 @@ CREATE TRIGGER `trg_inventory_transactions_after_insert` AFTER INSERT ON `tbl_in
          WHERE id = NEW.id;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1322,7 +1336,7 @@ CREATE TABLE `tbl_payments` (
 --
 -- Triggers `tbl_payments`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_payments_before_insert` BEFORE INSERT ON `tbl_payments` FOR EACH ROW BEGIN
     IF NEW.payment_code IS NULL OR NEW.payment_code = '' THEN
         CALL sp_generate_business_code('payments', 'PAY', @generated_code);
@@ -1332,8 +1346,8 @@ CREATE TRIGGER `trg_payments_before_insert` BEFORE INSERT ON `tbl_payments` FOR 
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1383,7 +1397,7 @@ CREATE TABLE `tbl_products` (
 --
 -- Triggers `tbl_products`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_products_before_insert` BEFORE INSERT ON `tbl_products` FOR EACH ROW BEGIN
     IF NEW.product_code IS NULL OR NEW.product_code = '' THEN
         CALL sp_generate_business_code('products', 'PRD', @generated_code);
@@ -1393,8 +1407,8 @@ CREATE TRIGGER `trg_products_before_insert` BEFORE INSERT ON `tbl_products` FOR 
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1422,18 +1436,18 @@ CREATE TABLE `tbl_product_cost_history` (
 --
 -- Triggers `tbl_product_cost_history`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_product_cost_history_no_delete` BEFORE DELETE ON `tbl_product_cost_history` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_cost_history is immutable';
 END
-$$
-DELIMITER ;
-DELIMITER $$
+;
+
+
 CREATE TRIGGER `trg_product_cost_history_no_update` BEFORE UPDATE ON `tbl_product_cost_history` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_cost_history is immutable';
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1461,7 +1475,7 @@ CREATE TABLE `tbl_product_cost_ledger` (
 --
 -- Triggers `tbl_product_cost_ledger`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_product_cost_ledger_after_insert` AFTER INSERT ON `tbl_product_cost_ledger` FOR EACH ROW BEGIN
     INSERT INTO tbl_product_cost_history (
         variant_id, cost_date, purchase_cost, import_cost, shipping_cost, packaging_cost, advertising_cost, photoshoot_cost, pr_cost, influencer_cost, miscellaneous_cost, true_cost
@@ -1484,20 +1498,20 @@ CREATE TRIGGER `trg_product_cost_ledger_after_insert` AFTER INSERT ON `tbl_produ
     WHERE pcl.variant_id = NEW.variant_id
       AND pcl.effective_date <= NEW.effective_date;
 END
-$$
-DELIMITER ;
-DELIMITER $$
+;
+
+
 CREATE TRIGGER `trg_product_cost_ledger_no_delete` BEFORE DELETE ON `tbl_product_cost_ledger` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_cost_ledger is immutable';
 END
-$$
-DELIMITER ;
-DELIMITER $$
+;
+
+
 CREATE TRIGGER `trg_product_cost_ledger_no_update` BEFORE UPDATE ON `tbl_product_cost_ledger` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_cost_ledger is immutable';
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1524,18 +1538,18 @@ CREATE TABLE `tbl_product_profit_snapshots` (
 --
 -- Triggers `tbl_product_profit_snapshots`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_product_profit_snapshots_no_delete` BEFORE DELETE ON `tbl_product_profit_snapshots` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_profit_snapshots is immutable';
 END
-$$
-DELIMITER ;
-DELIMITER $$
+;
+
+
 CREATE TRIGGER `trg_product_profit_snapshots_no_update` BEFORE UPDATE ON `tbl_product_profit_snapshots` FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'tbl_product_profit_snapshots is immutable';
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1564,7 +1578,7 @@ CREATE TABLE `tbl_product_variants` (
 --
 -- Triggers `tbl_product_variants`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_product_variants_before_insert` BEFORE INSERT ON `tbl_product_variants` FOR EACH ROW BEGIN
     IF NEW.variant_code IS NULL OR NEW.variant_code = '' THEN
         CALL sp_generate_business_code('product_variants', 'VAR', @generated_code);
@@ -1574,8 +1588,8 @@ CREATE TRIGGER `trg_product_variants_before_insert` BEFORE INSERT ON `tbl_produc
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1625,7 +1639,7 @@ CREATE TABLE `tbl_purchase_orders` (
 --
 -- Triggers `tbl_purchase_orders`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_purchase_orders_before_insert` BEFORE INSERT ON `tbl_purchase_orders` FOR EACH ROW BEGIN
     IF NEW.purchase_order_number IS NULL OR NEW.purchase_order_number = '' THEN
         CALL sp_generate_business_code('purchase_orders', 'PO', @generated_code);
@@ -1635,8 +1649,8 @@ CREATE TRIGGER `trg_purchase_orders_before_insert` BEFORE INSERT ON `tbl_purchas
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1801,7 +1815,7 @@ CREATE TABLE `tbl_shipments` (
 --
 -- Triggers `tbl_shipments`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_shipments_before_insert` BEFORE INSERT ON `tbl_shipments` FOR EACH ROW BEGIN
     IF NEW.shipment_number IS NULL OR NEW.shipment_number = '' THEN
         CALL sp_generate_business_code('shipments', 'SHP', @generated_code);
@@ -1811,8 +1825,8 @@ CREATE TRIGGER `trg_shipments_before_insert` BEFORE INSERT ON `tbl_shipments` FO
         SET NEW.created_at = CURRENT_TIMESTAMP;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -1894,7 +1908,7 @@ CREATE TABLE `tbl_stock_reservations` (
 --
 -- Triggers `tbl_stock_reservations`
 --
-DELIMITER $$
+
 CREATE TRIGGER `trg_stock_reservations_after_insert` AFTER INSERT ON `tbl_stock_reservations` FOR EACH ROW BEGIN
     IF NEW.reservation_status = 'reserved' THEN
         UPDATE tbl_inventory
@@ -1911,9 +1925,9 @@ CREATE TRIGGER `trg_stock_reservations_after_insert` AFTER INSERT ON `tbl_stock_
         END IF;
     END IF;
 END
-$$
-DELIMITER ;
-DELIMITER $$
+;
+
+
 CREATE TRIGGER `trg_stock_reservations_after_update` AFTER UPDATE ON `tbl_stock_reservations` FOR EACH ROW BEGIN
     IF OLD.reservation_status = 'reserved' AND NEW.reservation_status IN ('released', 'cancelled', 'restored') THEN
         UPDATE tbl_inventory
@@ -1930,8 +1944,8 @@ CREATE TRIGGER `trg_stock_reservations_after_update` AFTER UPDATE ON `tbl_stock_
         END IF;
     END IF;
 END
-$$
-DELIMITER ;
+;
+
 
 -- --------------------------------------------------------
 
@@ -3454,6 +3468,7 @@ COMMIT;
 -- =========================================================
 DROP PROCEDURE IF EXISTS sp_generate_business_code;
 
+DROP PROCEDURE IF EXISTS `sp_generate_business_code`;
 CREATE PROCEDURE sp_generate_business_code(
     IN p_entity_name VARCHAR(64),
     IN p_prefix VARCHAR(16),
@@ -3485,14 +3500,15 @@ BEGIN
 END;
 
 
-DELIMITER $$
+
 
 -- 1. Drop the problematic trigger completely
-DROP TRIGGER IF EXISTS trg_inventory_transactions_after_insert$$
+DROP TRIGGER IF EXISTS trg_inventory_transactions_after_insert;
 
 -- 2. Update sp_complete_order to generate batch_id before inserting
-DROP PROCEDURE IF EXISTS sp_complete_order$$
+DROP PROCEDURE IF EXISTS sp_complete_order;
 
+DROP PROCEDURE IF EXISTS `sp_complete_order`;
 CREATE PROCEDURE `sp_complete_order` (IN `p_order_id` INT)   
 BEGIN
     DECLARE v_order_type VARCHAR(20);
@@ -3563,11 +3579,12 @@ BEGIN
     SELECT v_transaction_code, 'order', p_order_id, CURDATE(), grand_total, 'Order income', 'system'
     FROM tbl_orders
     WHERE id = p_order_id;
-END$$
+END;
 
 -- 3. Update sp_receive_shipment to generate batch_id before inserting
-DROP PROCEDURE IF EXISTS sp_receive_shipment$$
+DROP PROCEDURE IF EXISTS sp_receive_shipment;
 
+DROP PROCEDURE IF EXISTS `sp_receive_shipment`;
 CREATE PROCEDURE `sp_receive_shipment` (IN `p_shipment_id` INT, IN `p_purchase_order_id` INT)   
 BEGIN
     DECLARE v_shipment_cost DECIMAL(12,2) DEFAULT 0.00;
@@ -3676,9 +3693,9 @@ BEGIN
        SET status_id = (SELECT id FROM tbl_purchase_order_statuses WHERE status_code = 'received' LIMIT 1),
            updated_at = CURRENT_TIMESTAMP
      WHERE id = p_purchase_order_id;
-END$$
+END;
 
-DELIMITER ;
+
 
 
 -- =========================================================
