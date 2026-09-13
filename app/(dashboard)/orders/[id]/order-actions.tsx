@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,12 +23,13 @@ export default function OrderActions({ orderId, orderStatus }: OrderActionsProps
   const showCancel   = !isDelivered && !isCancelled;
 
   const handleComplete = () => {
-    if (confirm('Confirm this order as DELIVERED? This will deduct the ordered quantities from inventory stock.')) {
+    if (confirm('Confirm this order as DELIVERED?')) {
       startTransition(async () => {
         try {
           const res = await completeOrder(orderId);
           if (res.success) {
-            toast.success('Order marked as Delivered. Inventory updated.');
+            toast.success('Order marked as Delivered.');
+            router.push('/orders');
             router.refresh();
           }
         } catch (error: any) {
@@ -39,12 +40,13 @@ export default function OrderActions({ orderId, orderStatus }: OrderActionsProps
   };
 
   const handleCancel = () => {
-    if (confirm('Cancel this order? Reserved stock will be released back to inventory.')) {
+    if (confirm('Cancel this order?')) {
       startTransition(async () => {
         try {
           const res = await cancelOrder(orderId);
           if (res.success) {
-            toast.success('Order cancelled. Reserved units released.');
+            toast.success('Order cancelled.');
+            router.push('/orders');
             router.refresh();
           }
         } catch (error: any) {
