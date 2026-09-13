@@ -3731,3 +3731,11 @@ VALUES ('USR000001', 'Administrator', 'admin@hazel.com', '$2b$10$AIKJZbA/tVh1gwX
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Insert Default Product Categories
+INSERT INTO tbl_categories (category_code, category_name, is_active, created_by) VALUES
+('CAT0001', 'Sling bag', 1, 'system'),
+('CAT0002', 'Handbag', 1, 'system'),
+('CAT0003', 'Tote bag', 1, 'system'),
+('CAT0004', 'Shoulder bag', 1, 'system')
+ON DUPLICATE KEY UPDATE category_name = VALUES(category_name);
