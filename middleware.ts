@@ -31,6 +31,6 @@ export default withAuth(
 // Protect all routes except auth endpoints, login page, static assets, and favicon
 export const config = {
   matcher: [
-    '/((?!api/auth|login|_next/static|_next/image|favicon.ico|next.svg|vercel.svg|Database).*)',
+    '/((?!api/auth|login|_next/static|_next/image|favicon.ico|next.svg|vercel.svg).*)',
   ],
 };
